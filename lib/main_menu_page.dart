@@ -147,7 +147,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             onPressed: () => {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const RecommandationResultsPage(),
+                  builder: (context) => RecommandationResultsPage(requestString: createRequestString()),
                 ),
               ),
             },
@@ -177,5 +177,36 @@ class _MainMenuPageState extends State<MainMenuPage> {
         ],
       ),
     );
+  }
+
+  String createRequestString() {
+    String requestString = '';
+
+    switch (currentIndex) {
+      case 0:
+        requestString = ' that are funny and lighthearted';
+        break;
+      case 1:
+        requestString = ' that have really good reviews and are not extremely popular';
+        break;
+      case 2:
+        requestString = ' with fun action and adventure';
+        break;
+      case 3:
+        requestString = ' that are ideal for a romantic date';
+        break;
+      case 4:
+        requestString = ' that are family friendly only';
+        break;
+      case 5:
+        requestString = ' that are horror or thriller';
+        break;
+      case 6:
+        requestString = 'that are crowd pleasing';
+        break;
+      default:
+        return 'that are crowd pleasing';
+    }
+    return requestString;
   }
 }

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'secrets.dart';
 
 class RecommandationResultsPage extends StatefulWidget {
-  const RecommandationResultsPage({Key? key}) : super(key: key);
+  final String requestString;
+  const RecommandationResultsPage({Key? key, required this.requestString}) : super(key: key);
 
   @override
   State<RecommandationResultsPage> createState() => _RecommandationResultsPageState();
@@ -37,12 +38,20 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   void askGpt() async {
     final request = ChatCompleteText(messages: [
-      Map.of({"role": "user", "content": 'Recommend me a movie'}),
+      Map.of({
+        "role": "user",
+        "content": 'Return 10 titles (in the format title,title,etc on one line) of movies ${widget.requestString}'
+      }),
     ], maxToken: 200, model: kChatGptTurbo0301Model);
 
     final response = await openAI.onChatCompletion(request: request);
-    for (var element in response!.choices) {
-      print("data -> ${element.message.content}");
+    parseResponse(response!.choices[0].message.content);
+  }
+
+  void parseResponse(String response) {
+    List<String> responseMovies = response.split(',');
+    for (String movie in responseMovies) {
+      //find in TMDB
     }
   }
 }

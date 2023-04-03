@@ -38,6 +38,7 @@ dependencies:
   path_provider: ^2.0.13
   path: ^1.8.2
   chat_gpt_sdk: ^2.0.6
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:

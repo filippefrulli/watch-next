@@ -50,8 +50,6 @@ class HttpService {
   }
 
   fetchMovieDetails(http.Client client, int id) async {
-    const String apiKey = 'e678360d628c81de6ca6771bdeda7abe';
-
     final response = await client.get(
       Uri.https(
         'api.themoviedb.org',
@@ -66,7 +64,6 @@ class HttpService {
   }
 
   // static fetchTvDetails(http.Client client, int id) async {
-  //   const String apiKey = 'e678360d628c81de6ca6771bdeda7abe';
 
   //   final response = await client.get(
   //     Uri.https(

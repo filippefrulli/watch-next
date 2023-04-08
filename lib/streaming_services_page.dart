@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:watch_next/main_menu_page.dart';
 import 'constants.dart';
+import 'services/database_service.dart';
 
 ///This is the page where you enter the movie you saw
 class StreamingServicesPage extends StatefulWidget {
@@ -117,8 +118,8 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                                       }
                                   },
                                 ),
-                            // DatabaseService.saveStreamingServices(
-                            //     selectedServicesIndex, streamingServicesIds, streamingServicesLogos),
+                            DatabaseService.saveStreamingServices(
+                                selectedServicesIndex, streamingServicesIds, streamingServicesLogos),
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (context) => const MainMenuPage(),

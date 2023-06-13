@@ -16,6 +16,7 @@ class MovieDetails {
   String? title;
   double? voteAverage;
   int? voteCount;
+  List<int>? watchProviders;
 
   MovieDetails(
       {this.adult,
@@ -34,7 +35,8 @@ class MovieDetails {
       this.status,
       this.title,
       this.voteAverage,
-      this.voteCount});
+      this.voteCount,
+      this.watchProviders});
 
   MovieDetails.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];

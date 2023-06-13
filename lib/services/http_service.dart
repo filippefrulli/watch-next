@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/watch_providers.dart';
-import 'package:watch_next/secrets.dart';
+import 'package:watch_next/utils/secrets.dart';
 import '../objects/search_results.dart';
 import '../objects/movie_details.dart';
 import 'database_service.dart';
@@ -10,12 +10,13 @@ import 'database_service.dart';
 class HttpService {
   final String apiKey = tmdbApiKey;
 
-  Future<Results> findMovieByTitle(http.Client client, String title) async {
+  Future<Results> findMovieByTitle(http.Client client, String title, String year) async {
     var response = await client.get(
       Uri.https('api.themoviedb.org', '/3/search/movie', {
         'api_key': apiKey,
         'language': 'en-US',
         'query': title,
+        'year': year,
       }),
     );
 
@@ -24,7 +25,10 @@ class HttpService {
     }
     SearchResults? searchResults = SearchResults.fromJson(jsonDecode(response.body));
 
-    return searchResults.results![0];
+    if (searchResults.results!.isNotEmpty) {
+      return searchResults.results![0];
+    }
+    return Results();
   }
 
   Future<MovieDetails> fetchMovieDetails(http.Client client, int id) async {
@@ -41,7 +45,7 @@ class HttpService {
     return details;
   }
 
-  Future<int> getWatchProviders(http.Client client, int id) async {
+  Future<List<int>> getWatchProviders(http.Client client, int id) async {
     final response = await client.get(
       Uri.https(
         'api.themoviedb.org',
@@ -51,9 +55,11 @@ class HttpService {
     );
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String region = prefs.getString('region') ?? 'US';
+    String region = prefs.getString('region') ?? 'DE';
 
     List<String> providers = jsonDecode(response.body)["results"].keys.toList();
+
+    List<int> movieProvidersIds = [];
 
     if (providers.contains(region)) {
       List<int> myProvidersIds = await DatabaseService.getStreamingServicesIds();
@@ -62,13 +68,13 @@ class HttpService {
       if (provider.flatrate != null) {
         for (StreamingType item in provider.flatrate!) {
           if (myProvidersIds.contains(item.providerId)) {
-            return item.providerId!;
+            movieProvidersIds.add(item.providerId!);
           }
         }
       }
     }
 
-    return 0;
+    return movieProvidersIds;
   }
 
   fetchSimilarMovies(http.Client client, int? id) async {

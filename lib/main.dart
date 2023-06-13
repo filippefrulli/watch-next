@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/main_menu_page.dart';
-import 'package:watch_next/region_page.dart';
+import 'package:watch_next/pages/region_page.dart';
+
+import 'pages/main_menu_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
       },
       theme: ThemeData(
         colorScheme: theme.colorScheme.copyWith(
-          primary: Colors.grey[900],
+          primary: const Color.fromRGBO(13, 6, 59, 1),
           secondary: Colors.orange,
           brightness: Brightness.dark,
         ),
@@ -84,6 +85,16 @@ class MyApp extends StatelessWidget {
             color: Colors.orange,
             fontWeight: FontWeight.w400,
             letterSpacing: 1.2,
+          ),
+          bodySmall: TextStyle(
+            fontSize: 15.0,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w400,
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 16.0,
+            color: Colors.grey[400],
+            fontWeight: FontWeight.w400,
           ),
         ),
       ),
@@ -135,10 +146,10 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  MainMovieListState createState() => MainMovieListState();
+  HomePageState createState() => HomePageState();
 }
 
-class MainMovieListState extends State<HomePage> with TickerProviderStateMixin<HomePage> {
+class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePage> {
   @override
   void initState() {
     super.initState();
@@ -146,17 +157,22 @@ class MainMovieListState extends State<HomePage> with TickerProviderStateMixin<H
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: Theme.of(context).primaryColor,
-      statusBarColor: Colors.transparent,
-    ));
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark));
+
+//Setting SystmeUIMode
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
 
     return WillPopScope(
       onWillPop: () async => false,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        body: const MainMenuPage(),
+      child: const Scaffold(
+        backgroundColor: Color.fromRGBO(11, 14, 23, 1),
+        body: MainMenuPage(),
       ),
     );
   }

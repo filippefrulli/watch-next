@@ -1,7 +1,33 @@
 import 'package:sqflite/sqflite.dart';
-import '../../../database.dart';
+import '../utils/database.dart';
 
 class DatabaseService {
+  static Future<List<Map>> getAllSeen() async {
+    Database? db = await DatabaseHelper.instance.database;
+
+    return await db!.rawQuery('SELECT TOP 50 * FROM already_watched ORDER BY date DESC');
+  }
+
+  static insertSeenMovie(int movieId) async {
+    Database? db = await DatabaseHelper.instance.database;
+
+    await db!.rawInsert(
+        'INSERT OR REPLACE INTO already_watched (movie_id, date) VALUES (?, ?)', [movieId, DateTime.now().toString()]);
+  }
+
+  static Future<List<Map>> getAllNotInterested() async {
+    Database? db = await DatabaseHelper.instance.database;
+
+    return await db!.rawQuery('SELECT TOP 50 * FROM not_interested ORDER BY date DESC');
+  }
+
+  static insertNotInterested(int movieId) async {
+    Database? db = await DatabaseHelper.instance.database;
+
+    await db!.rawInsert(
+        'INSERT OR REPLACE INTO not_interested (movie_id, date) VALUES (?, ?)', [movieId, DateTime.now().toString()]);
+  }
+
   static Future<List<Map>> getAllStreamingServices() async {
     Database? db = await DatabaseHelper.instance.database;
 

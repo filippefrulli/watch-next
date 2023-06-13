@@ -39,12 +39,27 @@ dependencies:
   path: ^1.8.2
   chat_gpt_sdk: ^2.0.6
   http: ^0.13.5
+  cached_network_image: ^3.2.3
+  loading_animation_widget: ^1.2.0+4
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^2.0.0
+
+flutter_launcher_icons:
+  android: true
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/icon_smol.png"
+  ios: true
+  image_path: "assets/icon.png"
+  remove_alpha_ios: true
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  macos:
+    generate: true
+    image_path: "assets/icon.png"
   
 
 flutter:
@@ -60,6 +75,7 @@ flutter:
     - assets/streaming_services/paramount+.png
     - assets/streaming_services/peacock.png
     - assets/streaming_services/prime_video.png
+    - assets/TMDb.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

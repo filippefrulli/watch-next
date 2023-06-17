@@ -58,7 +58,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     return Column(
       children: [
         const SizedBox(
-          height: 48,
+          height: 16,
         ),
         Text(
           'Here is our recommendation',
@@ -107,7 +107,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       child: Column(
         children: [
           Expanded(
-            flex: 16,
+            flex: 20,
             child: recommandationsElementWidget(
               selectedMovie.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
             ),
@@ -117,7 +117,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Container(),
           ),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: streamingWidget(),
           ),
           Expanded(
@@ -125,7 +125,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Container(),
           ),
           Expanded(
-            flex: 2,
+            flex: 3,
             child: buttonsRow(),
           ),
           Expanded(
@@ -186,7 +186,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         delay: const Duration(milliseconds: 1000),
         child: Container(
           padding: const EdgeInsets.all(8),
-          height: 50,
+          height: 46,
           width: 80,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),

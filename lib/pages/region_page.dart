@@ -1,7 +1,6 @@
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/main.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
 import 'streaming_services_page.dart';
 

@@ -306,7 +306,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         Map.of({
           "role": "user",
           "content":
-              'Return 20 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! '
+              'Return 30 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! '
         }),
       ],
       maxToken: 200,

@@ -16,7 +16,7 @@ class MainMenuPage extends StatefulWidget {
 int currentIndex = -1;
 
 final openAI = OpenAI.instance
-    .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), isLog: true);
+    .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
 
 final _controller = TextEditingController();
 
@@ -309,18 +309,17 @@ class _MainMenuPageState extends State<MainMenuPage> {
   validateQuery() async {
     final request = ChatCompleteText(
       messages: [
-        Map.of({
-          "role": "user",
-          "content":
-              'Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: "Recommend a movie that is romantic and funny, ideal for a first date", "Recommend a movie starring Tom Cruise and directed by Steven Spielberg", "Recommend a movie about artificial intelligence, with good reviews". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie ${_controller.text}'
-        }),
+        Messages(
+            role: Role.assistant,
+            content:
+                'Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: "Recommend a movie that is romantic and funny, ideal for a first date", "Recommend a movie starring Tom Cruise and directed by Steven Spielberg", "Recommend a movie about artificial intelligence, with good reviews". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie ${_controller.text}'),
       ],
       maxToken: 200,
-      model: kChatGptTurbo0301Model,
+      model: GptTurbo0631Model(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
-    if (response!.choices[0].message.content == "YES") {
+    if (response!.choices[0].message!.content == "YES") {
       setState(() {
         isValidQuery = true;
         enableLoading = false;

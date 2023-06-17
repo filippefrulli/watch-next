@@ -21,7 +21,7 @@ class RecommandationResultsPage extends StatefulWidget {
 
 class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   final openAI = OpenAI.instance
-      .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), isLog: true);
+      .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
 
   int index = 0;
   int length = 0;
@@ -303,18 +303,17 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Future<dynamic> askGpt() async {
     final request = ChatCompleteText(
       messages: [
-        Map.of({
-          "role": "user",
-          "content":
-              'Return 30 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! '
-        }),
+        Messages(
+            role: Role.assistant,
+            content:
+                'Return 30 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! '),
       ],
       maxToken: 200,
-      model: kChatGptTurbo0301Model,
+      model: GptTurbo0631Model(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
-    return parseResponse(response!.choices[0].message.content).then(
+    return parseResponse(response!.choices[0].message!.content).then(
       (value) => filterProviders(value),
     );
   }

@@ -1,5 +1,6 @@
 class WatchProviders {
   int? id;
+  // ignore: prefer_typing_uninitialized_variables
   var results;
 
   WatchProviders({this.id, this.results});

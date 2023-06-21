@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
@@ -14,7 +16,7 @@ class StreamingServicesPage extends StatefulWidget {
 }
 
 class _StreamingServicesPage extends State<StreamingServicesPage> with TickerProviderStateMixin {
-  List<int> streamingServicesIds = [8, 9, 350, 337, 384, 15, 531, 386];
+  List<int> streamingServicesIds = List<int>.empty(growable: true);
 
   List<bool> selectedStreamingServices = [
     false,
@@ -31,6 +33,11 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
 
   @override
   void initState() {
+    if (Platform.isAndroid) {
+      streamingServicesIds = [8, 9, 350, 337, 384, 15, 531, 386];
+    } else {
+      streamingServicesIds = [8, 9, 350, 384, 15, 531, 386];
+    }
     super.initState();
   }
 
@@ -96,7 +103,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                 padding: const EdgeInsets.all(12),
                 child: Center(
                   child: Image.asset(
-                    streamingServicesLogos[index],
+                    Platform.isIOS ? streamingServicesLogosIos[index] : streamingServicesLogos[index],
                     fit: BoxFit.fill,
                   ),
                 ),
@@ -127,11 +134,13 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                         );
                     await DatabaseService.saveStreamingServices(
                         selectedServicesIndex, streamingServicesIds, streamingServicesLogos);
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const MainMenuPage(),
-                      ),
-                    );
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const MainMenuPage(),
+                        ),
+                      );
+                    }
                   },
                   child: Text(
                     'Close',

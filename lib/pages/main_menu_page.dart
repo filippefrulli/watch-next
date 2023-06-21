@@ -26,20 +26,11 @@ bool enableLoading = false;
 bool enableWrongQuery = false;
 
 class _MainMenuPageState extends State<MainMenuPage> {
-  final Map<int, String> availableCategories = {
-    0: 'Lean back and relax',
-    1: 'Quality cinema',
-    2: 'Action packed',
-    3: 'Romantic date',
-    4: 'For children',
-    5: 'Horror night',
-    6: 'Anything',
-  };
-
   @override
   void initState() {
     super.initState();
     _controller.addListener(checkLength);
+    _controller.text = ' ';
   }
 
   @override
@@ -127,9 +118,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget description() {
     return Text(
-      "To get your recommandation, fill out the prompt",
+      "Find something to watch next",
       textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.displaySmall,
+      style: Theme.of(context).textTheme.displayMedium,
     );
   }
 
@@ -144,8 +135,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color.fromRGBO(35, 35, 50, 1),
-        hintText: 'Recommend a movie...',
-        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 18, fontStyle: FontStyle.italic),
+        helperText: 'Complete the sentence (at least 6 characters)',
+        prefixText: "Recommend a movie... ",
+        suffixText: "",
+        helperStyle: TextStyle(color: Colors.grey[500], fontSize: 12, fontStyle: FontStyle.italic),
+        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 12, fontStyle: FontStyle.italic),
         contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.orange, width: 2.0),
@@ -227,7 +221,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   enableLoading = true;
                 });
                 await validateQuery();
-                if (isValidQuery) {
+                if (isValidQuery && context.mounted) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => RecommandationResultsPage(requestString: _controller.text),
@@ -315,7 +309,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 'Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: "Recommend a movie that is romantic and funny, ideal for a first date", "Recommend a movie starring Tom Cruise and directed by Steven Spielberg", "Recommend a movie about artificial intelligence, with good reviews". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie ${_controller.text}'),
       ],
       maxToken: 200,
-      model: GptTurbo0631Model(),
+      model: GptTurbo0301ChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);

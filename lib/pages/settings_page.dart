@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/pages/region_page.dart';
 import 'package:watch_next/pages/streaming_services_page.dart';
 import 'package:watch_next/widgets/divider.dart';
@@ -72,24 +76,23 @@ class _SettingsPageState extends State<SettingsPage> {
             const DividerWidget(padding: 0, height: 32),
             TextButton(
               child: _row(("Rate the app"), Icons.star),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegionIntroPage(),
-                  ),
-                );
+              onPressed: () async {
+                if (Platform.isAndroid) {
+                  final Uri url =
+                      Uri.parse('https://play.google.com/store/apps/details?id=com.filippefrulli.watch_next');
+                  if (!await launchUrl(url)) {
+                    throw Exception('Could not launch url');
+                  }
+                }
               },
             ),
             TextButton(
               child: _row(("Share"), Icons.share),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegionIntroPage(),
-                  ),
-                );
+                if (Platform.isAndroid) {
+                  Share.share(
+                      'Check out my app: https://play.google.com/store/apps/details?id=com.filippefrulli.watch_next');
+                }
               },
             ),
             const DividerWidget(padding: 0, height: 32),

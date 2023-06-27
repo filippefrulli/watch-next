@@ -49,24 +49,39 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget body() {
-    return SingleChildScrollView(
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.9,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            const SizedBox(height: 48),
-            topBar(),
-            const SizedBox(
-              height: 120,
+            Expanded(
+              flex: 2,
+              child: topBar(),
             ),
-            description(),
-            const SizedBox(height: 32),
-            promptInput(),
-            const SizedBox(height: 32),
-            promptExample(),
-            const SizedBox(height: 32),
-            goButton(),
-            const SizedBox(height: 32),
+            Expanded(
+              flex: 1,
+              child: Container(),
+            ),
+            Expanded(
+              flex: 1,
+              child: description(),
+            ),
+            Expanded(
+              flex: 2,
+              child: promptInput(),
+            ),
+            Expanded(
+              flex: 3,
+              child: promptExample(),
+            ),
+            Expanded(
+              child: Container(),
+            ),
+            Expanded(
+              flex: 2,
+              child: goButton(),
+            ),
             enableWrongQuery ? invalidPrompt() : Container(),
           ],
         ),
@@ -138,8 +153,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
         helperText: 'Complete the sentence (at least 6 characters)',
         prefixText: "Recommend a movie... ",
         suffixText: "",
-        helperStyle: TextStyle(color: Colors.grey[500], fontSize: 12, fontStyle: FontStyle.italic),
-        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 12, fontStyle: FontStyle.italic),
+        helperStyle: TextStyle(
+          color: Colors.grey[500],
+          fontSize: 12,
+        ),
+        hintStyle: TextStyle(
+          color: Colors.grey[500],
+          fontSize: 12,
+        ),
         contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.orange, width: 2.0),
@@ -293,7 +314,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         isLongEnough = true;
       });
     }
-    if (_controller.text.length < 5 && isLongEnough) {
+    if (_controller.text.length < 5 && isLongEnough && context.mounted) {
       setState(() {
         isLongEnough = false;
       });

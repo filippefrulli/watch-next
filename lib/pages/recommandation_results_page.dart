@@ -61,7 +61,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     return Column(
       children: [
         const SizedBox(
-          height: 48,
+          height: 16,
         ),
         FutureBuilder<dynamic>(
           future: resultList,
@@ -108,7 +108,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   Widget recommandationContent(MovieDetails selectedMovie) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.85,
+      height: MediaQuery.of(context).size.height * 0.88,
       child: Column(
         children: [
           Expanded(
@@ -122,7 +122,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Container(),
           ),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: streamingWidget(),
           ),
           Expanded(
@@ -130,11 +130,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Container(),
           ),
           Expanded(
-            flex: 2,
+            flex: 3,
             child: buttonsRow(),
           ),
           Expanded(
-            flex: 2,
+            flex: 1,
             child: Container(),
           ),
         ],
@@ -230,8 +230,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             color: Colors.grey[300],
           ),
           child: Platform.isIOS
-              ? Image.asset(providersMap[selectedMovie.watchProviders!.first]!)
-              : Image.asset(providersMapIos[selectedMovie.watchProviders!.first]!),
+              ? Image.asset(providersMapIos[selectedMovie.watchProviders!.first]!)
+              : Image.asset(providersMap[selectedMovie.watchProviders!.first]!),
         ),
       );
     } else {
@@ -255,7 +255,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       child: DelayedDisplay(
         delay: const Duration(milliseconds: 100),
         child: Container(
-          height: 60,
+          height: 50,
           width: 150,
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(
@@ -274,40 +274,6 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Text(
               'Accept',
               style: Theme.of(context).textTheme.labelMedium,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget notInterestedButton() {
-    return Center(
-      child: DelayedDisplay(
-        delay: const Duration(milliseconds: 100),
-        child: Container(
-          height: 60,
-          width: 150,
-          decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(25),
-              ),
-              border: Border.all(
-                color: Colors.grey[300]!,
-                width: 1,
-              )),
-          child: TextButton(
-            onPressed: () {
-              DatabaseService.insertNotInterested(selectedMovie.id!);
-              setState(() {
-                if (index < length - 1) {
-                  index++;
-                }
-              });
-            },
-            child: Text(
-              'Not interested',
-              style: Theme.of(context).textTheme.displaySmall,
             ),
           ),
         ),

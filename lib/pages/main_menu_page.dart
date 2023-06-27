@@ -16,7 +16,7 @@ class MainMenuPage extends StatefulWidget {
 int currentIndex = -1;
 
 final openAI = OpenAI.instance
-    .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), isLog: true);
+    .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
 
 final _controller = TextEditingController();
 
@@ -26,20 +26,11 @@ bool enableLoading = false;
 bool enableWrongQuery = false;
 
 class _MainMenuPageState extends State<MainMenuPage> {
-  final Map<int, String> availableCategories = {
-    0: 'Lean back and relax',
-    1: 'Quality cinema',
-    2: 'Action packed',
-    3: 'Romantic date',
-    4: 'For children',
-    5: 'Horror night',
-    6: 'Anything',
-  };
-
   @override
   void initState() {
     super.initState();
     _controller.addListener(checkLength);
+    _controller.text = ' ';
   }
 
   @override
@@ -58,24 +49,39 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget body() {
-    return SingleChildScrollView(
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.9,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            const SizedBox(height: 48),
-            topBar(),
-            const SizedBox(
-              height: 120,
+            Expanded(
+              flex: 2,
+              child: topBar(),
             ),
-            description(),
-            const SizedBox(height: 32),
-            promptInput(),
-            const SizedBox(height: 32),
-            promptExample(),
-            const SizedBox(height: 32),
-            goButton(),
-            const SizedBox(height: 32),
+            Expanded(
+              flex: 1,
+              child: Container(),
+            ),
+            Expanded(
+              flex: 1,
+              child: description(),
+            ),
+            Expanded(
+              flex: 2,
+              child: promptInput(),
+            ),
+            Expanded(
+              flex: 3,
+              child: promptExample(),
+            ),
+            Expanded(
+              child: Container(),
+            ),
+            Expanded(
+              flex: 2,
+              child: goButton(),
+            ),
             enableWrongQuery ? invalidPrompt() : Container(),
           ],
         ),
@@ -127,9 +133,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget description() {
     return Text(
-      "To get your recommandation, fill out the prompt",
+      "Find something to watch next",
       textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.displaySmall,
+      style: Theme.of(context).textTheme.displayMedium,
     );
   }
 
@@ -144,8 +150,17 @@ class _MainMenuPageState extends State<MainMenuPage> {
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color.fromRGBO(35, 35, 50, 1),
-        hintText: 'Recommend a movie...',
-        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 18, fontStyle: FontStyle.italic),
+        helperText: 'Complete the sentence (at least 6 characters)',
+        prefixText: "Recommend a movie... ",
+        suffixText: "",
+        helperStyle: TextStyle(
+          color: Colors.grey[500],
+          fontSize: 12,
+        ),
+        hintStyle: TextStyle(
+          color: Colors.grey[500],
+          fontSize: 12,
+        ),
         contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.orange, width: 2.0),
@@ -227,7 +242,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   enableLoading = true;
                 });
                 await validateQuery();
-                if (isValidQuery) {
+                if (isValidQuery && context.mounted) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => RecommandationResultsPage(requestString: _controller.text),
@@ -299,7 +314,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         isLongEnough = true;
       });
     }
-    if (_controller.text.length < 5 && isLongEnough) {
+    if (_controller.text.length < 5 && isLongEnough && context.mounted) {
       setState(() {
         isLongEnough = false;
       });
@@ -309,18 +324,17 @@ class _MainMenuPageState extends State<MainMenuPage> {
   validateQuery() async {
     final request = ChatCompleteText(
       messages: [
-        Map.of({
-          "role": "user",
-          "content":
-              'Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: "Recommend a movie that is romantic and funny, ideal for a first date", "Recommend a movie starring Tom Cruise and directed by Steven Spielberg", "Recommend a movie about artificial intelligence, with good reviews". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie ${_controller.text}'
-        }),
+        Messages(
+            role: Role.assistant,
+            content:
+                'Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: "Recommend a movie that is romantic and funny, ideal for a first date", "Recommend a movie starring Tom Cruise and directed by Steven Spielberg", "Recommend a movie about artificial intelligence, with good reviews". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie ${_controller.text}'),
       ],
       maxToken: 200,
-      model: kChatGptTurbo0301Model,
+      model: GptTurbo0301ChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
-    if (response!.choices[0].message.content == "YES") {
+    if (response!.choices[0].message!.content == "YES") {
       setState(() {
         isValidQuery = true;
         enableLoading = false;

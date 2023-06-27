@@ -42,10 +42,10 @@ class Results {
   String? originalLanguage;
   String? title;
   String? backdropPath;
-  var popularity;
+  double? popularity;
   int? voteCount;
   bool? video;
-  var voteAverage;
+  double? voteAverage;
 
   Results(
       {this.posterPath,

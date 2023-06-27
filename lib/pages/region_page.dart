@@ -238,7 +238,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 bool seen = (prefs.getBool('skip_intro') ?? false);
-                if (seen) {
+                if (seen && context.mounted) {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) => const MainMenuPage(),

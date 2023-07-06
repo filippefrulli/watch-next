@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/widgets/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
   const MainMenuPage({Key? key}) : super(key: key);
@@ -23,9 +28,11 @@ final _controller = TextEditingController();
 bool isLongEnough = false;
 bool isValidQuery = false;
 bool enableLoading = false;
-bool enableWrongQuery = false;
+bool hideExample = false;
 
 class _MainMenuPageState extends State<MainMenuPage> {
+  bool noInternet = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,7 +48,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.renderView.automaticSystemUiAdjustment = false;
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     return Scaffold(
       backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
       body: body(),
@@ -55,34 +62,37 @@ class _MainMenuPageState extends State<MainMenuPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
+            const SizedBox(height: 12),
             Expanded(
-              flex: 2,
+              flex: 1,
               child: topBar(),
             ),
             Expanded(
-              flex: 1,
+              flex: 2,
               child: Container(),
             ),
             Expanded(
               flex: 1,
               child: description(),
             ),
+            const SizedBox(height: 12),
             Expanded(
-              flex: 2,
+              flex: 4,
               child: promptInput(),
             ),
             Expanded(
-              flex: 3,
-              child: promptExample(),
+              flex: 4,
+              child: hideExample ? Container() : promptExample(),
             ),
             Expanded(
+              flex: 1,
               child: Container(),
             ),
             Expanded(
               flex: 2,
               child: goButton(),
             ),
-            enableWrongQuery ? invalidPrompt() : Container(),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -171,7 +181,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
           borderRadius: BorderRadius.circular(15),
         ),
       ),
-      onSubmitted: (String value) async {},
     );
   }
 
@@ -202,28 +211,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
-  Widget lastSearches() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Last searches:',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• that is romantic and funny, ideal for a first date',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• starring Tom Cruise and directed by Steven Spielberg',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-
   Widget goButton() {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -237,19 +224,39 @@ class _MainMenuPageState extends State<MainMenuPage> {
               padding: const EdgeInsets.all(0),
             ),
             onPressed: () async {
-              if (isLongEnough) {
-                setState(() {
-                  enableLoading = true;
-                });
-                await validateQuery();
-                if (isValidQuery && context.mounted) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => RecommandationResultsPage(requestString: _controller.text),
-                    ),
-                  );
+              FocusScope.of(context).unfocus();
+              await checkConnection();
+              if (noInternet) {
+                showToastWidget(
+                  const ToastWidget(
+                    title: ('Please connect to the internet and try again'),
+                    icon: Icon(Icons.cloud_off, color: Colors.orange, size: 36),
+                  ),
+                  duration: const Duration(seconds: 4),
+                );
+              } else {
+                if (isLongEnough && mounted) {
+                  setState(() {
+                    enableLoading = true;
+                  });
+                  await validateQuery();
+                  if (isValidQuery && context.mounted) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => RecommandationResultsPage(requestString: _controller.text),
+                      ),
+                    );
+                  } else {
+                    showToastWidget(
+                      const ToastWidget(
+                        title: ('Inalid input, please change your query and try again'),
+                        icon: Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
+                      ),
+                      duration: const Duration(seconds: 4),
+                    );
+                  }
                 }
-              } else {}
+              }
             },
             child: Container(
               height: 60,
@@ -284,37 +291,18 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
-  Widget invalidPrompt() {
-    return Container(
-      width: MediaQuery.of(context).size.width - 32,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: const Color.fromRGBO(35, 35, 50, 1),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.dangerous_outlined, color: Colors.red, size: 40),
-          const SizedBox(width: 16),
-          Flexible(
-            child: Text(
-              "Invalid prompt.\n\nPlease change your query and try again",
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void checkLength() {
-    if (_controller.text.length > 5) {
+    if (_controller.text.isNotEmpty && mounted) {
+      setState(() {
+        hideExample = true;
+      });
+    }
+    if (_controller.text.length > 5 && mounted) {
       setState(() {
         isLongEnough = true;
       });
     }
-    if (_controller.text.length < 5 && isLongEnough && context.mounted) {
+    if (_controller.text.length < 5 && mounted) {
       setState(() {
         isLongEnough = false;
       });
@@ -334,17 +322,30 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
 
     final response = await openAI.onChatCompletion(request: request);
-    if (response!.choices[0].message!.content == "YES") {
+    if (response!.choices[0].message!.content == "YES" && mounted) {
       setState(() {
         isValidQuery = true;
         enableLoading = false;
-        enableWrongQuery = false;
       });
     } else {
       setState(() {
         isValidQuery = false;
         enableLoading = false;
-        enableWrongQuery = true;
+      });
+    }
+  }
+
+  Future<void> checkConnection() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() {
+          noInternet = false;
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        noInternet = true;
       });
     }
   }

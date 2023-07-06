@@ -7,7 +7,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/movie_details.dart';
-import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/utils/constants.dart';
 import 'package:watch_next/utils/secrets.dart';
@@ -28,6 +27,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   int index = 0;
   int length = 0;
+  bool askingGpt = false;
+  bool fetchingMovieInfo = false;
+  bool filtering = false;
   MovieDetails selectedMovie = MovieDetails();
 
   Map<int, String> streamingServices = {
@@ -61,7 +63,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     return Column(
       children: [
         const SizedBox(
-          height: 16,
+          height: 32,
         ),
         FutureBuilder<dynamic>(
           future: resultList,
@@ -194,37 +196,67 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   }
 
   Widget streamingWidget() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: DelayedDisplay(
-        delay: const Duration(milliseconds: 1000),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Watch it on:',
-                textAlign: TextAlign.left,
-                style: Theme.of(context).textTheme.displaySmall,
+    return Row(
+      children: [
+        Expanded(
+          child: Container(),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Watch it on:',
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            streamingOption(),
+          ],
+        ),
+        Expanded(
+          child: Container(),
+        ),
+        TextButton(
+          onPressed: () {},
+          child: Container(
+            height: 50,
+            width: 100,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(15),
               ),
-              const SizedBox(height: 8),
-              streamingOptions(),
-            ],
+              color: Colors.grey[800],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Info",
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                const Icon(Icons.expand_less, size: 32, color: Colors.white),
+              ],
+            ),
           ),
         ),
-      ),
+        Expanded(
+          child: Container(),
+        ),
+      ],
     );
   }
 
-  Widget streamingOptions() {
+  Widget streamingOption() {
     if (selectedMovie.watchProviders != null) {
       return DelayedDisplay(
         delay: const Duration(milliseconds: 1000),
         child: Container(
           padding: const EdgeInsets.all(8),
-          height: 46,
-          width: 80,
+          height: 50,
+          width: 100,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: Colors.grey[300],
@@ -288,17 +320,31 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Generating your suggestions",
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(
-              height: 32,
-            ),
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.orange,
               size: 50,
             ),
+            const SizedBox(
+              height: 16,
+            ),
+            askingGpt
+                ? Text(
+                    "Generating recommendations",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  )
+                : Container(),
+            fetchingMovieInfo
+                ? Text(
+                    "Fetching movie information",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  )
+                : Container(),
+            filtering
+                ? Text(
+                    "Filtering by your services",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -306,6 +352,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   }
 
   Future<dynamic> askGpt() async {
+    setState(() {
+      askingGpt = true;
+    });
     final request = ChatCompleteText(
       messages: [
         Messages(
@@ -318,12 +367,20 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
 
     final response = await openAI.onChatCompletion(request: request);
+
+    setState(() {
+      askingGpt = false;
+    });
+
     return parseResponse(response!.choices[0].message!.content).then(
       (value) => filterProviders(value),
     );
   }
 
   parseResponse(String response) async {
+    setState(() {
+      fetchingMovieInfo = true;
+    });
     List<MovieDetails> movieList = [];
     List<String> responseMovies = response.split(',,');
     if (responseMovies.isEmpty) {
@@ -352,10 +409,18 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       } else {}
     }
 
+    setState(() {
+      fetchingMovieInfo = false;
+    });
+
     return movieList;
   }
 
   filterProviders(List<MovieDetails> movieList) async {
+    setState(() {
+      filtering = true;
+    });
+
     Map<int, MovieDetails> movieMap = {};
     for (MovieDetails movie in List<MovieDetails>.from(movieList)) {
       await HttpService().getWatchProviders(http.Client(), movie.id!).then((value) => {
@@ -366,6 +431,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               }
           });
     }
+    setState(() {
+      filtering = false;
+    });
     if (movieMap.values.toList().isEmpty) {
       Navigator.of(context).pop();
       Fluttertoast.showToast(

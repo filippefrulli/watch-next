@@ -45,6 +45,8 @@ dependencies:
   share_plus: ^7.0.2
   url_launcher: ^6.1.11
   fluttertoast: ^8.2.2
+  sliding_up_panel: ^2.0.0+1
+  oktoast: ^3.3.1
 
 dev_dependencies:
   flutter_test:

@@ -1,12 +1,17 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:watch_next/objects/movie_credits.dart';
 import 'package:watch_next/objects/movie_details.dart';
+import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/utils/constants.dart';
 import 'package:watch_next/utils/secrets.dart';
@@ -31,19 +36,19 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   bool fetchingMovieInfo = false;
   bool filtering = false;
   MovieDetails selectedMovie = MovieDetails();
-
-  Map<int, String> streamingServices = {
-    8: 'Netflix',
-    9: 'Amazon Prime Video',
-    350: 'Disney+',
-    337: 'HBO Max',
-    384: 'Hulu',
-    15: 'Apple TV+',
-    531: 'Peacock',
-    386: 'Paramount+',
-  };
+  PanelController pc = PanelController();
 
   late Future<dynamic> resultList;
+  Future<MovieCredits> movieCredits = Future.value(MovieCredits());
+
+  String? trailerUrl = '';
+  String? title = '';
+
+  List<TrailerResults> trailerList = [];
+  List<String> trailerImages = [];
+
+  String thumbnail = "https://i.ytimg.com//vi//d_m5csmrf7I//hqdefault.jpg";
+  String baseUrl = 'https://www.youtube.com/watch?v=';
 
   @override
   initState() {
@@ -55,7 +60,21 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      body: pageBody(),
+      body: SlidingUpPanel(
+        controller: pc,
+        margin: const EdgeInsets.all(8.0),
+        panel: movieInfoPanel(),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(25),
+        ),
+        collapsed: Container(),
+        minHeight: 0,
+        maxHeight: MediaQuery.of(context).size.height * 0.80,
+        backdropEnabled: true,
+        backdropOpacity: 0.8,
+        color: Theme.of(context).primaryColor,
+        body: pageBody(),
+      ),
     );
   }
 
@@ -217,7 +236,17 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           child: Container(),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () async {
+            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedMovie.id!);
+            HttpService().fetchTrailer(http.Client(), selectedMovie.id!).then((value) {
+              setState(() {
+                trailerList = value;
+              });
+
+              waitForImages();
+            });
+            pc.open();
+          },
           child: Container(
             height: 50,
             width: 100,
@@ -351,6 +380,111 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
   }
 
+  Widget movieInfoPanel() {
+    return DelayedDisplay(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Center(
+              child: Container(width: 50, height: 5, color: Colors.grey[800]),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: Container()),
+                Text(
+                  selectedMovie.title ?? '',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Expanded(child: Container()),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(height: 1, color: Colors.grey[800]),
+            const SizedBox(height: 16),
+            Text(selectedMovie.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
+            const SizedBox(height: 16),
+            Container(height: 1, color: Colors.grey[800]),
+            const SizedBox(height: 16),
+            FutureBuilder<dynamic>(
+              future: movieCredits,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(
+                    "Director: ${getDirector(snapshot.data)}",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "TMDB score: ${selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''}",
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 16),
+            Container(height: 1, color: Colors.grey[800]),
+            const SizedBox(height: 16),
+            Text(
+              "Trailers:",
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            trailerWidget(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget trailerWidget() {
+    if (trailerList.isNotEmpty && trailerImages.isNotEmpty) {
+      return DelayedDisplay(
+        child: SizedBox(
+          height: 172,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: trailerList.length,
+            itemBuilder: (context, index) {
+              trailerUrl = trailerList[index].key;
+              title = trailerList[index].name;
+              thumbnail = trailerImages[index];
+              return TextButton(
+                onPressed: () => _launchURL(trailerUrl!),
+                child: SizedBox(
+                  height: 158,
+                  width: 160,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 124,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: CachedNetworkImage(imageUrl: thumbnail),
+                        ),
+                      ),
+                      Text(
+                        title!,
+                        maxLines: 2,
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
   Future<dynamic> askGpt() async {
     setState(() {
       askingGpt = true;
@@ -423,13 +557,20 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
     Map<int, MovieDetails> movieMap = {};
     for (MovieDetails movie in List<MovieDetails>.from(movieList)) {
-      await HttpService().getWatchProviders(http.Client(), movie.id!).then((value) => {
-            if (value.isNotEmpty)
-              {
-                movie.watchProviders = value,
-                movieMap[movie.id!] = movie,
-              }
-          });
+      await HttpService()
+          .getWatchProviders(
+            http.Client(),
+            movie.id!,
+          )
+          .then(
+            (value) => {
+              if (value.isNotEmpty)
+                {
+                  movie.watchProviders = value,
+                  movieMap[movie.id!] = movie,
+                }
+            },
+          );
     }
     setState(() {
       filtering = false;
@@ -447,5 +588,56 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     } else {
       return movieMap.values.toList();
     }
+  }
+
+  String getDirector(MovieCredits credits) {
+    ///this retrieves the first director of the movie
+    List<Crew>? list = credits.crew;
+    int index;
+    if (list == null) {
+      return "";
+    }
+    index = list.indexWhere((crew) => crew.job == "Director");
+
+    return list[index].name!;
+  }
+
+  _launchURL(String trailerUrl) async {
+    Uri uri = Uri.parse(baseUrl + trailerUrl);
+    if (Platform.isIOS) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      } else {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          throw 'Could not launch trailer';
+        }
+      }
+    } else {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        throw 'Could not launch $uri';
+      }
+    }
+  }
+
+  getTrailerImages() async {
+    trailerImages = [];
+    for (int i = 0; i < trailerList.length; i++) {
+      var jsonData = await HttpService().getDetail(baseUrl + trailerList[i].key!);
+      if (jsonData != null) {
+        String thumbnail = jsonData['thumbnail_url'];
+        trailerImages.add(thumbnail);
+      } else {
+        trailerImages.add('https://i.ytimg.com//vi//d_m5csmrf7I//hqdefault.jpg');
+      }
+    }
+  }
+
+  waitForImages() async {
+    await getTrailerImages();
+    setState(() {});
   }
 }

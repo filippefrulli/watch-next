@@ -38,6 +38,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     super.initState();
     _controller.addListener(checkLength);
     _controller.text = ' ';
+    hideExample = false;
   }
 
   @override
@@ -57,7 +58,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget body() {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: MediaQuery.of(context).size.height,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -77,13 +78,16 @@ class _MainMenuPageState extends State<MainMenuPage> {
             ),
             const SizedBox(height: 12),
             Expanded(
-              flex: 4,
+              flex: 2,
               child: promptInput(),
             ),
-            Expanded(
-              flex: 4,
-              child: hideExample ? Container() : promptExample(),
-            ),
+            const SizedBox(height: 16),
+            hideExample
+                ? Container()
+                : Expanded(
+                    flex: 4,
+                    child: promptExample(),
+                  ),
             Expanded(
               flex: 1,
               child: Container(),
@@ -305,6 +309,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
     if (_controller.text.length < 5 && mounted) {
       setState(() {
         isLongEnough = false;
+      });
+    }
+    if (_controller.text.isEmpty && mounted) {
+      setState(() {
+        hideExample = false;
       });
     }
   }

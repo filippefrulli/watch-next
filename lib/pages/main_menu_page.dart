@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/utils/secrets.dart';
@@ -30,11 +32,17 @@ bool isValidQuery = false;
 bool enableLoading = false;
 bool hideExample = false;
 
+GlobalKey textFieldKey = GlobalKey();
+GlobalKey goButtonKey = GlobalKey();
+
+late TutorialCoachMark tutorialCoachMark;
+
 class _MainMenuPageState extends State<MainMenuPage> {
   bool noInternet = false;
 
   @override
   void initState() {
+    createTutorial();
     super.initState();
     _controller.addListener(checkLength);
     _controller.text = ' ';
@@ -50,9 +58,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      body: body(),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        body: body(),
+      ),
     );
   }
 
@@ -64,39 +74,35 @@ class _MainMenuPageState extends State<MainMenuPage> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Expanded(
-              flex: 1,
-              child: topBar(),
-            ),
+            topBar(),
             Expanded(
               flex: 2,
               child: Container(),
             ),
-            Expanded(
-              flex: 1,
-              child: description(),
+            description(),
+            const SizedBox(height: 36),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.help_outline_rounded,
+                  color: Colors.orange,
+                  size: 26,
+                ),
+                onPressed: () {
+                  showTutorial();
+                },
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 2),
+            promptInput(),
+            const SizedBox(height: 16),
             Expanded(
               flex: 2,
-              child: promptInput(),
-            ),
-            const SizedBox(height: 16),
-            hideExample
-                ? Container()
-                : Expanded(
-                    flex: 4,
-                    child: promptExample(),
-                  ),
-            Expanded(
-              flex: 1,
               child: Container(),
             ),
-            Expanded(
-              flex: 2,
-              child: goButton(),
-            ),
-            const SizedBox(height: 16),
+            goButton(),
+            const SizedBox(height: 46),
           ],
         ),
       ),
@@ -154,64 +160,44 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget promptInput() {
-    return TextField(
-      autofocus: false,
-      maxLength: 60,
-      showCursor: true,
-      controller: _controller,
-      cursorColor: Colors.orange,
-      style: Theme.of(context).textTheme.titleMedium,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color.fromRGBO(35, 35, 50, 1),
-        helperText: 'Complete the sentence (at least 6 characters)',
-        prefixText: "Recommend a movie... ",
-        suffixText: "",
-        helperStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 12,
-        ),
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 12,
-        ),
-        contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.orange, width: 2.0),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: const BorderSide(color: Colors.orange, width: 2.0),
-          borderRadius: BorderRadius.circular(15),
+    return SizedBox(
+      height: 80,
+      child: TextField(
+        key: textFieldKey,
+        autofocus: false,
+        maxLength: 60,
+        showCursor: true,
+        maxLines: 1,
+        minLines: 1,
+        controller: _controller,
+        cursorColor: Colors.orange,
+        style: Theme.of(context).textTheme.titleMedium,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: const Color.fromRGBO(35, 35, 50, 1),
+          helperText: 'Complete the sentence (at least 6 characters)',
+          prefixText: "Recommend a movie... ",
+          prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12),
+          suffixText: "",
+          helperStyle: TextStyle(
+            color: Colors.grey[500],
+            fontSize: 12,
+          ),
+          hintStyle: TextStyle(
+            color: Colors.grey[500],
+            fontSize: 12,
+          ),
+          contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
+          focusedBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.orange, width: 2.0),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: const BorderSide(color: Colors.orange, width: 2.0),
+            borderRadius: BorderRadius.circular(15),
+          ),
         ),
       ),
-    );
-  }
-
-  Widget promptExample() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Examples:',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• that is romantic and funny, ideal for a first date',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• starring Tom Cruise and directed by Steven Spielberg',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• about artificial intelligence, with good reviews',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
     );
   }
 
@@ -224,43 +210,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
             child: Container(),
           ),
           TextButton(
+            key: goButtonKey,
             style: TextButton.styleFrom(
               padding: const EdgeInsets.all(0),
             ),
             onPressed: () async {
-              FocusScope.of(context).unfocus();
-              await checkConnection();
-              if (noInternet) {
-                showToastWidget(
-                  const ToastWidget(
-                    title: ('Please connect to the internet and try again'),
-                    icon: Icon(Icons.cloud_off, color: Colors.orange, size: 36),
-                  ),
-                  duration: const Duration(seconds: 4),
-                );
-              } else {
-                if (isLongEnough && mounted) {
-                  setState(() {
-                    enableLoading = true;
-                  });
-                  await validateQuery();
-                  if (isValidQuery && context.mounted) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => RecommandationResultsPage(requestString: _controller.text),
-                      ),
-                    );
-                  } else {
-                    showToastWidget(
-                      const ToastWidget(
-                        title: ('Inalid input, please change your query and try again'),
-                        icon: Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
-                      ),
-                      duration: const Duration(seconds: 4),
-                    );
-                  }
-                }
-              }
+              goButtonPressed();
             },
             child: Container(
               height: 60,
@@ -296,11 +251,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void checkLength() {
-    if (_controller.text.isNotEmpty && mounted) {
-      setState(() {
-        hideExample = true;
-      });
-    }
     if (_controller.text.length > 5 && mounted) {
       setState(() {
         isLongEnough = true;
@@ -309,11 +259,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
     if (_controller.text.length < 5 && mounted) {
       setState(() {
         isLongEnough = false;
-      });
-    }
-    if (_controller.text.isEmpty && mounted) {
-      setState(() {
-        hideExample = false;
       });
     }
   }
@@ -358,4 +303,169 @@ class _MainMenuPageState extends State<MainMenuPage> {
       });
     }
   }
+
+  void showTutorial() {
+    tutorialCoachMark.show(context: context);
+  }
+
+  void createTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+        targets: _createTargets(),
+        colorShadow: Colors.grey[900]!,
+        textSkip: "close",
+        paddingFocus: 10,
+        opacityShadow: 0.5,
+        focusAnimationDuration: const Duration(seconds: 2),
+        imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        onClickTarget: (target) {
+          if (target.keyTarget == textFieldKey) {
+            setState(() {
+              _controller.text = "with a lot of action";
+            });
+          } else {
+            goButtonPressed();
+          }
+        },
+        onClickOverlay: (target) {
+          setState(() {
+            _controller.text = "with a lot of action";
+          });
+        });
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+    targets.add(
+      TargetFocus(
+        shape: ShapeLightFocus.RRect,
+        identify: "textFieldKey",
+        keyTarget: textFieldKey,
+        alignSkip: Alignment.topRight,
+        enableOverlayTab: true,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Step 1: Type your query here. Just continue the phrase 'recommend a movie...' ",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ],
+              );
+            },
+          ),
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "\nLet's try 'With a lot of action'",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                  Text(
+                    "\n\nTap the box to continue",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    targets.add(
+      TargetFocus(
+        identify: "goButtonKey",
+        keyTarget: goButtonKey,
+        alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Step 2: After entering the text, press the GO button",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    return targets;
+  }
+
+  void goButtonPressed() async {
+    FocusScope.of(context).unfocus();
+    await checkConnection();
+    if (noInternet) {
+      showToastWidget(
+        const ToastWidget(
+          title: ('Please connect to the internet and try again'),
+          icon: Icon(Icons.cloud_off, color: Colors.orange, size: 36),
+        ),
+        duration: const Duration(seconds: 4),
+      );
+    } else {
+      if (isLongEnough && mounted) {
+        setState(() {
+          enableLoading = true;
+        });
+        await validateQuery();
+        if (isValidQuery && context.mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => RecommandationResultsPage(requestString: _controller.text),
+            ),
+          );
+        } else {
+          showToastWidget(
+            const ToastWidget(
+              title: ('Inalid input, please change your query and try again'),
+              icon: Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
+            ),
+            duration: const Duration(seconds: 4),
+          );
+        }
+      }
+    }
+  }
 }
+
+
+// Text(
+//                     'Examples:',
+//                     style: Theme.of(context).textTheme.bodyLarge,
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Text(
+//                     '• that is romantic and funny, ideal for a first date',
+//                     maxLines: 1,
+//                     style: Theme.of(context).textTheme.displaySmall,
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Text(
+//                     '• starring Tom Cruise and directed by Steven Spielberg',
+//                     maxLines: 1,
+//                     style: Theme.of(context).textTheme.displaySmall,
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Text(
+//                     '• about artificial intelligence, with good reviews',
+//                     maxLines: 1,
+//                     style: Theme.of(context).textTheme.displaySmall,
+//                   ),

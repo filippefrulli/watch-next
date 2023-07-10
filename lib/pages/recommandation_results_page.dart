@@ -58,22 +58,24 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      body: SlidingUpPanel(
-        controller: pc,
-        margin: const EdgeInsets.all(8.0),
-        panel: movieInfoPanel(),
-        borderRadius: const BorderRadius.all(
-          Radius.circular(25),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        body: SlidingUpPanel(
+          controller: pc,
+          margin: const EdgeInsets.all(8.0),
+          panel: movieInfoPanel(),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(25),
+          ),
+          collapsed: Container(),
+          minHeight: 0,
+          maxHeight: MediaQuery.of(context).size.height * 0.90,
+          backdropEnabled: true,
+          backdropOpacity: 0.8,
+          color: Theme.of(context).primaryColor,
+          body: pageBody(),
         ),
-        collapsed: Container(),
-        minHeight: 0,
-        maxHeight: MediaQuery.of(context).size.height * 0.80,
-        backdropEnabled: true,
-        backdropOpacity: 0.8,
-        color: Theme.of(context).primaryColor,
-        body: pageBody(),
       ),
     );
   }
@@ -82,7 +84,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     return Column(
       children: [
         const SizedBox(
-          height: 32,
+          height: 16,
         ),
         FutureBuilder<dynamic>(
           future: resultList,
@@ -354,7 +356,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               size: 50,
             ),
             const SizedBox(
-              height: 16,
+              height: 46,
             ),
             askingGpt
                 ? Text(
@@ -374,6 +376,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
+            const SizedBox(
+              height: 46,
+            ),
           ],
         ),
       ),
@@ -382,70 +387,70 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   Widget movieInfoPanel() {
     return DelayedDisplay(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Center(
-              child: Container(width: 50, height: 5, color: Colors.grey[800]),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: Container()),
-                Text(
+        child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          Center(
+            child: Container(width: 50, height: 5, color: Colors.grey[800]),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: Container()),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Text(
                   selectedMovie.title ?? '',
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                Expanded(child: Container()),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(height: 1, color: Colors.grey[800]),
-            const SizedBox(height: 16),
-            Text(selectedMovie.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
-            const SizedBox(height: 16),
-            Container(height: 1, color: Colors.grey[800]),
-            const SizedBox(height: 16),
-            FutureBuilder<dynamic>(
-              future: movieCredits,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text(
-                    "Director: ${getDirector(snapshot.data)}",
-                    style: Theme.of(context).textTheme.displaySmall,
-                  );
-                } else {
-                  return Container();
-                }
-              },
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "TMDB score: ${selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''}",
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(height: 16),
-            Container(height: 1, color: Colors.grey[800]),
-            const SizedBox(height: 16),
-            Text(
-              "Trailers:",
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            trailerWidget(),
-          ],
-        ),
+              ),
+              Expanded(child: Container()),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.grey[800]),
+          const SizedBox(height: 16),
+          Text(selectedMovie.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.grey[800]),
+          const SizedBox(height: 16),
+          FutureBuilder<dynamic>(
+            future: movieCredits,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(
+                  "Director: ${getDirector(snapshot.data)}",
+                  style: Theme.of(context).textTheme.displaySmall,
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "TMDB score: ${selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''}",
+            style: Theme.of(context).textTheme.displaySmall,
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.grey[800]),
+          const SizedBox(height: 8),
+          trailerWidget(),
+        ],
       ),
-    );
+    ));
   }
 
   Widget trailerWidget() {
     if (trailerList.isNotEmpty && trailerImages.isNotEmpty) {
       return DelayedDisplay(
         child: SizedBox(
-          height: 172,
+          height: 142,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: trailerList.length,
@@ -456,16 +461,31 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               return TextButton(
                 onPressed: () => _launchURL(trailerUrl!),
                 child: SizedBox(
-                  height: 158,
-                  width: 160,
+                  width: 150,
                   child: Column(
                     children: [
-                      SizedBox(
-                        height: 124,
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 2,
+                          ),
+                        ),
+                        height: 86,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: CachedNetworkImage(imageUrl: thumbnail),
+                          child: AspectRatio(
+                            aspectRatio: 21 / 9,
+                            child: CachedNetworkImage(
+                              imageUrl: thumbnail,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
                         ),
+                      ),
+                      const SizedBox(
+                        height: 4,
                       ),
                       Text(
                         title!,

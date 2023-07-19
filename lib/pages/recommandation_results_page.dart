@@ -157,7 +157,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: buttonsRow(),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Container(),
           ),
         ],
@@ -282,21 +282,27 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   Widget streamingOption() {
     if (selectedMovie.watchProviders != null) {
-      return DelayedDisplay(
-        delay: const Duration(milliseconds: 1000),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          height: 50,
-          width: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Colors.grey[300],
+      if (selectedMovie.watchProviders?.first == null) {
+        return Container();
+      } else {
+        return DelayedDisplay(
+          delay: const Duration(milliseconds: 1000),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            height: 50,
+            width: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey[300],
+            ),
+            child: Platform.isIOS
+                ? Image.asset(
+                    providersMapIos[selectedMovie.watchProviders?.first] ?? 'assets/streaming_services/netflix.png')
+                : Image.asset(
+                    providersMap[selectedMovie.watchProviders?.first] ?? 'assets/streaming_services/netflix.png'),
           ),
-          child: Platform.isIOS
-              ? Image.asset(providersMapIos[selectedMovie.watchProviders!.first]!)
-              : Image.asset(providersMap[selectedMovie.watchProviders!.first]!),
-        ),
-      );
+        );
+      }
     } else {
       return Container();
     }
@@ -516,6 +522,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             content:
                 'Return 30 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend more than one movie from the same franchise! '),
       ],
+      temperature: 0.3,
       maxToken: 200,
       model: GptTurbo0301ChatModel(),
     );

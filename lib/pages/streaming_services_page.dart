@@ -117,9 +117,12 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
               child: TextButton(
                   onPressed: () async {
                     SharedPreferences prefs = await SharedPreferences.getInstance();
+                    bool seen = prefs.getBool('skip_intro') ?? false;
                     prefs.setBool('skip_intro', true);
                     await DatabaseService.saveStreamingServices(selectedStreamingServices);
-                    if (context.mounted) {
+                    if (context.mounted && seen) {
+                      Navigator.of(context).pop();
+                    } else if (mounted && !seen) {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => const MainMenuPage(),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
@@ -47,6 +49,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
     _controller.addListener(checkLength);
     _controller.text = ' ';
     hideExample = false;
+    Timer(const Duration(seconds: 2), () {
+      showTutorial();
+    });
   }
 
   @override
@@ -57,7 +62,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
@@ -90,7 +94,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   size: 26,
                 ),
                 onPressed: () {
-                  showTutorial();
+                  showExamples();
                 },
               ),
             ),
@@ -251,16 +255,18 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void checkLength() {
-    if (_controller.text.length > 5 && mounted) {
-      setState(() {
-        isLongEnough = true;
-      });
-    }
-    if (_controller.text.length < 5 && mounted) {
-      setState(() {
-        isLongEnough = false;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_controller.text.length > 5 && mounted) {
+        setState(() {
+          isLongEnough = true;
+        });
+      }
+      if (_controller.text.length < 5 && mounted) {
+        setState(() {
+          isLongEnough = false;
+        });
+      }
+    });
   }
 
   validateQuery() async {
@@ -304,8 +310,13 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
   }
 
-  void showTutorial() {
-    tutorialCoachMark.show(context: context);
+  void showTutorial() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int showed = prefs.getInt('showed_tutorial') ?? 0;
+    if (showed == 0 && mounted) {
+      tutorialCoachMark.show(context: context);
+    }
+    prefs.setInt("showed_tutorial", 1);
   }
 
   void createTutorial() {
@@ -444,28 +455,44 @@ class _MainMenuPageState extends State<MainMenuPage> {
       }
     }
   }
+
+  void showExamples() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[850]!,
+        title: const Text('Need inspiration? \nHere are some example queries'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '• that is romantic and funny, ideal for a first date\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• that will make me cry\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• starring Tom Cruise and directed by Steven Spielberg\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• based on a true story\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• about artificial intelligence, with good reviews\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
-
-
-// Text(
-//                     'Examples:',
-//                     style: Theme.of(context).textTheme.bodyLarge,
-//                   ),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     '• that is romantic and funny, ideal for a first date',
-//                     maxLines: 1,
-//                     style: Theme.of(context).textTheme.displaySmall,
-//                   ),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     '• starring Tom Cruise and directed by Steven Spielberg',
-//                     maxLines: 1,
-//                     style: Theme.of(context).textTheme.displaySmall,
-//                   ),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     '• about artificial intelligence, with good reviews',
-//                     maxLines: 1,
-//                     style: Theme.of(context).textTheme.displaySmall,
-//                   ),

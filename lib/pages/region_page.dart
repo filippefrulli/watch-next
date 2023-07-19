@@ -1,7 +1,7 @@
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/main_menu_page.dart';
+import 'package:watch_next/objects/region.dart';
 import 'streaming_services_page.dart';
 
 class RegionIntroPage extends StatefulWidget {
@@ -12,136 +12,11 @@ class RegionIntroPage extends StatefulWidget {
 }
 
 class _SecondIntroScreenState extends State<RegionIntroPage> {
-  static const List<String> regions = [
-    'Argentina',
-    'Australia',
-    'Austria',
-    'Bangladesch',
-    'Belgium',
-    'Brazil',
-    'Bulgaria',
-    'Canada',
-    'Chile',
-    'China',
-    'Columbia',
-    'Croatia',
-    'Czech Republic',
-    'Denmark',
-    'Egypt',
-    'Estonia',
-    'Finland',
-    'France',
-    'Germany',
-    'Greece',
-    'Hong Kong',
-    'Hungary',
-    'India',
-    'Indonesia',
-    'Iran',
-    'Irak',
-    'Ireland',
-    'Israel',
-    'Italy',
-    'Japan',
-    'Malaysia',
-    'Mexico',
-    'Netherlands',
-    'New Zealand',
-    'Norway',
-    'Pakistan',
-    'Paraguay',
-    'Peru',
-    'Philippines',
-    'Poland',
-    'Portugal',
-    'Romania',
-    'Russia',
-    'Saudi Arabia',
-    'Serbia',
-    'Slowakia',
-    'Slovenia',
-    'South Africa',
-    'South Korea',
-    'Spain',
-    'Sweden',
-    'Switzerland',
-    'Thailand',
-    'Tunisia',
-    'Turkey',
-    'Ukraine',
-    'United Kingdom',
-    'United States',
-    'Uruguay',
-    'Vietnam',
-  ];
-
-  static const List<String> regionsShort = [
-    'AR',
-    'AU',
-    'AT',
-    'BD',
-    'BE',
-    'BR',
-    'BG',
-    'CA',
-    'CL',
-    'CN',
-    'CO',
-    'HR',
-    'CZ',
-    'DK',
-    'EG',
-    'EE',
-    'FI',
-    'FR',
-    'DE',
-    'GR',
-    'HK',
-    'HU',
-    'IN',
-    'ID',
-    'IR',
-    'IQ',
-    'IE',
-    'IL',
-    'IT',
-    'JP',
-    'MY',
-    'MX',
-    'NL',
-    'NZ',
-    'NO',
-    'PK',
-    'PY',
-    'PE',
-    'PH',
-    'PL',
-    'PT',
-    'RO',
-    'RU',
-    'SA',
-    'RS',
-    'SK',
-    'SI',
-    'ZA',
-    'SK',
-    'ES',
-    'SE',
-    'CH',
-    'TH',
-    'TN',
-    'TR',
-    'UA',
-    'UK',
-    'US',
-    'UY',
-    'VN',
-  ];
-
   int selected = -1;
 
   @override
   initState() {
+    availableRegions.sort((a, b) => a.englishName!.compareTo(b.englishName!));
     super.initState();
   }
 
@@ -174,18 +49,28 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
   }
 
   Widget _regions() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      height: MediaQuery.of(context).size.height - 230,
-      child: MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: ListView.builder(
-          padding: const EdgeInsets.only(bottom: 32),
-          itemCount: regions.length,
-          itemBuilder: (context, index) {
-            return _listTile(regions[index], regionsShort[index], index);
-          },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          border: Border.all(
+            color: Colors.grey[700]!,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 32),
+            itemCount: availableRegions.length,
+            itemBuilder: (context, index) {
+              return _listTile(availableRegions[index].englishName!, availableRegions[index].iso!, index);
+            },
+          ),
         ),
       ),
     );
@@ -236,21 +121,11 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
             delay: const Duration(milliseconds: 100),
             child: TextButton(
               onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                bool seen = (prefs.getBool('skip_intro') ?? false);
-                if (seen && context.mounted) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const MainMenuPage(),
-                    ),
-                  );
-                } else {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const StreamingServicesPage(),
-                    ),
-                  );
-                }
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => const StreamingServicesPage(),
+                  ),
+                );
               },
               child: Text(
                 'Done',

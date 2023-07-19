@@ -1,10 +1,10 @@
-import 'dart:io';
-
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
 import 'package:watch_next/services/database_service.dart';
-import 'package:watch_next/utils/constants.dart';
+import 'package:watch_next/services/http_service.dart';
 
 ///This is the page where you enter the movie you saw
 class StreamingServicesPage extends StatefulWidget {
@@ -16,28 +16,13 @@ class StreamingServicesPage extends StatefulWidget {
 }
 
 class _StreamingServicesPage extends State<StreamingServicesPage> with TickerProviderStateMixin {
-  List<int> streamingServicesIds = List<int>.empty(growable: true);
+  late Future<dynamic> resultList;
 
-  List<bool> selectedStreamingServices = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
-
-  List<int> selectedServicesIndex = [];
+  Map<int, String> selectedStreamingServices = {};
 
   @override
   void initState() {
-    if (Platform.isAndroid) {
-      streamingServicesIds = [8, 9, 350, 337, 384, 15, 531, 386];
-    } else {
-      streamingServicesIds = [8, 9, 350, 384, 15, 531, 386];
-    }
+    resultList = HttpService().getWatchProvidersByLocale(http.Client());
     super.initState();
   }
 
@@ -58,7 +43,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
           style: Theme.of(context).textTheme.displayMedium,
         ),
         const SizedBox(height: 16),
-        streamingOptions(),
+        streamingGrid(),
         Expanded(
           child: Container(),
         ),
@@ -68,73 +53,76 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
     );
   }
 
-  Widget streamingOptions() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height - 230,
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.3,
-        ),
-        itemCount: streamingServicesIds.length,
-        itemBuilder: (BuildContext context, int index) {
+  Widget streamingGrid() {
+    return FutureBuilder<dynamic>(
+      future: resultList,
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data.length > 0) {
           return Padding(
-            padding: const EdgeInsets.all(8),
-            child: TextButton(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.all(0),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[900],
+                border: Border.all(
+                  color: Colors.grey[700]!,
+                ),
+                borderRadius: BorderRadius.circular(8),
               ),
-              onPressed: () {
-                setState(() {
-                  selectedStreamingServices[index] = !selectedStreamingServices[index];
-                });
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(25),
-                  ),
-                  border: Border.all(
-                    width: 3,
-                    color: selectedStreamingServices[index] ? Colors.orange : Colors.white,
-                  ),
-                  color: Colors.grey[300],
+              padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 1,
                 ),
-                padding: const EdgeInsets.all(12),
-                child: Center(
-                  child: Image.asset(
-                    Platform.isIOS ? streamingServicesLogosIos[index] : streamingServicesLogos[index],
-                    fit: BoxFit.fill,
-                  ),
-                ),
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.all(0),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          if (selectedStreamingServices.containsKey(snapshot.data[index].providerId)) {
+                            selectedStreamingServices
+                                .removeWhere((key, value) => key == snapshot.data[index].providerId);
+                          } else {
+                            selectedStreamingServices[snapshot.data[index].providerId] = snapshot.data[index].logoPath;
+                          }
+                        });
+                      },
+                      child: gridItem(snapshot.data[index].logoPath, index, snapshot.data[index].providerId),
+                    ),
+                  );
+                },
               ),
             ),
           );
-        },
-      ),
+        } else {
+          return Expanded(
+            child: Container(),
+          );
+        }
+      },
     );
   }
 
   Widget closeButton() {
-    return selectedStreamingServices.contains(true)
+    return selectedStreamingServices.isNotEmpty
         ? SizedBox(
             height: 50,
             child: Center(
               child: TextButton(
                   onPressed: () async {
                     SharedPreferences prefs = await SharedPreferences.getInstance();
+                    bool seen = prefs.getBool('skip_intro') ?? false;
                     prefs.setBool('skip_intro', true);
-                    selectedStreamingServices.asMap().forEach(
-                          (index, value) => {
-                            if (value)
-                              {
-                                selectedServicesIndex.add(index),
-                              }
-                          },
-                        );
-                    await DatabaseService.saveStreamingServices(
-                        selectedServicesIndex, streamingServicesIds, streamingServicesLogos);
-                    if (context.mounted) {
+                    await DatabaseService.saveStreamingServices(selectedStreamingServices);
+                    if (context.mounted && seen) {
+                      Navigator.of(context).pop();
+                    } else if (mounted && !seen) {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => const MainMenuPage(),
@@ -149,5 +137,37 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
             ),
           )
         : Container();
+  }
+
+  Widget gridItem(String logo, int index, int providerId) {
+    return Container(
+      height: 100,
+      width: 100,
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        border: Border.all(
+          width: 3,
+          color: selectedStreamingServices.keys.contains(providerId) ? Colors.orange : Colors.white,
+        ),
+        color: Colors.grey[300],
+      ),
+      child: Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: CachedNetworkImage(
+            fit: BoxFit.cover,
+            imageUrl: "http://image.tmdb.org/t/p/original//$logo",
+            placeholder: (context, url) => Container(
+              color: const Color.fromRGBO(11, 14, 23, 1),
+            ),
+            errorWidget: (context, url, error) => Expanded(
+              child: Container(
+                color: Colors.grey[800],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -1,13 +1,17 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:watch_next/objects/movie_credits.dart';
 import 'package:watch_next/objects/movie_details.dart';
-import 'package:watch_next/services/database_service.dart';
+import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/utils/constants.dart';
 import 'package:watch_next/utils/secrets.dart';
@@ -28,20 +32,23 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   int index = 0;
   int length = 0;
+  bool askingGpt = false;
+  bool fetchingMovieInfo = false;
+  bool filtering = false;
   MovieDetails selectedMovie = MovieDetails();
-
-  Map<int, String> streamingServices = {
-    8: 'Netflix',
-    9: 'Amazon Prime Video',
-    350: 'Disney+',
-    337: 'HBO Max',
-    384: 'Hulu',
-    15: 'Apple TV+',
-    531: 'Peacock',
-    386: 'Paramount+',
-  };
+  PanelController pc = PanelController();
 
   late Future<dynamic> resultList;
+  Future<MovieCredits> movieCredits = Future.value(MovieCredits());
+
+  String? trailerUrl = '';
+  String? title = '';
+
+  List<TrailerResults> trailerList = [];
+  List<String> trailerImages = [];
+
+  String thumbnail = "https://i.ytimg.com//vi//d_m5csmrf7I//hqdefault.jpg";
+  String baseUrl = 'https://www.youtube.com/watch?v=';
 
   @override
   initState() {
@@ -51,9 +58,25 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      body: pageBody(),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        body: SlidingUpPanel(
+          controller: pc,
+          margin: const EdgeInsets.all(8.0),
+          panel: movieInfoPanel(),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(25),
+          ),
+          collapsed: Container(),
+          minHeight: 0,
+          maxHeight: MediaQuery.of(context).size.height * 0.90,
+          backdropEnabled: true,
+          backdropOpacity: 0.8,
+          color: Theme.of(context).primaryColor,
+          body: pageBody(),
+        ),
+      ),
     );
   }
 
@@ -134,7 +157,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: buttonsRow(),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Container(),
           ),
         ],
@@ -194,46 +217,92 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   }
 
   Widget streamingWidget() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: DelayedDisplay(
-        delay: const Duration(milliseconds: 1000),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Watch it on:',
-                textAlign: TextAlign.left,
-                style: Theme.of(context).textTheme.displaySmall,
+    return Row(
+      children: [
+        Expanded(
+          child: Container(),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Watch it on:',
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            streamingOption(),
+          ],
+        ),
+        Expanded(
+          child: Container(),
+        ),
+        TextButton(
+          onPressed: () async {
+            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedMovie.id!);
+            HttpService().fetchTrailer(http.Client(), selectedMovie.id!).then((value) {
+              setState(() {
+                trailerList = value;
+              });
+
+              waitForImages();
+            });
+            pc.open();
+          },
+          child: Container(
+            height: 50,
+            width: 100,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(
+                Radius.circular(15),
               ),
-              const SizedBox(height: 8),
-              streamingOptions(),
-            ],
+              color: Colors.grey[800],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Info",
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                const Icon(Icons.expand_less, size: 32, color: Colors.white),
+              ],
+            ),
           ),
         ),
-      ),
+        Expanded(
+          child: Container(),
+        ),
+      ],
     );
   }
 
-  Widget streamingOptions() {
+  Widget streamingOption() {
     if (selectedMovie.watchProviders != null) {
-      return DelayedDisplay(
-        delay: const Duration(milliseconds: 1000),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          height: 46,
-          width: 80,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Colors.grey[300],
+      if (selectedMovie.watchProviders?.first == null) {
+        return Container();
+      } else {
+        return DelayedDisplay(
+          delay: const Duration(milliseconds: 1000),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            height: 50,
+            width: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey[300],
+            ),
+            child: Platform.isIOS
+                ? Image.asset(
+                    providersMapIos[selectedMovie.watchProviders?.first] ?? 'assets/streaming_services/netflix.png')
+                : Image.asset(
+                    providersMap[selectedMovie.watchProviders?.first] ?? 'assets/streaming_services/netflix.png'),
           ),
-          child: Platform.isIOS
-              ? Image.asset(providersMapIos[selectedMovie.watchProviders!.first]!)
-              : Image.asset(providersMap[selectedMovie.watchProviders!.first]!),
-        ),
-      );
+        );
+      }
     } else {
       return Container();
     }
@@ -288,16 +357,33 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Generating your suggestions",
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(
-              height: 32,
-            ),
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.orange,
               size: 50,
+            ),
+            const SizedBox(
+              height: 46,
+            ),
+            askingGpt
+                ? Text(
+                    "Generating recommendations",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  )
+                : Container(),
+            fetchingMovieInfo
+                ? Text(
+                    "Fetching movie information",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  )
+                : Container(),
+            filtering
+                ? Text(
+                    "Filtering by your services",
+                    style: Theme.of(context).textTheme.displaySmall,
+                  )
+                : Container(),
+            const SizedBox(
+              height: 46,
             ),
           ],
         ),
@@ -305,7 +391,130 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
   }
 
+  Widget movieInfoPanel() {
+    return DelayedDisplay(
+        child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          Center(
+            child: Container(width: 50, height: 5, color: Colors.grey[800]),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: Container()),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Text(
+                  selectedMovie.title ?? '',
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              Expanded(child: Container()),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.grey[800]),
+          const SizedBox(height: 16),
+          Text(selectedMovie.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.grey[800]),
+          const SizedBox(height: 16),
+          FutureBuilder<dynamic>(
+            future: movieCredits,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(
+                  "Director: ${getDirector(snapshot.data)}",
+                  style: Theme.of(context).textTheme.displaySmall,
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "TMDB score: ${selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''}",
+            style: Theme.of(context).textTheme.displaySmall,
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.grey[800]),
+          const SizedBox(height: 8),
+          trailerWidget(),
+        ],
+      ),
+    ));
+  }
+
+  Widget trailerWidget() {
+    if (trailerList.isNotEmpty && trailerImages.isNotEmpty) {
+      return DelayedDisplay(
+        child: SizedBox(
+          height: 142,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: trailerList.length,
+            itemBuilder: (context, index) {
+              trailerUrl = trailerList[index].key;
+              title = trailerList[index].name;
+              thumbnail = trailerImages[index];
+              return TextButton(
+                onPressed: () => _launchURL(trailerUrl!),
+                child: SizedBox(
+                  width: 150,
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 2,
+                          ),
+                        ),
+                        height: 86,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: AspectRatio(
+                            aspectRatio: 21 / 9,
+                            child: CachedNetworkImage(
+                              imageUrl: thumbnail,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      Text(
+                        title!,
+                        maxLines: 2,
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
   Future<dynamic> askGpt() async {
+    setState(() {
+      askingGpt = true;
+    });
     final request = ChatCompleteText(
       messages: [
         Messages(
@@ -313,17 +522,26 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             content:
                 'Return 30 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend more than one movie from the same franchise! '),
       ],
+      temperature: 0.3,
       maxToken: 200,
       model: GptTurbo0301ChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
+
+    setState(() {
+      askingGpt = false;
+    });
+
     return parseResponse(response!.choices[0].message!.content).then(
       (value) => filterProviders(value),
     );
   }
 
   parseResponse(String response) async {
+    setState(() {
+      fetchingMovieInfo = true;
+    });
     List<MovieDetails> movieList = [];
     List<String> responseMovies = response.split(',,');
     if (responseMovies.isEmpty) {
@@ -352,20 +570,38 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       } else {}
     }
 
+    setState(() {
+      fetchingMovieInfo = false;
+    });
+
     return movieList;
   }
 
   filterProviders(List<MovieDetails> movieList) async {
+    setState(() {
+      filtering = true;
+    });
+
     Map<int, MovieDetails> movieMap = {};
     for (MovieDetails movie in List<MovieDetails>.from(movieList)) {
-      await HttpService().getWatchProviders(http.Client(), movie.id!).then((value) => {
-            if (value.isNotEmpty)
-              {
-                movie.watchProviders = value,
-                movieMap[movie.id!] = movie,
-              }
-          });
+      await HttpService()
+          .getWatchProviders(
+            http.Client(),
+            movie.id!,
+          )
+          .then(
+            (value) => {
+              if (value.isNotEmpty)
+                {
+                  movie.watchProviders = value,
+                  movieMap[movie.id!] = movie,
+                }
+            },
+          );
     }
+    setState(() {
+      filtering = false;
+    });
     if (movieMap.values.toList().isEmpty) {
       Navigator.of(context).pop();
       Fluttertoast.showToast(
@@ -379,5 +615,56 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     } else {
       return movieMap.values.toList();
     }
+  }
+
+  String getDirector(MovieCredits credits) {
+    ///this retrieves the first director of the movie
+    List<Crew>? list = credits.crew;
+    int index;
+    if (list == null) {
+      return "";
+    }
+    index = list.indexWhere((crew) => crew.job == "Director");
+
+    return list[index].name!;
+  }
+
+  _launchURL(String trailerUrl) async {
+    Uri uri = Uri.parse(baseUrl + trailerUrl);
+    if (Platform.isIOS) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      } else {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          throw 'Could not launch trailer';
+        }
+      }
+    } else {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        throw 'Could not launch $uri';
+      }
+    }
+  }
+
+  getTrailerImages() async {
+    trailerImages = [];
+    for (int i = 0; i < trailerList.length; i++) {
+      var jsonData = await HttpService().getDetail(baseUrl + trailerList[i].key!);
+      if (jsonData != null) {
+        String thumbnail = jsonData['thumbnail_url'];
+        trailerImages.add(thumbnail);
+      } else {
+        trailerImages.add('https://i.ytimg.com//vi//d_m5csmrf7I//hqdefault.jpg');
+      }
+    }
+  }
+
+  waitForImages() async {
+    await getTrailerImages();
+    setState(() {});
   }
 }

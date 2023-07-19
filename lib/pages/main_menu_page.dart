@@ -1,10 +1,19 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/widgets/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
   const MainMenuPage({Key? key}) : super(key: key);
@@ -23,14 +32,26 @@ final _controller = TextEditingController();
 bool isLongEnough = false;
 bool isValidQuery = false;
 bool enableLoading = false;
-bool enableWrongQuery = false;
+bool hideExample = false;
+
+GlobalKey textFieldKey = GlobalKey();
+GlobalKey goButtonKey = GlobalKey();
+
+late TutorialCoachMark tutorialCoachMark;
 
 class _MainMenuPageState extends State<MainMenuPage> {
+  bool noInternet = false;
+
   @override
   void initState() {
+    createTutorial();
     super.initState();
     _controller.addListener(checkLength);
     _controller.text = ' ';
+    hideExample = false;
+    Timer(const Duration(seconds: 2), () {
+      showTutorial();
+    });
   }
 
   @override
@@ -41,48 +62,51 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.renderView.automaticSystemUiAdjustment = false;
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      body: body(),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        body: body(),
+      ),
     );
   }
 
   Widget body() {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: MediaQuery.of(context).size.height,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
+            const SizedBox(height: 12),
+            topBar(),
             Expanded(
               flex: 2,
-              child: topBar(),
-            ),
-            Expanded(
-              flex: 1,
               child: Container(),
             ),
-            Expanded(
-              flex: 1,
-              child: description(),
+            description(),
+            const SizedBox(height: 36),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.help_outline_rounded,
+                  color: Colors.orange,
+                  size: 26,
+                ),
+                onPressed: () {
+                  showExamples();
+                },
+              ),
             ),
+            const SizedBox(height: 2),
+            promptInput(),
+            const SizedBox(height: 16),
             Expanded(
               flex: 2,
-              child: promptInput(),
-            ),
-            Expanded(
-              flex: 3,
-              child: promptExample(),
-            ),
-            Expanded(
               child: Container(),
             ),
-            Expanded(
-              flex: 2,
-              child: goButton(),
-            ),
-            enableWrongQuery ? invalidPrompt() : Container(),
+            goButton(),
+            const SizedBox(height: 46),
           ],
         ),
       ),
@@ -140,87 +164,44 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget promptInput() {
-    return TextField(
-      autofocus: false,
-      maxLength: 60,
-      showCursor: true,
-      controller: _controller,
-      cursorColor: Colors.orange,
-      style: Theme.of(context).textTheme.titleMedium,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color.fromRGBO(35, 35, 50, 1),
-        helperText: 'Complete the sentence (at least 6 characters)',
-        prefixText: "Recommend a movie... ",
-        suffixText: "",
-        helperStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 12,
-        ),
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 12,
-        ),
-        contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.orange, width: 2.0),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: const BorderSide(color: Colors.orange, width: 2.0),
-          borderRadius: BorderRadius.circular(15),
+    return SizedBox(
+      height: 80,
+      child: TextField(
+        key: textFieldKey,
+        autofocus: false,
+        maxLength: 60,
+        showCursor: true,
+        maxLines: 1,
+        minLines: 1,
+        controller: _controller,
+        cursorColor: Colors.orange,
+        style: Theme.of(context).textTheme.titleMedium,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: const Color.fromRGBO(35, 35, 50, 1),
+          helperText: 'Complete the sentence (at least 6 characters)',
+          prefixText: "Recommend a movie... ",
+          prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12),
+          suffixText: "",
+          helperStyle: TextStyle(
+            color: Colors.grey[500],
+            fontSize: 12,
+          ),
+          hintStyle: TextStyle(
+            color: Colors.grey[500],
+            fontSize: 12,
+          ),
+          contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
+          focusedBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.orange, width: 2.0),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: const BorderSide(color: Colors.orange, width: 2.0),
+            borderRadius: BorderRadius.circular(15),
+          ),
         ),
       ),
-      onSubmitted: (String value) async {},
-    );
-  }
-
-  Widget promptExample() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Examples:',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• that is romantic and funny, ideal for a first date',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• starring Tom Cruise and directed by Steven Spielberg',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• about artificial intelligence, with good reviews',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-
-  Widget lastSearches() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Last searches:',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• that is romantic and funny, ideal for a first date',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '• starring Tom Cruise and directed by Steven Spielberg',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
     );
   }
 
@@ -233,23 +214,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
             child: Container(),
           ),
           TextButton(
+            key: goButtonKey,
             style: TextButton.styleFrom(
               padding: const EdgeInsets.all(0),
             ),
             onPressed: () async {
-              if (isLongEnough) {
-                setState(() {
-                  enableLoading = true;
-                });
-                await validateQuery();
-                if (isValidQuery && context.mounted) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => RecommandationResultsPage(requestString: _controller.text),
-                    ),
-                  );
-                }
-              } else {}
+              goButtonPressed();
             },
             child: Container(
               height: 60,
@@ -284,41 +254,19 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
-  Widget invalidPrompt() {
-    return Container(
-      width: MediaQuery.of(context).size.width - 32,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: const Color.fromRGBO(35, 35, 50, 1),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.dangerous_outlined, color: Colors.red, size: 40),
-          const SizedBox(width: 16),
-          Flexible(
-            child: Text(
-              "Invalid prompt.\n\nPlease change your query and try again",
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void checkLength() {
-    if (_controller.text.length > 5) {
-      setState(() {
-        isLongEnough = true;
-      });
-    }
-    if (_controller.text.length < 5 && isLongEnough && context.mounted) {
-      setState(() {
-        isLongEnough = false;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_controller.text.length > 5 && mounted) {
+        setState(() {
+          isLongEnough = true;
+        });
+      }
+      if (_controller.text.length < 5 && mounted) {
+        setState(() {
+          isLongEnough = false;
+        });
+      }
+    });
   }
 
   validateQuery() async {
@@ -334,18 +282,217 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
 
     final response = await openAI.onChatCompletion(request: request);
-    if (response!.choices[0].message!.content == "YES") {
+    if (response!.choices[0].message!.content == "YES" && mounted) {
       setState(() {
         isValidQuery = true;
         enableLoading = false;
-        enableWrongQuery = false;
       });
     } else {
       setState(() {
         isValidQuery = false;
         enableLoading = false;
-        enableWrongQuery = true;
       });
     }
+  }
+
+  Future<void> checkConnection() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() {
+          noInternet = false;
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        noInternet = true;
+      });
+    }
+  }
+
+  void showTutorial() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int showed = prefs.getInt('showed_tutorial') ?? 0;
+    if (showed == 0 && mounted) {
+      tutorialCoachMark.show(context: context);
+    }
+    prefs.setInt("showed_tutorial", 1);
+  }
+
+  void createTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+        targets: _createTargets(),
+        colorShadow: Colors.grey[900]!,
+        textSkip: "close",
+        paddingFocus: 10,
+        opacityShadow: 0.5,
+        focusAnimationDuration: const Duration(seconds: 2),
+        imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        onClickTarget: (target) {
+          if (target.keyTarget == textFieldKey) {
+            setState(() {
+              _controller.text = "with a lot of action";
+            });
+          } else {
+            goButtonPressed();
+          }
+        },
+        onClickOverlay: (target) {
+          setState(() {
+            _controller.text = "with a lot of action";
+          });
+        });
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+    targets.add(
+      TargetFocus(
+        shape: ShapeLightFocus.RRect,
+        identify: "textFieldKey",
+        keyTarget: textFieldKey,
+        alignSkip: Alignment.topRight,
+        enableOverlayTab: true,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Step 1: Type your query here. Just continue the phrase 'recommend a movie...' ",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ],
+              );
+            },
+          ),
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "\nLet's try 'With a lot of action'",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                  Text(
+                    "\n\nTap the box to continue",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    targets.add(
+      TargetFocus(
+        identify: "goButtonKey",
+        keyTarget: goButtonKey,
+        alignSkip: Alignment.topRight,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Step 2: After entering the text, press the GO button",
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    return targets;
+  }
+
+  void goButtonPressed() async {
+    FocusScope.of(context).unfocus();
+    await checkConnection();
+    if (noInternet) {
+      showToastWidget(
+        const ToastWidget(
+          title: ('Please connect to the internet and try again'),
+          icon: Icon(Icons.cloud_off, color: Colors.orange, size: 36),
+        ),
+        duration: const Duration(seconds: 4),
+      );
+    } else {
+      if (isLongEnough && mounted) {
+        setState(() {
+          enableLoading = true;
+        });
+        await validateQuery();
+        if (isValidQuery && context.mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => RecommandationResultsPage(requestString: _controller.text),
+            ),
+          );
+        } else {
+          showToastWidget(
+            const ToastWidget(
+              title: ('Inalid input, please change your query and try again'),
+              icon: Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
+            ),
+            duration: const Duration(seconds: 4),
+          );
+        }
+      }
+    }
+  }
+
+  void showExamples() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[850]!,
+        title: const Text('Need inspiration? \nHere are some example queries'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '• that is romantic and funny, ideal for a first date\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• that will make me cry\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• starring Tom Cruise and directed by Steven Spielberg\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• based on a true story\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• about artificial intelligence, with good reviews\n',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

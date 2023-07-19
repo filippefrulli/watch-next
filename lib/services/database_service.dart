@@ -45,18 +45,18 @@ class DatabaseService {
     return streamingIds;
   }
 
-  static saveStreamingServices(List<int> selected, List<int> streamingIds, List<String> streamingLogos) async {
+  static saveStreamingServices(Map<int, String> streamingServices) async {
     Database? db = await DatabaseHelper.instance.database;
     int id;
     String logo;
     db!.rawQuery('DELETE FROM streaming_services');
 
-    selected.asMap().forEach(
-          (index, value) => {
-            id = streamingIds[value],
-            logo = streamingLogos[value],
-            db.rawInsert('INSERT OR REPLACE INTO streaming_services(streaming_id, streaming_logo) VALUES($id, "$logo")')
-          },
-        );
+    streamingServices.forEach(
+      (key, value) => {
+        id = key,
+        logo = value,
+        db.rawInsert('INSERT OR REPLACE INTO streaming_services(streaming_id, streaming_logo) VALUES($id, "$logo")')
+      },
+    );
   }
 }

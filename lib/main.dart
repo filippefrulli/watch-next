@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/region_page.dart';
 
@@ -8,6 +9,12 @@ import 'pages/main_menu_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemStatusBarContrastEnforced: true,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive).then(
     (_) => runApp(
       const MyApp(),
@@ -23,83 +30,85 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/main': (BuildContext context) => const MainMenuPage(),
-      },
-      builder: (context, child) {
-        return ScrollConfiguration(
-          behavior: MyBehavior(),
-          child: child!,
-        );
-      },
-      theme: ThemeData(
-        colorScheme: theme.colorScheme.copyWith(
-          primary: const Color.fromRGBO(13, 6, 59, 1),
-          secondary: Colors.orange,
-          brightness: Brightness.dark,
-        ),
-        fontFamily: 'Raleway',
+    return OKToast(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        routes: {
+          '/main': (BuildContext context) => const MainMenuPage(),
+        },
+        builder: (context, child) {
+          return ScrollConfiguration(
+            behavior: MyBehavior(),
+            child: child!,
+          );
+        },
+        theme: ThemeData(
+          colorScheme: theme.colorScheme.copyWith(
+            primary: const Color.fromRGBO(13, 6, 59, 1),
+            secondary: Colors.orange,
+            brightness: Brightness.dark,
+          ),
+          fontFamily: 'Raleway',
 
-        // Define the default TextTheme. Use this to specify the default
-        // text styling for headlines, titles, bodies of text, and more.
-        textTheme: TextTheme(
-          displayLarge: TextStyle(
-            fontSize: 24.0,
-            color: Colors.grey[200],
-            fontWeight: FontWeight.w400,
-            letterSpacing: 1.2,
-          ),
-          displayMedium: TextStyle(
-            fontSize: 20.0,
-            color: Colors.grey[200],
-            fontWeight: FontWeight.w400,
-            letterSpacing: 1.2,
-          ),
-          displaySmall: TextStyle(
-            fontSize: 16.0,
-            color: Colors.grey[200],
-            fontWeight: FontWeight.w400,
-            letterSpacing: 1.2,
-          ),
-          labelLarge: TextStyle(
-            fontSize: 24.0,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[900],
-            letterSpacing: 1.2,
-          ),
-          labelMedium: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[900],
-            letterSpacing: 1.2,
-          ),
-          labelSmall: TextStyle(
-            fontSize: 16.0,
-            color: Colors.grey[900],
-            fontWeight: FontWeight.w400,
-            letterSpacing: 1.2,
-          ),
-          bodyMedium: const TextStyle(
-            fontSize: 20.0,
-            color: Colors.orange,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 1.2,
-          ),
-          bodySmall: TextStyle(
-            fontSize: 15.0,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w400,
-          ),
-          bodyLarge: TextStyle(
-            fontSize: 16.0,
-            color: Colors.grey[400],
-            fontWeight: FontWeight.w400,
+          // Define the default TextTheme. Use this to specify the default
+          // text styling for headlines, titles, bodies of text, and more.
+          textTheme: TextTheme(
+            displayLarge: TextStyle(
+              fontSize: 24.0,
+              color: Colors.grey[200],
+              fontWeight: FontWeight.w400,
+              letterSpacing: 1.2,
+            ),
+            displayMedium: TextStyle(
+              fontSize: 20.0,
+              color: Colors.grey[200],
+              fontWeight: FontWeight.w400,
+              letterSpacing: 1.2,
+            ),
+            displaySmall: TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[200],
+              fontWeight: FontWeight.w400,
+              letterSpacing: 1.2,
+            ),
+            labelLarge: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[900],
+              letterSpacing: 1.2,
+            ),
+            labelMedium: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[900],
+              letterSpacing: 1.2,
+            ),
+            labelSmall: TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[900],
+              fontWeight: FontWeight.w400,
+              letterSpacing: 1.2,
+            ),
+            bodyMedium: const TextStyle(
+              fontSize: 20.0,
+              color: Colors.orange,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 1.2,
+            ),
+            bodySmall: TextStyle(
+              fontSize: 15.0,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w400,
+            ),
+            bodyLarge: TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[400],
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ),
+        home: const Splash(),
       ),
-      home: const Splash(),
     );
   }
 }

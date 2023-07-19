@@ -83,6 +83,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (!await launchUrl(url)) {
                     throw Exception('Could not launch url');
                   }
+                } else if (Platform.isIOS) {
+                  final Uri url =
+                      Uri.parse('https://apps.apple.com/de/app/watch-next-ai-movie-assistant/id6450368827?l=en');
+                  if (!await launchUrl(url)) {
+                    throw Exception('Could not launch url');
+                  }
                 }
               },
             ),
@@ -92,6 +98,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (Platform.isAndroid) {
                   Share.share(
                       'Check out my app: https://play.google.com/store/apps/details?id=com.filippefrulli.watch_next');
+                } else if (Platform.isIOS) {
+                  Share.share(
+                      'Check out my app: https://apps.apple.com/de/app/watch-next-ai-movie-assistant/id6450368827?l=en');
                 }
               },
             ),

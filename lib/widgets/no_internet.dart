@@ -1,0 +1,33 @@
+import 'package:flutter/material.dart';
+
+class NoInternet extends StatelessWidget {
+  const NoInternet({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 210,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.cloud_off,
+            color: Colors.orange,
+            size: 32,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Sorry, no internet connection.',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

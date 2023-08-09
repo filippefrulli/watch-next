@@ -48,6 +48,9 @@ class MyApp extends StatelessWidget {
             secondary: Colors.orange,
             brightness: Brightness.dark,
           ),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
           fontFamily: 'Raleway',
 
           // Define the default TextTheme. Use this to specify the default

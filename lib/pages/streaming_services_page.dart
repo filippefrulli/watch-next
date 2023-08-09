@@ -23,6 +23,15 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
   @override
   void initState() {
     resultList = HttpService().getWatchProvidersByLocale(http.Client());
+    DatabaseService.getAllStreamingServices().then(
+      (mapList) => {
+        for (var map in mapList)
+          {
+            print(map['streaming_logo']),
+            selectedStreamingServices[int.parse(map['streaming_id'].toString())] = map['streaming_logo'].toString()
+          },
+      },
+    );
     super.initState();
   }
 
@@ -42,7 +51,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
           'Select your streaming services',
           style: Theme.of(context).textTheme.displayMedium,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 32),
         streamingGrid(),
         Expanded(
           child: Container(),
@@ -71,6 +80,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
               padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
               height: MediaQuery.of(context).size.height * 0.7,
               child: GridView.builder(
+                padding: EdgeInsets.zero,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: 1,

@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,7 +46,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     createTutorial();
     super.initState();
     _controller.addListener(checkLength);
-    _controller.text = ' ';
+    _controller.text = '';
     hideExample = false;
     Timer(const Duration(seconds: 2), () {
       showTutorial();
@@ -62,11 +61,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-        body: body(),
-      ),
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      body: body(),
     );
   }
 
@@ -77,7 +74,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             topBar(),
             Expanded(
               flex: 2,
@@ -180,7 +177,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           filled: true,
           fillColor: const Color.fromRGBO(35, 35, 50, 1),
           helperText: 'Complete the sentence (at least 6 characters)',
-          prefixText: "Recommend a movie... ",
+          hintText: "Recommend a movie... ",
           prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12),
           suffixText: "",
           helperStyle: TextStyle(
@@ -377,11 +374,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "\nLet's try 'With a lot of action'",
+                    "\nLet's try 'with a lot of action'",
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   Text(
-                    "\n\nTap the box to continue",
+                    "\n\nTap the text field to continue",
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ],
@@ -443,6 +440,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
               builder: (context) => RecommandationResultsPage(requestString: _controller.text),
             ),
           );
+          setState(() {
+            _controller.text = '';
+          });
         } else {
           showToastWidget(
             const ToastWidget(
@@ -460,34 +460,59 @@ class _MainMenuPageState extends State<MainMenuPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[850]!,
+        shape: ShapeBorder.lerp(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          1,
+        )!,
+        backgroundColor: Colors.grey[900]!,
         title: const Text('Need inspiration? \nHere are some example queries'),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '• that is romantic and funny, ideal for a first date\n',
+              '• that is romantic and funny, ideal for a first date',
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• that will make me cry\n',
+              '• that will make me cry',
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• starring Tom Cruise and directed by Steven Spielberg\n',
+              '• starring Tom Cruise and directed by Steven Spielberg',
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• based on a true story\n',
+              '• based on a true story',
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• about artificial intelligence, with good reviews\n',
+              '• about artificial intelligence, with good reviews',
               style: Theme.of(context).textTheme.displaySmall,
             ),
           ],

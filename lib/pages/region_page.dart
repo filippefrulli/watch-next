@@ -1,4 +1,5 @@
 import 'package:delayed_display/delayed_display.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
@@ -32,7 +33,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
           children: <Widget>[
             const SizedBox(height: 48),
             Text(
-              'Select your country',
+              "select_country".tr(),
               style: Theme.of(context).textTheme.displayLarge,
             ),
             const SizedBox(height: 16),
@@ -128,7 +129,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                 );
               },
               child: Text(
-                'Done',
+                "done".tr(),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),

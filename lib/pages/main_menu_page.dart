@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
@@ -122,7 +122,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         DelayedDisplay(
           fadingDuration: const Duration(milliseconds: 1000),
           child: Text(
-            "Hey There!",
+            "hey_there".tr(),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
@@ -154,7 +154,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget description() {
     return Text(
-      "Find something to watch next",
+      "find_something".tr(),
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.displayMedium,
     );
@@ -176,8 +176,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
         decoration: InputDecoration(
           filled: true,
           fillColor: const Color.fromRGBO(35, 35, 50, 1),
-          helperText: 'Complete the sentence (at least 6 characters)',
-          hintText: "Recommend a movie... ",
+          helperText: "complete_sentence".tr(),
+          hintText: "recommend_a_movie".tr(),
           prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12),
           suffixText: "",
           helperStyle: TextStyle(
@@ -234,7 +234,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         size: 30,
                       )
                     : Text(
-                        "GO",
+                        "go".tr(),
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.grey[900],
@@ -318,27 +318,30 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   void createTutorial() {
     tutorialCoachMark = TutorialCoachMark(
-        targets: _createTargets(),
-        colorShadow: Colors.grey[900]!,
-        textSkip: "close",
-        paddingFocus: 10,
-        opacityShadow: 0.5,
-        focusAnimationDuration: const Duration(seconds: 2),
-        imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        onClickTarget: (target) {
-          if (target.keyTarget == textFieldKey) {
-            setState(() {
-              _controller.text = "with a lot of action";
-            });
-          } else {
-            goButtonPressed();
-          }
-        },
-        onClickOverlay: (target) {
+      targets: _createTargets(),
+      colorShadow: Colors.grey[900]!,
+      textSkip: "close".tr(),
+      paddingFocus: 10,
+      opacityShadow: 0.5,
+      focusAnimationDuration: const Duration(seconds: 2),
+      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      onClickTarget: (target) {
+        if (target.keyTarget == textFieldKey) {
           setState(() {
-            _controller.text = "with a lot of action";
+            _controller.text = "with_action".tr();
           });
-        });
+        } else {
+          goButtonPressed();
+        }
+      },
+      onClickOverlay: (target) {
+        setState(
+          () {
+            _controller.text = "with_action".tr();
+          },
+        );
+      },
+    );
   }
 
   List<TargetFocus> _createTargets() {
@@ -359,7 +362,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Step 1: Type your query here. Just continue the phrase 'recommend a movie...' ",
+                    "step_one".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ],
@@ -374,11 +377,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "\nLet's try 'with a lot of action'",
+                    "try_with_action".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   Text(
-                    "\n\nTap the text field to continue",
+                    "tap_text_field".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ],
@@ -403,7 +406,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Step 2: After entering the text, press the GO button",
+                    "step_two".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ],
@@ -422,9 +425,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
     await checkConnection();
     if (noInternet) {
       showToastWidget(
-        const ToastWidget(
-          title: ('Please connect to the internet and try again'),
-          icon: Icon(Icons.cloud_off, color: Colors.orange, size: 36),
+        ToastWidget(
+          title: "connect_to_internet".tr(),
+          icon: const Icon(Icons.cloud_off, color: Colors.orange, size: 36),
         ),
         duration: const Duration(seconds: 4),
       );
@@ -445,9 +448,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
           });
         } else {
           showToastWidget(
-            const ToastWidget(
-              title: ('Inalid input, please change your query and try again'),
-              icon: Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
+            ToastWidget(
+              title: "invalid_input".tr(),
+              icon: const Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
             ),
             duration: const Duration(seconds: 4),
           );
@@ -466,13 +469,13 @@ class _MainMenuPageState extends State<MainMenuPage> {
           1,
         )!,
         backgroundColor: Colors.grey[900]!,
-        title: const Text('Need inspiration? \nHere are some example queries'),
+        title: Text("need_inspiration".tr()),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '• that is romantic and funny, ideal for a first date',
+              "example_1".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: 12),
@@ -482,7 +485,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              '• that will make me cry',
+              "example_2".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: 12),
@@ -492,7 +495,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              '• starring Tom Cruise and directed by Steven Spielberg',
+              "example_3".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: 12),
@@ -502,7 +505,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              '• based on a true story',
+              "example_4".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: 12),
@@ -512,7 +515,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              '• about artificial intelligence, with good reviews',
+              "example_5".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
           ],

@@ -1,8 +1,8 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -94,14 +94,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             if (snapshot.hasData && snapshot.data.length > 0) {
               return Column(children: [
                 Text(
-                  'Here is our recommendation',
+                  "here_recommendation".tr(),
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
                   height: 8,
                 ),
                 Text(
-                  length != 0 ? '${index + 1} of $length' : '',
+                  length != 0 ? '${index + 1} / $length' : '',
                   style: Theme.of(context).textTheme.bodySmall,
                 )
               ]);
@@ -198,12 +198,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         ),
         IconButton(
           onPressed: () {
-            setState(() {
-              if (index == length - 1) {
-              } else {
-                index++;
-              }
-            });
+            setState(
+              () {
+                if (index == length - 1) {
+                } else {
+                  index++;
+                }
+              },
+            );
           },
           icon: Icon(
             Icons.arrow_forward_ios_rounded,
@@ -228,7 +230,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Watch it on:',
+              "watch_it_on".tr(),
               textAlign: TextAlign.left,
               style: Theme.of(context).textTheme.displaySmall,
             ),
@@ -355,7 +357,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               }
             },
             child: Text(
-              'Accept',
+              "accept".tr(),
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),
@@ -380,19 +382,19 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             ),
             askingGpt
                 ? Text(
-                    "Generating recommendations",
+                    "generating".tr(),
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
             fetchingMovieInfo
                 ? Text(
-                    "Fetching movie information",
+                    "fetching".tr(),
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
             filtering
                 ? Text(
-                    "Filtering by your services",
+                    "filtering".tr(),
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
@@ -444,7 +446,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Text(
-                  "Director: ${getDirector(snapshot.data)}",
+                  "director".tr() + getDirector(snapshot.data),
                   style: Theme.of(context).textTheme.displaySmall,
                 );
               } else {
@@ -454,7 +456,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            "TMDB score: ${selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''}",
+            "tmdb_score".tr() + (selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''),
             style: Theme.of(context).textTheme.displaySmall,
           ),
           const SizedBox(height: 16),
@@ -581,7 +583,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     if (responseMovies.isEmpty) {
       Navigator.pop(context);
       Fluttertoast.showToast(
-        msg: "We had an issue with your promt. Please try again",
+        msg: "prompt_issue".tr(),
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
@@ -642,7 +644,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     if (movieMap.values.toList().isEmpty && mounted) {
       Navigator.of(context).pop();
       Fluttertoast.showToast(
-          msg: "We couldn't find any movies on your streaming services. Please try again",
+          msg: "no_movies".tr(),
           timeInSecForIosWeb: 4,
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class NoInternet extends StatelessWidget {
@@ -21,7 +22,7 @@ class NoInternet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Sorry, no internet connection.',
+                "no_internet".tr(),
                 style: Theme.of(context).textTheme.displayMedium,
               ),
             ],

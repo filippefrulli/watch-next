@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             const SizedBox(height: 64),
             TextButton(
-              child: _row(("Change region"), Icons.public),
+              child: _row(("change_region".tr()), Icons.public),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -63,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             TextButton(
-              child: _row(("Edit streaming services"), Icons.edit),
+              child: _row(("edit_streaming".tr()), Icons.edit),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -75,7 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const DividerWidget(padding: 0, height: 32),
             TextButton(
-              child: _row(("Rate the app"), Icons.star),
+              child: _row(("rate_app".tr()), Icons.star),
               onPressed: () async {
                 if (Platform.isAndroid) {
                   final Uri url =
@@ -93,7 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             TextButton(
-              child: _row(("Share"), Icons.share),
+              child: _row(("share".tr()), Icons.share),
               onPressed: () {
                 if (Platform.isAndroid) {
                   Share.share(
@@ -106,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const DividerWidget(padding: 0, height: 32),
             TextButton(
-              child: _row(("About"), Icons.info),
+              child: _row(("about".tr()), Icons.info),
               onPressed: () {
                 showAboutDialog(
                   context: context,
@@ -136,7 +136,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const DividerWidget(padding: 0, height: 16),
             TextButton(
-              child: _row(("Privacy policy"), Icons.receipt),
+              child: _row(("privacy_policy".tr()), Icons.receipt),
               onPressed: () {
                 Navigator.push(
                   context,

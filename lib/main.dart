@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/region_page.dart';
-
+import 'package:watch_next/pages/language_page.dart';
 import 'pages/main_menu_page.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,19 @@ void main() async {
       statusBarIconBrightness: Brightness.dark));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive).then(
     (_) => runApp(
-      const MyApp(),
+      EasyLocalization(
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('it', 'IT'),
+          Locale('de', 'DE'),
+          Locale('fr', 'FR'),
+          Locale('es', 'ES'),
+        ],
+        path: 'assets/translations',
+        startLocale: const Locale('en', 'US'),
+        fallbackLocale: const Locale('en', 'US'),
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -133,7 +145,7 @@ class SplashState extends State<Splash> {
     } else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const RegionIntroPage(),
+          builder: (context) => const LanguagePage(),
         ),
       );
     }

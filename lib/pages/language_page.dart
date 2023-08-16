@@ -1,7 +1,6 @@
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/region_page.dart';
 
@@ -50,63 +49,29 @@ class _LanguagePageState extends State<LanguagePage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              const SizedBox(height: 48),
-              Stack(
-                children: <Widget>[
-                  Center(
-                    child: Stack(
-                      children: <Widget>[
-                        AnimatedOpacity(
-                          opacity: opacity,
-                          duration: const Duration(seconds: 1),
-                          child: const Text(''),
-                        ),
-                        AnimatedOpacity(
-                          opacity: opacity == 1 ? 0 : 1,
-                          duration: const Duration(seconds: 1),
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 120),
-                            child: Text(
-                              'Welcome to Watch next',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  DelayedDisplay(
-                    delay: const Duration(seconds: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Select your language',
-                          maxLines: 1,
-                          style: Theme.of(context).textTheme.displayLarge,
-                        ),
-                        const SizedBox(height: 64),
-                        _languages(),
-                        const SizedBox(height: 64),
-                        _next(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      body: body(),
+    );
+  }
+
+  Widget body() {
+    return Column(
+      children: <Widget>[
+        const SizedBox(height: 48),
+        Text(
+          'Select your language',
+          maxLines: 1,
+          style: Theme.of(context).textTheme.displayLarge,
         ),
-      ),
+        const SizedBox(height: 48),
+        _languages(),
+        Expanded(
+          child: Container(),
+        ),
+        _next(),
+        const SizedBox(height: 32),
+      ],
     );
   }
 
@@ -140,16 +105,27 @@ class _LanguagePageState extends State<LanguagePage> {
   }
 
   Widget _languages() {
-    return SizedBox(
-      height: 370,
-      child: MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: ListView.builder(
-          itemCount: languages.length,
-          itemBuilder: (context, index) {
-            return _listTile(languages[index], lang[index], regions[index], index);
-          },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          border: Border.all(
+            color: Colors.grey[700]!,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+        height: 260,
+        child: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: ListView.builder(
+            itemCount: languages.length,
+            itemBuilder: (context, index) {
+              return _listTile(languages[index], lang[index], regions[index], index);
+            },
+          ),
         ),
       ),
     );

@@ -28,9 +28,11 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
       (mapList) => {
         for (var map in mapList)
           {
-            print(map['streaming_logo']),
-            selectedStreamingServices[int.parse(map['streaming_id'].toString())] = map['streaming_logo'].toString()
+            selectedStreamingServices[int.parse(map['streaming_id'].toString())] = map['streaming_logo'].toString(),
           },
+        setState(
+          () {},
+        )
       },
     );
     super.initState();
@@ -142,7 +144,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                   }
                 },
                 child: Text(
-                  "close".tr(),
+                  "done".tr(),
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),

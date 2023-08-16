@@ -19,27 +19,28 @@
     "example_3": "• mit Tom Cruise und unter der Regie von Steven Spielberg",
     "example_4": "• basierend auf einer echten Geschichte",
     "example_5": "• über künstliche Intelligenz, mit guten Bewertungen",
-
     "here_recommendation": "Wir empfehlen",
     "watch_it_on": "Verfügbar auf:",
     "accept": "Akzeptieren",
     "generating": "Generiere Empfehlungen",
     "fetching": "Suche nach Informationen",
     "filtering": "Filter über deine Streaming-Dienste",
-    "director": "Regisseur: ",
+    "director": "Regisseur*in: ",
     "tmdb_score": "TMDB Bewertung: ",
     "prompt_issue": "Es gab ein Problem mit deiner Eingabe. Bitte versuche es nochmal",
     "no_movies": "Wir konnten keine Ergebnisse für deine Streaming-Dienste finden. Bitte versuche es nochmal",
-
     "select_country": "Wähle dein Land aus",
     "done": "Bestätigen",
 
     "change_region": "Land ändern",
     "edit_streaming": "Streaming-Dienste ändern",
+    "edit_language": "Sprache ändern",
     "rate_app": "App bewerten",
     "share": "Teilen",
     "about": "Infos",
     "privacy_policy": "Datenschutzrichtlinie",
+    "select_streaming": "Wähle deine Streaming-Dienste",
 
-    "select_streaming": "Wähle deine Streaming-Dienste"
+    "prompt_1": "Deine Aufgabe besteht darin, 30 Titel zurückzugeben (im Format „Titel y:Veröffentlichungsdatum“,, mit zwei Kommas, in einer Zeile und nicht als nummerierte Liste!) von Filmen ",
+    "prompt_2": "Hier ist eine Beispielantwort: Star Wars y: 1977,, Jurassic Park y: 1993. Nummeriere die Antwortelemente nicht! Empfehle nicht mehr als einen Film aus demselben Franchise!"
 }

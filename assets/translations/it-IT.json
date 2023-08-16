@@ -5,7 +5,6 @@
     "complete_sentence": "Completa la frase (almeno 6 caratteri)",
     "recommend_a_movie": "Consiglia un film... ",
     "go": "VAI",
-    "close": "Chiudi",
     "with_action": "con tanta azione",
     "step_one": "Primo passo: Inserisci la tua richiesta. Semplicemente continua la frase 'consiglia un film...' ",
     "try_with_action": "\nproviamo con 'con tanta azione'",
@@ -20,7 +19,7 @@
     "example_4": "• basato su una storia vera",
     "example_5": "• sull'intelligenza artificiale, con buone recensioni",
 
-    "here_recommendation": "Ti raccomandiamo",
+    "here_recommendation": "Ti consigliamo",
     "watch_it_on": "Lo trovi su:",
     "accept": "Accetta",
     "generating": "Sto generando i consigli",
@@ -36,10 +35,14 @@
 
     "change_region": "Cambia paese",
     "edit_streaming": "Cambia servizi streaming",
+    "edit_language": "Cambia lingua",
     "rate_app": "Valuta l'app",
     "share": "Condividi",
     "about": "Informazioni",
     "privacy_policy": "Normativa sulla privacy",
 
-    "select_streaming": "Seleziona i tuoi servizi di streaming"
+    "select_streaming": "Seleziona i tuoi servizi di streaming",
+
+    "prompt_1": "Il tuo compito è restituire 30 titoli (nel formato \"titolo y:data di uscita\",, con doppie virgole su una riga e non come elenco numerato!) di film",
+    "prompt_2": "Ecco un esempio di risposta: star wars y:1977,, Jurassic Park y:1993. Non numerare gli elementi di risposta! Non consigliare più di un film della stessa serie!"
 }

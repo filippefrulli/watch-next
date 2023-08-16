@@ -103,7 +103,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               child: Container(),
             ),
             goButton(),
-            const SizedBox(height: 46),
+            const SizedBox(height: 48),
           ],
         ),
       ),
@@ -443,9 +443,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
               builder: (context) => RecommandationResultsPage(requestString: _controller.text),
             ),
           );
-          setState(() {
-            _controller.text = '';
-          });
         } else {
           showToastWidget(
             ToastWidget(

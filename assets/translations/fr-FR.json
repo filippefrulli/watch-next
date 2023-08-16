@@ -14,7 +14,7 @@
     "connect_to_internet": "Veuillez vous connecter à Internet et réessayer",
     "invalid_input": "Saisie invalide, veuillez modifier votre requête et réessayer",
     "need_inspiration": "Besoin d'inspiration?\nHVoici quelques exemples",
-    "example_1": "• omantique et drôle, idéal pour un premier rendez-vous",
+    "example_1": "• Romantique et drôle, idéal pour un premier rendez-vous",
     "example_2": "• qui me fera pleurer",
     "example_3": "• Avec Tom Cruise et réalisé par Steven Spielberg",
     "example_4": "• Basé sur une histoire vraie",
@@ -23,7 +23,7 @@
     "here_recommendation": "Nous recommandons",
     "watch_it_on": "Trouve-le sur:",
     "accept": "Accepter",
-    "generating": "Génération de recommandations",
+    "generating": "Génération des recommandations",
     "fetching": "Récupération des informations",
     "filtering": "Filtrage par vos services",
     "director": "Directeur: ",
@@ -36,10 +36,14 @@
 
     "change_region": "Changer le pays",
     "edit_streaming": "Changer les services de streaming",
+    "edit_language": "Changer la langue",
     "rate_app": "Noter l'application",
     "share": "Partager",
     "about": "Info",
     "privacy_policy": "Politique de confidentialité",
 
-    "select_streaming": "Choisis tes services de streaming"
+    "select_streaming": "Choisis tes services de streaming",
+
+    "prompt_1": "Ton tâche consiste à renvoyer 30 titres (au format \"titre y:date de sortie\",, avec des doubles virgules sur une ligne et non sous forme de liste numérotée !) de films",
+    "prompt_2": "Voici un exemple de réponse : star wars y:1977,, Jurassic Park y:1993. Ne numérotez pas les éléments de réponse ! Ne recommandez pas plus d'un film de la même franchise !. Ne pas répondre par bien sur, seulement la liste"    
 }

@@ -35,11 +35,15 @@
     "done": "Confirmar",
 
     "change_region": "Cambiar pais",
-    "edit_streaming": "Editar servicios de transmisión",
+    "edit_streaming": "Cambiar servicios de transmisión",
+    "edit_language": "Cambiar idioma",
     "rate_app": "Califica la aplicación",
     "share": "Compartir",
     "about": "Información",
     "privacy_policy": "Política de privacidad",
 
-    "select_streaming": "Selecciona tus servicios de transmisión"
+    "select_streaming": "Selecciona tus servicios de transmisión",
+
+    "prompt_1": "Su tarea es devolver 30 títulos (en el formato \"título y:fecha de lanzamiento\",, con comas dobles en una línea y no como una lista numerada) de películas",
+    "prompt_2": "Aquí hay una respuesta de ejemplo: star wars y:1977,, Jurassic Park y:1993. ¡No numere los elementos de respuesta! ¡No recomiendo más de una película de la misma franquicia!"
 }

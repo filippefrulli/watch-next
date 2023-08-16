@@ -554,9 +554,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     final request = ChatCompleteText(
       messages: [
         Messages(
-            role: Role.assistant,
-            content:
-                'Your task is to return 30 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend more than one movie from the same franchise!'),
+          role: Role.assistant,
+          content: 'prompt_1'.tr() + widget.requestString + 'prompt_2'.tr(),
+        ),
       ],
       temperature: 0.9,
       maxToken: 200,

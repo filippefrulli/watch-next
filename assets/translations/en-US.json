@@ -4,6 +4,9 @@
     "find_something": "Find something to watch next",
     "complete_sentence": "Complete the sentence (at least 6 characters)",
     "recommend_a_movie": "Recommend a movie... ",
+    "recommend_a_show": "Recommend a show... ",
+    "movie": "Movie",
+    "tv_show": "TV show",
     "go": "GO",
     "close": "Close",
     "with_action": "with a lot of action",
@@ -19,6 +22,11 @@
     "example_3": "• starring Tom Cruise and directed by Steven Spielberg",
     "example_4": "• based on a true story",
     "example_5": "• about artificial intelligence, with good reviews",
+    "example_show_1": "• that is finished and has a happy ending",
+    "example_show_2": "• about sports",
+    "example_show_3": "• with episodes shorter than 30 minutes",
+    "example_show_4": "• with less than 5 seasons",
+    "example_show_5": "• that is reality television",
 
     "here_recommendation": "We recommend",
     "watch_it_on": "Available on:",
@@ -44,6 +52,12 @@
 
     "select_streaming": "Select your streaming services",
 
-    "prompt_1": "Your task is to return 30 titles (in the format \"title y:release date\",, with double commas on one line and not as anumbered list!) of movies",
-    "prompt_2": "Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend more than one movie from the same franchise!"
+    "validation_prompt": "Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: \"Recommend a movie that is romantic and funny, ideal for a first date\", \"Recommend a movie starring Tom Cruise and directed by Steven Spielberg\", \"Recommend a movie about artificial intelligence, with good reviews\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie",
+    "validation_prompt_series": "Your job is to validate wether a given sentence is a request to recommend a tv show. Examples of correct prompts are: \"Recommend a tv show that has less than 5 seasons\", \"Recommend a tv show about sports\", \"Recommend a tv show with episodes shorter than 30 minutes\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a tv show",
+
+    "prompt_1": "Your task is to return 30 unique titles (in the format \"title y:release date\",, with double commas on one line and not as a numbered list!) of movies",
+    "prompt_2": "Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend more than one movie from the same franchise!",
+
+    "prompt_series_1": "Your task is to return 30 unique titles (in the format \"title y:first air date\",, with double commas on one line and not as a numbered list!) of tv shows",
+    "prompt_series_2": "Here is an example response: Game of Thrones y:2011,, Stranger Things y:2016. Do not number the response elements!"
 }

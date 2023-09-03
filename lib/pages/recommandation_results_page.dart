@@ -10,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/objects/movie_credits.dart';
-import 'package:watch_next/objects/movie_details.dart';
 import 'package:watch_next/objects/streaming_service.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/services/http_service.dart';
@@ -20,7 +19,9 @@ import 'package:http/http.dart' as http;
 
 class RecommandationResultsPage extends StatefulWidget {
   final String requestString;
-  const RecommandationResultsPage({Key? key, required this.requestString}) : super(key: key);
+  final int type;
+
+  const RecommandationResultsPage({Key? key, required this.requestString, required this.type}) : super(key: key);
 
   @override
   State<RecommandationResultsPage> createState() => _RecommandationResultsPageState();
@@ -37,7 +38,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   bool askingGpt = false;
   bool fetchingMovieInfo = false;
   bool filtering = false;
-  MovieDetails selectedMovie = MovieDetails();
+  WatchObject selectedWatchObject = WatchObject();
   PanelController pc = PanelController();
 
   late Future<dynamic> resultList;
@@ -120,8 +121,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data.length > 0) {
               length = snapshot.data.length;
-              selectedMovie = snapshot.data[index];
-              return recommandationContent(selectedMovie);
+              selectedWatchObject = snapshot.data[index];
+              return recommandationContent(selectedWatchObject);
             } else {
               return loadingWidget();
             }
@@ -131,7 +132,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
   }
 
-  Widget recommandationContent(MovieDetails selectedMovie) {
+  Widget recommandationContent(WatchObject watchObject) {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.85,
       child: Column(
@@ -139,7 +140,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           Expanded(
             flex: 20,
             child: recommandationsElementWidget(
-              selectedMovie.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
+              watchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
             ),
           ),
           Expanded(
@@ -243,14 +244,24 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         ),
         TextButton(
           onPressed: () async {
-            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedMovie.id!);
-            HttpService().fetchTrailer(http.Client(), selectedMovie.id!).then((value) {
-              setState(() {
-                trailerList = value;
-              });
+            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedWatchObject.id!);
+            if (widget.type == 0) {
+              HttpService().fetchTrailer(http.Client(), selectedWatchObject.id!).then((value) {
+                setState(() {
+                  trailerList = value;
+                });
 
-              waitForImages();
-            });
+                waitForImages();
+              });
+            } else {
+              HttpService().fetchTrailerSeries(http.Client(), selectedWatchObject.id!).then((value) {
+                setState(() {
+                  trailerList = value;
+                });
+
+                waitForImages();
+              });
+            }
             pc.open();
           },
           child: Container(
@@ -285,8 +296,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   }
 
   Widget streamingOption() {
-    if (selectedMovie.watchProviders != null) {
-      if (selectedMovie.watchProviders?.first == null) {
+    if (selectedWatchObject.watchProviders != null) {
+      if (selectedWatchObject.watchProviders?.first == null) {
         return Container();
       } else {
         return FutureBuilder(
@@ -351,7 +362,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           child: TextButton(
             onPressed: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setInt('accepted_movie', selectedMovie.id!);
+              prefs.setInt('accepted_movie', selectedWatchObject.id!);
               if (mounted) {
                 Navigator.of(context).pop();
               }
@@ -425,7 +436,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.85,
                 child: Text(
-                  selectedMovie.title ?? '',
+                  selectedWatchObject.title ?? '',
                   maxLines: 2,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -437,26 +448,12 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           const SizedBox(height: 16),
           Container(height: 1, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          Text(selectedMovie.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
+          Text(selectedWatchObject.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
           const SizedBox(height: 16),
           Container(height: 1, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          FutureBuilder<dynamic>(
-            future: movieCredits,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
-                  "director".tr() + getDirector(snapshot.data),
-                  style: Theme.of(context).textTheme.displaySmall,
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-          const SizedBox(height: 8),
           Text(
-            "tmdb_score".tr() + (selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''),
+            "tmdb_score".tr() + (selectedWatchObject.tmdbRating?.toStringAsFixed(1) ?? ''),
             style: Theme.of(context).textTheme.displaySmall,
           ),
           const SizedBox(height: 16),
@@ -529,7 +526,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   Widget streamingLogo(List<StreamingService> streamingList) {
     for (StreamingService item in streamingList) {
-      if (item.providerId == selectedMovie.watchProviders!.first) {
+      if (item.providerId == selectedWatchObject.watchProviders!.first) {
         return CachedNetworkImage(
           fit: BoxFit.fill,
           imageUrl: "http://image.tmdb.org/t/p/original//${item.logoPath}",
@@ -554,12 +551,13 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     final request = ChatCompleteText(
       messages: [
         Messages(
-          role: Role.assistant,
-          content: 'prompt_1'.tr() + widget.requestString + 'prompt_2'.tr(),
-        ),
+            role: Role.assistant,
+            content: widget.type == 0
+                ? 'prompt_1'.tr() + widget.requestString + 'prompt_2'.tr()
+                : 'prompt_series_1'.tr() + widget.requestString + 'prompt_series_2'.tr()),
       ],
-      temperature: 0.9,
-      maxToken: 200,
+      temperature: 0.6,
+      maxToken: 400,
       model: GptTurboChatModel(),
     );
 
@@ -578,9 +576,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     setState(() {
       fetchingMovieInfo = true;
     });
-    List<MovieDetails> movieList = [];
-    List<String> responseMovies = response.split(',,');
-    if (responseMovies.isEmpty) {
+
+    List<WatchObject> watchObjectsList = [];
+
+    List<String> responseTitles = response.split(',,');
+    if (responseTitles.isEmpty) {
       Navigator.pop(context);
       Fluttertoast.showToast(
         msg: "prompt_issue".tr(),
@@ -592,20 +592,46 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         fontSize: 16.0,
       );
     }
-    for (String movieTitle in responseMovies) {
+    for (String movieTitle in responseTitles) {
       List<String> list = movieTitle.split('y:');
       if (list.length > 1) {
-        await HttpService().findMovieByTitle(http.Client(), list[0], list[1]).then(
-          (movieResult) {
-            if (movieResult.id != null) {
-              HttpService().fetchMovieDetails(http.Client(), movieResult.id!).then(
-                (movieDetail) {
-                  movieList.add(movieDetail);
-                },
-              );
-            }
-          },
-        );
+        if (widget.type == 0) {
+          await HttpService().findMovieByTitle(http.Client(), list[0], list[1]).then(
+            (movieResult) {
+              if (movieResult.id != null) {
+                HttpService().fetchMovieDetails(http.Client(), movieResult.id!).then(
+                  (movieDetail) {
+                    watchObjectsList.add(
+                      WatchObject(
+                        posterPath: movieDetail.posterPath,
+                        overview: movieDetail.overview,
+                        tmdbRating: movieDetail.voteAverage,
+                        id: movieDetail.id,
+                        title: movieDetail.title,
+                      ),
+                    );
+                  },
+                );
+              }
+            },
+          );
+        } else {
+          await HttpService().findShowByTitle(http.Client(), list[0], list[1]).then(
+            (seriesResult) {
+              if (seriesResult.id != null) {
+                watchObjectsList.add(
+                  WatchObject(
+                    posterPath: seriesResult.posterPath,
+                    overview: seriesResult.overview,
+                    tmdbRating: seriesResult.voteAverage,
+                    id: seriesResult.id,
+                    title: seriesResult.title,
+                  ),
+                );
+              }
+            },
+          );
+        }
       } else {}
     }
 
@@ -613,35 +639,52 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       fetchingMovieInfo = false;
     });
 
-    return movieList;
+    return watchObjectsList;
   }
 
-  filterProviders(List<MovieDetails> movieList) async {
+  filterProviders(List<WatchObject> watchObjectList) async {
     setState(() {
       filtering = true;
     });
 
-    Map<int, MovieDetails> movieMap = {};
-    for (MovieDetails movie in List<MovieDetails>.from(movieList)) {
-      await HttpService()
-          .getWatchProviders(
-            http.Client(),
-            movie.id!,
-          )
-          .then(
-            (value) => {
-              if (value.isNotEmpty)
-                {
-                  movie.watchProviders = value,
-                  movieMap[movie.id!] = movie,
-                }
-            },
-          );
+    Map<int, WatchObject> watchObjectMap = {};
+    for (WatchObject watchObject in List<WatchObject>.from(watchObjectList)) {
+      if (widget.type == 0) {
+        await HttpService()
+            .getWatchProviders(
+              http.Client(),
+              watchObject.id!,
+            )
+            .then(
+              (value) => {
+                if (value.isNotEmpty)
+                  {
+                    watchObject.watchProviders = value,
+                    watchObjectMap[watchObject.id!] = watchObject,
+                  }
+              },
+            );
+      } else {
+        await HttpService()
+            .getWatchProvidersSeries(
+              http.Client(),
+              watchObject.id!,
+            )
+            .then(
+              (value) => {
+                if (value.isNotEmpty)
+                  {
+                    watchObject.watchProviders = value,
+                    watchObjectMap[watchObject.id!] = watchObject,
+                  }
+              },
+            );
+      }
     }
     setState(() {
       filtering = false;
     });
-    if (movieMap.values.toList().isEmpty && mounted) {
+    if (watchObjectMap.values.toList().isEmpty && mounted) {
       Navigator.of(context).pop();
       Fluttertoast.showToast(
           msg: "no_movies".tr(),
@@ -652,7 +695,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           textColor: Colors.white,
           fontSize: 16.0);
     } else {
-      return movieMap.values.toList();
+      return watchObjectMap.values.toList();
     }
   }
 
@@ -705,4 +748,22 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     await getTrailerImages();
     setState(() {});
   }
+}
+
+class WatchObject {
+  String? posterPath;
+  String? overview;
+  double? tmdbRating;
+  int? id;
+  String? title;
+  List<int>? watchProviders;
+
+  WatchObject({
+    this.posterPath,
+    this.overview,
+    this.tmdbRating,
+    this.id,
+    this.title,
+    this.watchProviders,
+  });
 }

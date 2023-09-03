@@ -22,6 +22,10 @@
 		<string>es</string>
 		<string>fr</string>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+  		<string>https</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>watch_next</string>
 	<key>CFBundlePackageType</key>

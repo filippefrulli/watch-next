@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
@@ -21,25 +22,25 @@ class MainMenuPage extends StatefulWidget {
   State<MainMenuPage> createState() => _MainMenuPageState();
 }
 
-int currentIndex = -1;
-
-final openAI = OpenAI.instance
-    .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
-
-final _controller = TextEditingController();
-
-bool isLongEnough = false;
-bool isValidQuery = false;
-bool enableLoading = false;
-bool hideExample = false;
-
-GlobalKey textFieldKey = GlobalKey();
-GlobalKey goButtonKey = GlobalKey();
-
-late TutorialCoachMark tutorialCoachMark;
-
 class _MainMenuPageState extends State<MainMenuPage> {
+  int currentIndex = -1;
+
+  final openAI = OpenAI.instance
+      .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
+
+  final _controller = TextEditingController();
+
+  bool isLongEnough = false;
+  bool isValidQuery = false;
+  bool enableLoading = false;
+  bool hideExample = false;
+
+  GlobalKey textFieldKey = GlobalKey();
+  GlobalKey goButtonKey = GlobalKey();
+
+  late TutorialCoachMark tutorialCoachMark;
   bool noInternet = false;
+  int typeIsMovie = 1; //0 = movie 1 = show
 
   @override
   void initState() {
@@ -81,7 +82,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
               child: Container(),
             ),
             description(),
-            const SizedBox(height: 36),
+            const SizedBox(height: 32),
+            switchWidget(),
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
@@ -91,7 +93,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   size: 26,
                 ),
                 onPressed: () {
-                  showExamples();
+                  typeIsMovie == 0 ? showExamples() : showExamplesShows();
                 },
               ),
             ),
@@ -103,7 +105,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               child: Container(),
             ),
             goButton(),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -152,6 +154,30 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
+  Widget switchWidget() {
+    return ToggleSwitch(
+      minWidth: 110.0,
+      initialLabelIndex: typeIsMovie,
+      cornerRadius: 15.0,
+      animate: true,
+      animationDuration: 400,
+      activeFgColor: Colors.white,
+      inactiveBgColor: Colors.grey[900],
+      inactiveFgColor: Colors.white,
+      totalSwitches: 2,
+      labels: ['movie'.tr(), 'tv_show'.tr()],
+      activeBgColors: const [
+        [Colors.orange],
+        [Colors.orange],
+      ],
+      onToggle: (index) {
+        setState(() {
+          typeIsMovie = index!;
+        });
+      },
+    );
+  }
+
   Widget description() {
     return Text(
       "find_something".tr(),
@@ -177,7 +203,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           filled: true,
           fillColor: const Color.fromRGBO(35, 35, 50, 1),
           helperText: "complete_sentence".tr(),
-          hintText: "recommend_a_movie".tr(),
+          hintText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
           prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12),
           suffixText: "",
           helperStyle: TextStyle(
@@ -271,10 +297,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
       messages: [
         Messages(
             role: Role.assistant,
-            content:
-                'Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: "Recommend a movie that is romantic and funny, ideal for a first date", "Recommend a movie starring Tom Cruise and directed by Steven Spielberg", "Recommend a movie about artificial intelligence, with good reviews". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie ${_controller.text}'),
+            content: typeIsMovie == 0
+                ? 'validation_prompt'.tr() + _controller.text
+                : 'validation_prompt_series'.tr() + _controller.text),
       ],
-      maxToken: 200,
+      maxToken: 400,
       model: GptTurbo0301ChatModel(),
     );
 
@@ -440,7 +467,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         if (isValidQuery && context.mounted) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => RecommandationResultsPage(requestString: _controller.text),
+              builder: (context) => RecommandationResultsPage(requestString: _controller.text, type: typeIsMovie),
             ),
           );
         } else {
@@ -513,6 +540,71 @@ class _MainMenuPageState extends State<MainMenuPage> {
             const SizedBox(height: 12),
             Text(
               "example_5".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void showExamplesShows() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: ShapeBorder.lerp(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          1,
+        )!,
+        backgroundColor: Colors.grey[900]!,
+        title: Text("need_inspiration".tr()),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "example_show_1".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_2".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_3".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_4".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_5".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
           ],

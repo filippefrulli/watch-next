@@ -22,10 +22,13 @@ class HttpService {
   final String baseUrl = 'https://www.youtube.com/watch?v=';
 
   Future<Results> findMovieByTitle(http.Client client, String title, String year) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     var response = await client.get(
       Uri.https('api.themoviedb.org', '/3/search/movie', {
         'api_key': apiKey,
-        'language': 'en-US',
+        'language': lang,
         'query': title,
         'year': year,
       }),
@@ -43,10 +46,13 @@ class HttpService {
   }
 
   Future<SeriesResults> findShowByTitle(http.Client client, String title, String year) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     var response = await client.get(
       Uri.https('api.themoviedb.org', '/3/search/tv', {
         'api_key': apiKey,
-        'language': 'en-US',
+        'language': lang,
         'query': title,
         'first_air_date_year': year,
         'include_adult': 'true',
@@ -65,11 +71,14 @@ class HttpService {
   }
 
   Future<MovieDetails> fetchMovieDetails(http.Client client, int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     final response = await client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/movie/$id',
-        {'api_key': apiKey, 'language': 'en-US'},
+        {'api_key': apiKey, 'language': lang},
       ),
     );
 
@@ -79,11 +88,14 @@ class HttpService {
   }
 
   Future<SeriesDetails> fetchSeriesDetails(http.Client client, int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     final response = await client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/tv/$id',
-        {'api_key': apiKey, 'language': 'en-US'},
+        {'api_key': apiKey, 'language': lang},
       ),
     );
 

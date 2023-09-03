@@ -134,6 +134,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       'Watch next uses TMDb but is not endorsed or certified by TMDb.',
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Watch provider information is provided by JustWatch.',
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       'We do not claim ownership of any of the images or data provided.',

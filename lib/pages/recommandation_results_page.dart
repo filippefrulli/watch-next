@@ -448,7 +448,12 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           const SizedBox(height: 16),
           Container(height: 1, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          Text(selectedWatchObject.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
+          Text(
+            selectedWatchObject.overview ?? '',
+            maxLines: 17,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.displaySmall,
+          ),
           const SizedBox(height: 16),
           Container(height: 1, color: Colors.grey[800]),
           const SizedBox(height: 16),
@@ -599,18 +604,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           await HttpService().findMovieByTitle(http.Client(), list[0], list[1]).then(
             (movieResult) {
               if (movieResult.id != null) {
-                HttpService().fetchMovieDetails(http.Client(), movieResult.id!).then(
-                  (movieDetail) {
-                    watchObjectsList.add(
-                      WatchObject(
-                        posterPath: movieDetail.posterPath,
-                        overview: movieDetail.overview,
-                        tmdbRating: movieDetail.voteAverage,
-                        id: movieDetail.id,
-                        title: movieDetail.title,
-                      ),
-                    );
-                  },
+                watchObjectsList.add(
+                  WatchObject(
+                    posterPath: movieResult.posterPath,
+                    overview: movieResult.overview,
+                    tmdbRating: movieResult.voteAverage,
+                    id: movieResult.id,
+                    title: movieResult.title,
+                  ),
                 );
               }
             },

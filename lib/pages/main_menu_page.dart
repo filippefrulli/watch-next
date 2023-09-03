@@ -40,7 +40,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   late TutorialCoachMark tutorialCoachMark;
   bool noInternet = false;
-  int typeIsMovie = 1; //0 = movie 1 = show
+  int typeIsMovie = 0; //0 = movie 1 = show
 
   @override
   void initState() {
@@ -245,8 +245,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
               goButtonPressed();
             },
             child: Container(
-              height: 60,
-              width: 180,
+              height: 50,
+              width: 160,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(
                   Radius.circular(25),

@@ -52,6 +52,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
         const SizedBox(height: 48),
         Text(
           "select_streaming".tr(),
+          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.displayMedium,
         ),
         const SizedBox(height: 32),

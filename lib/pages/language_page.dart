@@ -62,6 +62,7 @@ class _LanguagePageState extends State<LanguagePage> {
         Text(
           'Select your language',
           maxLines: 1,
+          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.displayLarge,
         ),
         const SizedBox(height: 48),
@@ -148,6 +149,7 @@ class _LanguagePageState extends State<LanguagePage> {
           context.setLocale(Locale(lang, region));
         }
         prefs.setInt('language_number', index);
+        prefs.setString('lang', '$lang-$region');
 
         setState(() {
           selected = index;

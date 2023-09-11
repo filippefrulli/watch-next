@@ -185,7 +185,7 @@ class HttpService {
 
     List<StreamingService> list = providers.results!;
     list.removeWhere(
-      (item) => item.displayPriority! > 10,
+      (item) => item.displayPriority! > 100,
     );
 
     List<StreamingService> resultList = providers.results!;

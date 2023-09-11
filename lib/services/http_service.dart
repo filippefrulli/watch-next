@@ -188,13 +188,13 @@ class HttpService {
       (item) => item.displayPriority! > 100,
     );
 
-    List<StreamingService> resultList = providers.results!;
-    if (Platform.isIOS) {
-      resultList.removeWhere(
-        (item) => item.providerId == 337,
-      );
-    }
-    return resultList;
+    // List<StreamingService> resultList = providers.results!;
+    // if (Platform.isIOS) {
+    //   resultList.removeWhere(
+    //     (item) => item.providerId == 337,
+    //   );
+    // }
+    return list;
   }
 
   Future<MovieCredits> fetchMovieCredits(http.Client client, int id) async {

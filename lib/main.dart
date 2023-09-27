@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/region_page.dart';
-
+import 'package:watch_next/pages/language_page.dart';
 import 'pages/main_menu_page.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemStatusBarContrastEnforced: true,
       systemNavigationBarColor: Colors.transparent,
@@ -17,7 +18,19 @@ void main() async {
       statusBarIconBrightness: Brightness.dark));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive).then(
     (_) => runApp(
-      const MyApp(),
+      EasyLocalization(
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('it', 'IT'),
+          Locale('de', 'DE'),
+          Locale('fr', 'FR'),
+          Locale('es', 'ES'),
+        ],
+        path: 'assets/translations',
+        startLocale: const Locale('en', 'US'),
+        fallbackLocale: const Locale('en', 'US'),
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -32,6 +45,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(
       child: MaterialApp(
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
         debugShowCheckedModeBanner: false,
         routes: {
           '/main': (BuildContext context) => const MainMenuPage(),
@@ -48,6 +64,9 @@ class MyApp extends StatelessWidget {
             secondary: Colors.orange,
             brightness: Brightness.dark,
           ),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
           fontFamily: 'Raleway',
 
           // Define the default TextTheme. Use this to specify the default
@@ -130,7 +149,7 @@ class SplashState extends State<Splash> {
     } else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const RegionIntroPage(),
+          builder: (context) => const LanguagePage(),
         ),
       );
     }
@@ -176,7 +195,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
         statusBarIconBrightness: Brightness.dark));
 
 //Setting SystmeUIMode
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: [SystemUiOverlay.top]);
 
     return WillPopScope(
       onWillPop: () async => false,

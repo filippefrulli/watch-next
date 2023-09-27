@@ -1,8 +1,9 @@
 import 'dart:io';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:watch_next/pages/language_page.dart';
 import 'package:watch_next/pages/region_page.dart';
 import 'package:watch_next/pages/streaming_services_page.dart';
 import 'package:watch_next/widgets/divider.dart';
@@ -43,16 +44,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget pageBody() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            const SizedBox(height: 64),
+            const SizedBox(height: 48),
             TextButton(
-              child: _row(("Change region"), Icons.public),
+              child: _row(("change_region".tr()), Icons.public),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -63,7 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             TextButton(
-              child: _row(("Edit streaming services"), Icons.edit),
+              child: _row(("edit_streaming".tr()), Icons.edit),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -73,9 +74,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 );
               },
             ),
+            TextButton(
+              child: _row(("edit_language".tr()), Icons.language_outlined),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LanguagePage(),
+                  ),
+                );
+              },
+            ),
             const DividerWidget(padding: 0, height: 32),
             TextButton(
-              child: _row(("Rate the app"), Icons.star),
+              child: _row(("rate_app".tr()), Icons.star),
               onPressed: () async {
                 if (Platform.isAndroid) {
                   final Uri url =
@@ -93,7 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
             TextButton(
-              child: _row(("Share"), Icons.share),
+              child: _row(("share".tr()), Icons.share),
               onPressed: () {
                 if (Platform.isAndroid) {
                   Share.share(
@@ -106,37 +118,40 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const DividerWidget(padding: 0, height: 32),
             TextButton(
-              child: _row(("About"), Icons.info),
+              child: _row(("about".tr()), Icons.info),
               onPressed: () {
                 showAboutDialog(
                   context: context,
                   applicationName: 'Watch next',
-                  applicationIcon: const FlutterLogo(),
-                  applicationVersion: "1.0.0",
                   children: [
-                    Center(
-                      child: Image.asset(
-                        'assets/TMDb.png',
-                        width: 50.0,
-                        height: 50.0,
-                      ),
+                    Image.asset(
+                      'assets/TMDb.png',
+                      width: 40.0,
+                      height: 40.0,
                     ),
-                    const Text(
-                      'Watch next uses TMDb but is not endorsed or certified by TMDb',
+                    const SizedBox(height: 4),
+                    Text(
+                      'Watch next uses TMDb but is not endorsed or certified by TMDb.',
+                      style: Theme.of(context).textTheme.displaySmall,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Watch provider information is provided by JustWatch.',
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'We do not claim ownership of any of the images or data provided.',
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
                     const DividerWidget(padding: 0, height: 16),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'We do not claim ownership of any of the images or data provided',
-                    ),
                   ],
                 );
               },
             ),
             const DividerWidget(padding: 0, height: 16),
             TextButton(
-              child: _row(("Privacy policy"), Icons.receipt),
+              child: _row(("privacy_policy".tr()), Icons.receipt),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -162,7 +177,11 @@ class _SettingsPageState extends State<SettingsPage> {
         children: <Widget>[
           Icon(icon, color: Colors.orange),
           const SizedBox(width: 16),
-          Text(text, style: Theme.of(context).textTheme.displayMedium),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.displaySmall,
+            maxLines: 1,
+          ),
         ],
       ),
     );

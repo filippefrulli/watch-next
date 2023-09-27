@@ -28,7 +28,7 @@ class DatabaseService {
         'INSERT OR REPLACE INTO not_interested (movie_id, date) VALUES (?, ?)', [movieId, DateTime.now().toString()]);
   }
 
-  static Future<List<Map>> getAllStreamingServices() async {
+  static Future<List<Map<String, Object?>>> getAllStreamingServices() async {
     Database? db = await DatabaseHelper.instance.database;
 
     return await db!.rawQuery('SELECT * FROM streaming_services');

@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
@@ -22,32 +22,32 @@ class MainMenuPage extends StatefulWidget {
   State<MainMenuPage> createState() => _MainMenuPageState();
 }
 
-int currentIndex = -1;
-
-final openAI = OpenAI.instance
-    .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
-
-final _controller = TextEditingController();
-
-bool isLongEnough = false;
-bool isValidQuery = false;
-bool enableLoading = false;
-bool hideExample = false;
-
-GlobalKey textFieldKey = GlobalKey();
-GlobalKey goButtonKey = GlobalKey();
-
-late TutorialCoachMark tutorialCoachMark;
-
 class _MainMenuPageState extends State<MainMenuPage> {
+  int currentIndex = -1;
+
+  final openAI = OpenAI.instance
+      .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
+
+  final _controller = TextEditingController();
+
+  bool isLongEnough = false;
+  bool isValidQuery = false;
+  bool enableLoading = false;
+  bool hideExample = false;
+
+  GlobalKey textFieldKey = GlobalKey();
+  GlobalKey goButtonKey = GlobalKey();
+
+  late TutorialCoachMark tutorialCoachMark;
   bool noInternet = false;
+  int typeIsMovie = 0; //0 = movie 1 = show
 
   @override
   void initState() {
     createTutorial();
     super.initState();
     _controller.addListener(checkLength);
-    _controller.text = ' ';
+    _controller.text = '';
     hideExample = false;
     Timer(const Duration(seconds: 2), () {
       showTutorial();
@@ -62,11 +62,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-        body: body(),
-      ),
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      body: body(),
     );
   }
 
@@ -77,14 +75,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             topBar(),
             Expanded(
               flex: 2,
               child: Container(),
             ),
             description(),
-            const SizedBox(height: 36),
+            const SizedBox(height: 32),
+            switchWidget(),
             Align(
               alignment: Alignment.centerRight,
               child: IconButton(
@@ -94,7 +93,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   size: 26,
                 ),
                 onPressed: () {
-                  showExamples();
+                  typeIsMovie == 0 ? showExamples() : showExamplesShows();
                 },
               ),
             ),
@@ -106,7 +105,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               child: Container(),
             ),
             goButton(),
-            const SizedBox(height: 46),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -125,7 +124,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         DelayedDisplay(
           fadingDuration: const Duration(milliseconds: 1000),
           child: Text(
-            "Hey There!",
+            "hey_there".tr(),
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
@@ -155,9 +154,33 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
+  Widget switchWidget() {
+    return ToggleSwitch(
+      minWidth: 110.0,
+      initialLabelIndex: typeIsMovie,
+      cornerRadius: 15.0,
+      animate: true,
+      animationDuration: 400,
+      activeFgColor: Colors.white,
+      inactiveBgColor: Colors.grey[900],
+      inactiveFgColor: Colors.white,
+      totalSwitches: 2,
+      labels: ['movie'.tr(), 'tv_show'.tr()],
+      activeBgColors: const [
+        [Colors.orange],
+        [Colors.orange],
+      ],
+      onToggle: (index) {
+        setState(() {
+          typeIsMovie = index!;
+        });
+      },
+    );
+  }
+
   Widget description() {
     return Text(
-      "Find something to watch next",
+      "find_something".tr(),
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.displayMedium,
     );
@@ -179,8 +202,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
         decoration: InputDecoration(
           filled: true,
           fillColor: const Color.fromRGBO(35, 35, 50, 1),
-          helperText: 'Complete the sentence (at least 6 characters)',
-          prefixText: "Recommend a movie... ",
+          helperText: "complete_sentence".tr(),
+          hintText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
           prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12),
           suffixText: "",
           helperStyle: TextStyle(
@@ -222,8 +245,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
               goButtonPressed();
             },
             child: Container(
-              height: 60,
-              width: 180,
+              height: 50,
+              width: 160,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(
                   Radius.circular(25),
@@ -237,7 +260,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         size: 30,
                       )
                     : Text(
-                        "GO",
+                        "go".tr(),
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.grey[900],
@@ -274,10 +297,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
       messages: [
         Messages(
             role: Role.assistant,
-            content:
-                'Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: "Recommend a movie that is romantic and funny, ideal for a first date", "Recommend a movie starring Tom Cruise and directed by Steven Spielberg", "Recommend a movie about artificial intelligence, with good reviews". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie ${_controller.text}'),
+            content: typeIsMovie == 0
+                ? 'validation_prompt'.tr() + _controller.text
+                : 'validation_prompt_series'.tr() + _controller.text),
       ],
-      maxToken: 200,
+      maxToken: 400,
       model: GptTurbo0301ChatModel(),
     );
 
@@ -321,27 +345,30 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   void createTutorial() {
     tutorialCoachMark = TutorialCoachMark(
-        targets: _createTargets(),
-        colorShadow: Colors.grey[900]!,
-        textSkip: "close",
-        paddingFocus: 10,
-        opacityShadow: 0.5,
-        focusAnimationDuration: const Duration(seconds: 2),
-        imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        onClickTarget: (target) {
-          if (target.keyTarget == textFieldKey) {
-            setState(() {
-              _controller.text = "with a lot of action";
-            });
-          } else {
-            goButtonPressed();
-          }
-        },
-        onClickOverlay: (target) {
+      targets: _createTargets(),
+      colorShadow: Colors.grey[900]!,
+      textSkip: "close".tr(),
+      paddingFocus: 10,
+      opacityShadow: 0.5,
+      focusAnimationDuration: const Duration(seconds: 2),
+      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      onClickTarget: (target) {
+        if (target.keyTarget == textFieldKey) {
           setState(() {
-            _controller.text = "with a lot of action";
+            _controller.text = "with_action".tr();
           });
-        });
+        } else {
+          goButtonPressed();
+        }
+      },
+      onClickOverlay: (target) {
+        setState(
+          () {
+            _controller.text = "with_action".tr();
+          },
+        );
+      },
+    );
   }
 
   List<TargetFocus> _createTargets() {
@@ -362,7 +389,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Step 1: Type your query here. Just continue the phrase 'recommend a movie...' ",
+                    "step_one".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ],
@@ -377,11 +404,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "\nLet's try 'With a lot of action'",
+                    "try_with_action".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   Text(
-                    "\n\nTap the box to continue",
+                    "tap_text_field".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ],
@@ -406,7 +433,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Step 2: After entering the text, press the GO button",
+                    "step_two".tr(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ],
@@ -425,9 +452,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
     await checkConnection();
     if (noInternet) {
       showToastWidget(
-        const ToastWidget(
-          title: ('Please connect to the internet and try again'),
-          icon: Icon(Icons.cloud_off, color: Colors.orange, size: 36),
+        ToastWidget(
+          title: "connect_to_internet".tr(),
+          icon: const Icon(Icons.cloud_off, color: Colors.orange, size: 36),
         ),
         duration: const Duration(seconds: 4),
       );
@@ -440,14 +467,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
         if (isValidQuery && context.mounted) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => RecommandationResultsPage(requestString: _controller.text),
+              builder: (context) => RecommandationResultsPage(requestString: _controller.text, type: typeIsMovie),
             ),
           );
         } else {
           showToastWidget(
-            const ToastWidget(
-              title: ('Inalid input, please change your query and try again'),
-              icon: Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
+            ToastWidget(
+              title: "invalid_input".tr(),
+              icon: const Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
             ),
             duration: const Duration(seconds: 4),
           );
@@ -460,34 +487,124 @@ class _MainMenuPageState extends State<MainMenuPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[850]!,
-        title: const Text('Need inspiration? \nHere are some example queries'),
+        shape: ShapeBorder.lerp(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          1,
+        )!,
+        backgroundColor: Colors.grey[900]!,
+        title: Text("need_inspiration".tr()),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '• that is romantic and funny, ideal for a first date\n',
+              "example_1".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• that will make me cry\n',
+              "example_2".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• starring Tom Cruise and directed by Steven Spielberg\n',
+              "example_3".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• based on a true story\n',
+              "example_4".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
             Text(
-              '• about artificial intelligence, with good reviews\n',
+              "example_5".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void showExamplesShows() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: ShapeBorder.lerp(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          1,
+        )!,
+        backgroundColor: Colors.grey[900]!,
+        title: Text("need_inspiration".tr()),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "example_show_1".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_2".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_3".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_4".tr(),
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: Colors.grey[800],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "example_show_5".tr(),
               style: Theme.of(context).textTheme.displaySmall,
             ),
           ],

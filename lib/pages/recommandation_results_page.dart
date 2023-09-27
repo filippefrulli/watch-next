@@ -1,8 +1,8 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -10,17 +10,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/objects/movie_credits.dart';
-import 'package:watch_next/objects/movie_details.dart';
+import 'package:watch_next/objects/streaming_service.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/services/http_service.dart';
-import 'package:watch_next/utils/constants.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/widgets/movie_poster_widget.dart';
 import 'package:http/http.dart' as http;
 
 class RecommandationResultsPage extends StatefulWidget {
   final String requestString;
-  const RecommandationResultsPage({Key? key, required this.requestString}) : super(key: key);
+  final int type;
+
+  const RecommandationResultsPage({Key? key, required this.requestString, required this.type}) : super(key: key);
 
   @override
   State<RecommandationResultsPage> createState() => _RecommandationResultsPageState();
@@ -30,12 +31,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   final openAI = OpenAI.instance
       .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
 
+  late Future<dynamic> servicesList;
+
   int index = 0;
   int length = 0;
   bool askingGpt = false;
   bool fetchingMovieInfo = false;
   bool filtering = false;
-  MovieDetails selectedMovie = MovieDetails();
+  WatchObject selectedWatchObject = WatchObject();
   PanelController pc = PanelController();
 
   late Future<dynamic> resultList;
@@ -53,29 +56,29 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   @override
   initState() {
     super.initState();
+
+    servicesList = HttpService().getWatchProvidersByLocale(http.Client());
     resultList = askGpt();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-        body: SlidingUpPanel(
-          controller: pc,
-          margin: const EdgeInsets.all(8.0),
-          panel: movieInfoPanel(),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(25),
-          ),
-          collapsed: Container(),
-          minHeight: 0,
-          maxHeight: MediaQuery.of(context).size.height * 0.90,
-          backdropEnabled: true,
-          backdropOpacity: 0.8,
-          color: Theme.of(context).primaryColor,
-          body: pageBody(),
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      body: SlidingUpPanel(
+        controller: pc,
+        margin: const EdgeInsets.all(8.0),
+        panel: movieInfoPanel(),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(25),
         ),
+        collapsed: Container(),
+        minHeight: 0,
+        maxHeight: MediaQuery.of(context).size.height * 0.90,
+        backdropEnabled: true,
+        backdropOpacity: 0.8,
+        color: Theme.of(context).primaryColor,
+        body: pageBody(),
       ),
     );
   }
@@ -83,8 +86,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Widget pageBody() {
     return Column(
       children: [
-        const SizedBox(
-          height: 16,
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.05,
         ),
         FutureBuilder<dynamic>(
           future: resultList,
@@ -92,14 +95,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             if (snapshot.hasData && snapshot.data.length > 0) {
               return Column(children: [
                 Text(
-                  'Here is our recommendation',
+                  "here_recommendation".tr(),
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
                   height: 8,
                 ),
                 Text(
-                  length != 0 ? '${index + 1} of $length' : '',
+                  length != 0 ? '${index + 1} / $length' : '',
                   style: Theme.of(context).textTheme.bodySmall,
                 )
               ]);
@@ -118,8 +121,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data.length > 0) {
               length = snapshot.data.length;
-              selectedMovie = snapshot.data[index];
-              return recommandationContent(selectedMovie);
+              selectedWatchObject = snapshot.data[index];
+              return recommandationContent(selectedWatchObject);
             } else {
               return loadingWidget();
             }
@@ -129,15 +132,15 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
   }
 
-  Widget recommandationContent(MovieDetails selectedMovie) {
+  Widget recommandationContent(WatchObject watchObject) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.88,
+      height: MediaQuery.of(context).size.height * 0.85,
       child: Column(
         children: [
           Expanded(
             flex: 20,
             child: recommandationsElementWidget(
-              selectedMovie.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
+              watchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
             ),
           ),
           Expanded(
@@ -145,7 +148,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Container(),
           ),
           Expanded(
-            flex: 4,
+            flex: 5,
             child: streamingWidget(),
           ),
           Expanded(
@@ -157,7 +160,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: buttonsRow(),
           ),
           Expanded(
-            flex: 2,
+            flex: 1,
             child: Container(),
           ),
         ],
@@ -196,12 +199,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         ),
         IconButton(
           onPressed: () {
-            setState(() {
-              if (index == length - 1) {
-              } else {
-                index++;
-              }
-            });
+            setState(
+              () {
+                if (index == length - 1) {
+                } else {
+                  index++;
+                }
+              },
+            );
           },
           icon: Icon(
             Icons.arrow_forward_ios_rounded,
@@ -226,11 +231,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Watch it on:',
+              "watch_it_on".tr(),
               textAlign: TextAlign.left,
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             streamingOption(),
           ],
         ),
@@ -239,14 +244,24 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         ),
         TextButton(
           onPressed: () async {
-            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedMovie.id!);
-            HttpService().fetchTrailer(http.Client(), selectedMovie.id!).then((value) {
-              setState(() {
-                trailerList = value;
-              });
+            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedWatchObject.id!);
+            if (widget.type == 0) {
+              HttpService().fetchTrailer(http.Client(), selectedWatchObject.id!).then((value) {
+                setState(() {
+                  trailerList = value;
+                });
 
-              waitForImages();
-            });
+                waitForImages();
+              });
+            } else {
+              HttpService().fetchTrailerSeries(http.Client(), selectedWatchObject.id!).then((value) {
+                setState(() {
+                  trailerList = value;
+                });
+
+                waitForImages();
+              });
+            }
             pc.open();
           },
           child: Container(
@@ -281,26 +296,38 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   }
 
   Widget streamingOption() {
-    if (selectedMovie.watchProviders != null) {
-      if (selectedMovie.watchProviders?.first == null) {
+    if (selectedWatchObject.watchProviders != null) {
+      if (selectedWatchObject.watchProviders?.first == null) {
         return Container();
       } else {
-        return DelayedDisplay(
-          delay: const Duration(milliseconds: 1000),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            height: 50,
-            width: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.grey[300],
-            ),
-            child: Platform.isIOS
-                ? Image.asset(
-                    providersMapIos[selectedMovie.watchProviders?.first] ?? 'assets/streaming_services/netflix.png')
-                : Image.asset(
-                    providersMap[selectedMovie.watchProviders?.first] ?? 'assets/streaming_services/netflix.png'),
-          ),
+        return FutureBuilder(
+          future: servicesList,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data.length > 0) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: DelayedDisplay(
+                  delay: const Duration(milliseconds: 1000),
+                  child: SizedBox(
+                    height: 64,
+                    width: 64,
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: streamingLogo(
+                          snapshot.data,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return Expanded(
+                child: Container(),
+              );
+            }
+          },
         );
       }
     } else {
@@ -335,13 +362,13 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           child: TextButton(
             onPressed: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setInt('accepted_movie', selectedMovie.id!);
+              prefs.setInt('accepted_movie', selectedWatchObject.id!);
               if (mounted) {
                 Navigator.of(context).pop();
               }
             },
             child: Text(
-              'Accept',
+              "accept".tr(),
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),
@@ -366,19 +393,19 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             ),
             askingGpt
                 ? Text(
-                    "Generating recommendations",
+                    "generating".tr(),
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
             fetchingMovieInfo
                 ? Text(
-                    "Fetching movie information",
+                    "fetching".tr(),
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
             filtering
                 ? Text(
-                    "Filtering by your services",
+                    "filtering".tr(),
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
@@ -409,7 +436,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.85,
                 child: Text(
-                  selectedMovie.title ?? '',
+                  selectedWatchObject.title ?? '',
                   maxLines: 2,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -421,26 +448,17 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           const SizedBox(height: 16),
           Container(height: 1, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          Text(selectedMovie.overview ?? '', style: Theme.of(context).textTheme.displaySmall),
+          Text(
+            selectedWatchObject.overview ?? '',
+            maxLines: 17,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.displaySmall,
+          ),
           const SizedBox(height: 16),
           Container(height: 1, color: Colors.grey[800]),
           const SizedBox(height: 16),
-          FutureBuilder<dynamic>(
-            future: movieCredits,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
-                  "Director: ${getDirector(snapshot.data)}",
-                  style: Theme.of(context).textTheme.displaySmall,
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-          const SizedBox(height: 8),
           Text(
-            "TMDB score: ${selectedMovie.voteAverage?.toStringAsFixed(1) ?? ''}",
+            "tmdb_score".tr() + (selectedWatchObject.tmdbRating?.toStringAsFixed(1) ?? ''),
             style: Theme.of(context).textTheme.displaySmall,
           ),
           const SizedBox(height: 16),
@@ -511,6 +529,26 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     }
   }
 
+  Widget streamingLogo(List<StreamingService> streamingList) {
+    for (StreamingService item in streamingList) {
+      if (item.providerId == selectedWatchObject.watchProviders!.first) {
+        return CachedNetworkImage(
+          fit: BoxFit.fill,
+          imageUrl: "http://image.tmdb.org/t/p/original//${item.logoPath}",
+          placeholder: (context, url) => Container(
+            color: const Color.fromRGBO(11, 14, 23, 1),
+          ),
+          errorWidget: (context, url, error) => Expanded(
+            child: Container(
+              color: Colors.grey[800],
+            ),
+          ),
+        );
+      }
+    }
+    return Container();
+  }
+
   Future<dynamic> askGpt() async {
     setState(() {
       askingGpt = true;
@@ -519,12 +557,13 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       messages: [
         Messages(
             role: Role.assistant,
-            content:
-                'Return 30 titles (in the format "title y:release date",, with double commas on one line and not as anumbered list!) of movies ${widget.requestString}. Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend more than one movie from the same franchise! '),
+            content: widget.type == 0
+                ? 'prompt_1'.tr() + widget.requestString + 'prompt_2'.tr()
+                : 'prompt_series_1'.tr() + widget.requestString + 'prompt_series_2'.tr()),
       ],
-      temperature: 0.3,
-      maxToken: 200,
-      model: GptTurbo0301ChatModel(),
+      temperature: 0.6,
+      maxToken: 400,
+      model: GptTurboChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
@@ -542,31 +581,58 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     setState(() {
       fetchingMovieInfo = true;
     });
-    List<MovieDetails> movieList = [];
-    List<String> responseMovies = response.split(',,');
-    if (responseMovies.isEmpty) {
+
+    List<WatchObject> watchObjectsList = [];
+
+    List<String> responseTitles = response.split(',,');
+    if (responseTitles.isEmpty) {
       Navigator.pop(context);
       Fluttertoast.showToast(
-          msg: "We had an issue with your promt. Please try again",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+        msg: "prompt_issue".tr(),
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
-    for (String movieTitle in responseMovies) {
+    for (String movieTitle in responseTitles) {
       List<String> list = movieTitle.split('y:');
       if (list.length > 1) {
-        await HttpService().findMovieByTitle(http.Client(), list[0], list[1]).then(
-          (movieResult) {
-            if (movieResult.id != null) {
-              HttpService().fetchMovieDetails(http.Client(), movieResult.id!).then((movieDetail) {
-                movieList.add(movieDetail);
-              });
-            }
-          },
-        );
+        if (widget.type == 0) {
+          await HttpService().findMovieByTitle(http.Client(), list[0], list[1]).then(
+            (movieResult) {
+              if (movieResult.id != null) {
+                watchObjectsList.add(
+                  WatchObject(
+                    posterPath: movieResult.posterPath,
+                    overview: movieResult.overview,
+                    tmdbRating: movieResult.voteAverage,
+                    id: movieResult.id,
+                    title: movieResult.title,
+                  ),
+                );
+              }
+            },
+          );
+        } else {
+          await HttpService().findShowByTitle(http.Client(), list[0], list[1]).then(
+            (seriesResult) {
+              if (seriesResult.id != null) {
+                watchObjectsList.add(
+                  WatchObject(
+                    posterPath: seriesResult.posterPath,
+                    overview: seriesResult.overview,
+                    tmdbRating: seriesResult.voteAverage,
+                    id: seriesResult.id,
+                    title: seriesResult.title,
+                  ),
+                );
+              }
+            },
+          );
+        }
       } else {}
     }
 
@@ -574,38 +640,55 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       fetchingMovieInfo = false;
     });
 
-    return movieList;
+    return watchObjectsList;
   }
 
-  filterProviders(List<MovieDetails> movieList) async {
+  filterProviders(List<WatchObject> watchObjectList) async {
     setState(() {
       filtering = true;
     });
 
-    Map<int, MovieDetails> movieMap = {};
-    for (MovieDetails movie in List<MovieDetails>.from(movieList)) {
-      await HttpService()
-          .getWatchProviders(
-            http.Client(),
-            movie.id!,
-          )
-          .then(
-            (value) => {
-              if (value.isNotEmpty)
-                {
-                  movie.watchProviders = value,
-                  movieMap[movie.id!] = movie,
-                }
-            },
-          );
+    Map<int, WatchObject> watchObjectMap = {};
+    for (WatchObject watchObject in List<WatchObject>.from(watchObjectList)) {
+      if (widget.type == 0) {
+        await HttpService()
+            .getWatchProviders(
+              http.Client(),
+              watchObject.id!,
+            )
+            .then(
+              (value) => {
+                if (value.isNotEmpty)
+                  {
+                    watchObject.watchProviders = value,
+                    watchObjectMap[watchObject.id!] = watchObject,
+                  }
+              },
+            );
+      } else {
+        await HttpService()
+            .getWatchProvidersSeries(
+              http.Client(),
+              watchObject.id!,
+            )
+            .then(
+              (value) => {
+                if (value.isNotEmpty)
+                  {
+                    watchObject.watchProviders = value,
+                    watchObjectMap[watchObject.id!] = watchObject,
+                  }
+              },
+            );
+      }
     }
     setState(() {
       filtering = false;
     });
-    if (movieMap.values.toList().isEmpty) {
+    if (watchObjectMap.values.toList().isEmpty && mounted) {
       Navigator.of(context).pop();
       Fluttertoast.showToast(
-          msg: "We couldn't find any movies on your streaming services. Please try again",
+          msg: "no_movies".tr(),
           timeInSecForIosWeb: 4,
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,
@@ -613,12 +696,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           textColor: Colors.white,
           fontSize: 16.0);
     } else {
-      return movieMap.values.toList();
+      return watchObjectMap.values.toList();
     }
   }
 
   String getDirector(MovieCredits credits) {
-    ///this retrieves the first director of the movie
     List<Crew>? list = credits.crew;
     int index;
     if (list == null) {
@@ -667,4 +749,22 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     await getTrailerImages();
     setState(() {});
   }
+}
+
+class WatchObject {
+  String? posterPath;
+  String? overview;
+  double? tmdbRating;
+  int? id;
+  String? title;
+  List<int>? watchProviders;
+
+  WatchObject({
+    this.posterPath,
+    this.overview,
+    this.tmdbRating,
+    this.id,
+    this.title,
+    this.watchProviders,
+  });
 }

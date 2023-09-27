@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +24,17 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
   @override
   void initState() {
     resultList = HttpService().getWatchProvidersByLocale(http.Client());
+    DatabaseService.getAllStreamingServices().then(
+      (mapList) => {
+        for (var map in mapList)
+          {
+            selectedStreamingServices[int.parse(map['streaming_id'].toString())] = map['streaming_logo'].toString(),
+          },
+        setState(
+          () {},
+        )
+      },
+    );
     super.initState();
   }
 
@@ -39,10 +51,11 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
       children: [
         const SizedBox(height: 48),
         Text(
-          'Select your streaming services',
+          "select_streaming".tr(),
+          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.displayMedium,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 32),
         streamingGrid(),
         Expanded(
           child: Container(),
@@ -71,6 +84,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
               padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
               height: MediaQuery.of(context).size.height * 0.7,
               child: GridView.builder(
+                padding: EdgeInsets.zero,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: 1,
@@ -115,25 +129,26 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
             height: 50,
             child: Center(
               child: TextButton(
-                  onPressed: () async {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    bool seen = prefs.getBool('skip_intro') ?? false;
-                    prefs.setBool('skip_intro', true);
-                    await DatabaseService.saveStreamingServices(selectedStreamingServices);
-                    if (context.mounted && seen) {
-                      Navigator.of(context).pop();
-                    } else if (mounted && !seen) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const MainMenuPage(),
-                        ),
-                      );
-                    }
-                  },
-                  child: Text(
-                    'Close',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  )),
+                onPressed: () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  bool seen = prefs.getBool('skip_intro') ?? false;
+                  prefs.setBool('skip_intro', true);
+                  await DatabaseService.saveStreamingServices(selectedStreamingServices);
+                  if (context.mounted && seen) {
+                    Navigator.of(context).pop();
+                  } else if (mounted && !seen) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const MainMenuPage(),
+                      ),
+                    );
+                  }
+                },
+                child: Text(
+                  "done".tr(),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
             ),
           )
         : Container();

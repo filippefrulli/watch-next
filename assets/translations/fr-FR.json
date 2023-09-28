@@ -38,9 +38,10 @@
     "tmdb_score": "Score TMDB: ",
     "prompt_issue": "Nous avons eu un problème avec votre promt. Veuillez réessayer",
     "no_movies": "Nous n'avons trouvé aucun résultat sur vos services de streaming. Veuillez réessayer",
-
     "select_country": "Sélectionne ton pays",
     "done": "Confirmer",
+    "new": "Nouveau",
+    "do_not_recommend": "Ne recommandez aucun de ces titres: ",
 
     "change_region": "Changer le pays",
     "edit_streaming": "Changer les services de streaming",

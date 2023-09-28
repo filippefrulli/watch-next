@@ -52,6 +52,7 @@ dependencies:
   tutorial_coach_mark: ^1.2.9
   easy_localization: ^3.0.2
   toggle_switch: ^2.1.0
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:

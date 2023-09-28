@@ -37,9 +37,10 @@
     "tmdb_score": "Voto TMDB: ",
     "prompt_issue": "C'e' stato un problema con la richiesta. Perfavore riprova",
     "no_movies": "Non siamo riusciti a trovare risultati sui tuoi servizi di streaming. Perfavore riprova",
-
     "select_country": "Seleziona il tuo paese",
     "done": "Conferma",
+    "new": "Nuovi",
+    "do_not_recommend": "Non consigliare nessuno di questi titoli: ",
 
     "change_region": "Cambia paese",
     "edit_streaming": "Cambia servizi streaming",

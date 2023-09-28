@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
@@ -40,6 +41,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   bool filtering = false;
   WatchObject selectedWatchObject = WatchObject();
   PanelController pc = PanelController();
+  String responseItems = '';
+  String itemsToNotRecommend = '';
 
   late Future<dynamic> resultList;
   Future<MovieCredits> movieCredits = Future.value(MovieCredits());
@@ -92,7 +95,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data.length > 0) {
+            if (!filtering && !fetchingMovieInfo && !askingGpt) {
               return Column(children: [
                 Text(
                   "here_recommendation".tr(),
@@ -119,7 +122,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data.length > 0) {
+            if (!filtering && !fetchingMovieInfo && !askingGpt) {
               length = snapshot.data.length;
               selectedWatchObject = snapshot.data[index];
               return recommandationContent(selectedWatchObject);
@@ -156,7 +159,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Container(),
           ),
           Expanded(
-            flex: 3,
+            flex: 2,
             child: buttonsRow(),
           ),
           Expanded(
@@ -242,56 +245,104 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         Expanded(
           child: Container(),
         ),
-        TextButton(
-          onPressed: () async {
-            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedWatchObject.id!);
-            if (widget.type == 0) {
-              HttpService().fetchTrailer(http.Client(), selectedWatchObject.id!).then((value) {
-                setState(() {
-                  trailerList = value;
-                });
-
-                waitForImages();
-              });
-            } else {
-              HttpService().fetchTrailerSeries(http.Client(), selectedWatchObject.id!).then((value) {
-                setState(() {
-                  trailerList = value;
-                });
-
-                waitForImages();
-              });
-            }
-            pc.open();
-          },
-          child: Container(
-            height: 50,
-            width: 100,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(15),
-              ),
-              color: Colors.grey[800],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Info",
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                const Icon(Icons.expand_less, size: 32, color: Colors.white),
-              ],
-            ),
-          ),
+        Column(
+          children: [
+            infoButton(),
+            index == length - 1 ? reloadButton() : Container(),
+          ],
         ),
         Expanded(
           child: Container(),
         ),
       ],
+    );
+  }
+
+  Widget reloadButton() {
+    return TextButton(
+      onPressed: () {
+        setState(() {
+          index = 0;
+          resultList.whenComplete(() => []);
+          resultList = askGpt();
+        });
+      },
+      child: Container(
+        height: 42,
+        width: 120,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(15),
+          ),
+          color: Colors.orange,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 80,
+              child: AutoSizeText(
+                "new".tr(),
+                maxLines: 1,
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+            ),
+            const SizedBox(
+              width: 4,
+            ),
+            Icon(Icons.refresh, size: 32, color: Colors.grey[900]),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget infoButton() {
+    return TextButton(
+      onPressed: () async {
+        movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedWatchObject.id!);
+        if (widget.type == 0) {
+          HttpService().fetchTrailer(http.Client(), selectedWatchObject.id!).then((value) {
+            setState(() {
+              trailerList = value;
+            });
+
+            waitForImages();
+          });
+        } else {
+          HttpService().fetchTrailerSeries(http.Client(), selectedWatchObject.id!).then((value) {
+            setState(() {
+              trailerList = value;
+            });
+
+            waitForImages();
+          });
+        }
+        pc.open();
+      },
+      child: Container(
+        height: 42,
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(15),
+          ),
+          color: Colors.grey[800],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Info",
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            const Icon(Icons.expand_less, size: 32, color: Colors.white),
+          ],
+        ),
+      ),
     );
   }
 
@@ -553,13 +604,18 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     setState(() {
       askingGpt = true;
     });
+
+    String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
+
+    String queryContent = widget.type == 0
+        ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
+        : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
     final request = ChatCompleteText(
       messages: [
         Messages(
-            role: Role.assistant,
-            content: widget.type == 0
-                ? 'prompt_1'.tr() + widget.requestString + 'prompt_2'.tr()
-                : 'prompt_series_1'.tr() + widget.requestString + 'prompt_series_2'.tr()),
+          role: Role.assistant,
+          content: queryContent,
+        ),
       ],
       temperature: 0.6,
       maxToken: 400,
@@ -567,9 +623,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
 
     final response = await openAI.onChatCompletion(request: request);
+    itemsToNotRecommend = '';
 
     setState(() {
       askingGpt = false;
+      itemsToNotRecommend = response!.choices[0].message!.content;
     });
 
     return parseResponse(response!.choices[0].message!.content).then(

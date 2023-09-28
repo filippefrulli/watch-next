@@ -146,7 +146,7 @@ class SplashState extends State<Splash> {
 
     if (seen && mounted) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomePage()));
-    } else {
+    } else if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const LanguagePage(),

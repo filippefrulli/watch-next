@@ -40,6 +40,8 @@
     "no_movies": "Wir konnten keine Ergebnisse für deine Streaming-Dienste finden. Bitte versuche es nochmal",
     "select_country": "Wähle dein Land aus",
     "done": "Bestätigen",
+    "new": "Neue",
+    "do_not_recommend": "Empfehle keinen dieser Titel: ", 
 
     "change_region": "Land ändern",
     "edit_streaming": "Streaming-Dienste ändern",

@@ -38,9 +38,10 @@
     "tmdb_score": "Puntuación TMDB: ",
     "prompt_issue": "Tuvimos un problema con tu entrada. Inténtalo de nuevo",
     "no_movies": "No pudimos encontrar ningún resultado en tus servicios de transmisión. Inténtalo de nuevo",
-
     "select_country": "Selecciona tu pais",
     "done": "Confirmar",
+    "new": "Nuevas",
+    "do_not_recommend": "No recomiendo ninguno de estos títulos: ", 
 
     "change_region": "Cambiar pais",
     "edit_streaming": "Cambiar servicios de transmisión",

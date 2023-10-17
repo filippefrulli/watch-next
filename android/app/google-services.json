@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1024361335030",
+    "project_id": "watch-next-13",
+    "storage_bucket": "watch-next-13.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024361335030:android:6618d0d3f6cccd309d44d7",
+        "android_client_info": {
+          "package_name": "com.filippefrulli.watch_next"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqHt-U93XGm4ZvKfj40_f2Lshuo72LN_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

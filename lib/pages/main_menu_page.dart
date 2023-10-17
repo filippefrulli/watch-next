@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
@@ -93,6 +94,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   size: 26,
                 ),
                 onPressed: () {
+                  FirebaseAnalytics.instance.logEvent(
+                    name: 'opened_examples',
+                    parameters: <String, dynamic>{
+                      "type": typeIsMovie == 0 ? "movie" : "show",
+                    },
+                  );
                   typeIsMovie == 0 ? showExamples() : showExamplesShows();
                 },
               ),
@@ -144,6 +151,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
         size: 28,
       ),
       onPressed: () {
+        FirebaseAnalytics.instance.logEvent(
+          name: 'opened_settings',
+        );
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -464,13 +474,26 @@ class _MainMenuPageState extends State<MainMenuPage> {
           enableLoading = true;
         });
         await validateQuery();
-        if (isValidQuery && context.mounted) {
+        if (isValidQuery && mounted) {
+          FirebaseAnalytics.instance.logEvent(
+            name: 'go_button_pressed',
+            parameters: <String, dynamic>{
+              "type": typeIsMovie == 0 ? "movie" : "show",
+            },
+          );
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => RecommandationResultsPage(requestString: _controller.text, type: typeIsMovie),
             ),
           );
         } else {
+          FirebaseAnalytics.instance.logEvent(
+            name: 'invalid_prompt',
+            parameters: <String, dynamic>{
+              "prompt": _controller.text,
+              "type": typeIsMovie == 0 ? "movie" : "show",
+            },
+          );
           showToastWidget(
             ToastWidget(
               title: "invalid_input".tr(),

@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -123,7 +124,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           future: resultList,
           builder: (context, snapshot) {
             if (!filtering && !fetchingMovieInfo && !askingGpt) {
-              length = snapshot.data.length;
+              length = snapshot.data?.length ?? 0;
               selectedWatchObject = snapshot.data[index];
               return recommandationContent(selectedWatchObject);
             } else {
@@ -186,6 +187,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                 index--;
               }
             });
+            FirebaseAnalytics.instance.logEvent(
+              name: 'moved_back',
+            );
           },
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -209,6 +213,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                   index++;
                 }
               },
+            );
+            FirebaseAnalytics.instance.logEvent(
+              name: 'moved_forward',
             );
           },
           icon: Icon(
@@ -261,6 +268,12 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Widget reloadButton() {
     return TextButton(
       onPressed: () {
+        FirebaseAnalytics.instance.logEvent(
+          name: 'reloaded_recommendations',
+          parameters: <String, dynamic>{
+            "type": widget.type == 0 ? "movie" : "show",
+          },
+        );
         setState(() {
           index = 0;
           resultList.whenComplete(() => []);
@@ -284,6 +297,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               child: AutoSizeText(
                 "new".tr(),
                 maxLines: 1,
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
@@ -318,6 +332,12 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             waitForImages();
           });
         }
+        FirebaseAnalytics.instance.logEvent(
+          name: 'opened_info',
+          parameters: <String, dynamic>{
+            "type": widget.type == 0 ? "movie" : "show",
+          },
+        );
         pc.open();
       },
       child: Container(

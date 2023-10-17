@@ -53,6 +53,8 @@ dependencies:
   easy_localization: ^3.0.2
   toggle_switch: ^2.1.0
   auto_size_text: ^3.0.0
+  firebase_analytics: ^10.5.1
+  firebase_core: ^2.17.0
 
 dev_dependencies:
   flutter_test:

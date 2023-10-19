@@ -625,6 +625,16 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       askingGpt = true;
     });
 
+    List<String> itemsList = itemsToNotRecommend.split(',,');
+    itemsToNotRecommend = '';
+    for (String item in itemsList) {
+      if (item.isNotEmpty) {
+        itemsToNotRecommend += '${item.substring(
+          0,
+          item.indexOf('y:'),
+        )},';
+      }
+    }
     String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
 
     String queryContent = widget.type == 0
@@ -664,6 +674,10 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
     List<String> responseTitles = response.split(',,');
     if (responseTitles.isEmpty) {
+      FirebaseAnalytics.instance.logEvent(name: 'empty_results', parameters: {
+        'type': widget.type == 0 ? 'movie' : 'show',
+        'query': widget.requestString,
+      });
       Navigator.pop(context);
       Fluttertoast.showToast(
         msg: "prompt_issue".tr(),

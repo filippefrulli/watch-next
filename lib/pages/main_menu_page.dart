@@ -479,6 +479,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             name: 'go_button_pressed',
             parameters: <String, dynamic>{
               "type": typeIsMovie == 0 ? "movie" : "show",
+              "prompt": _controller.text,
             },
           );
           Navigator.of(context).push(

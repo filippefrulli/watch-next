@@ -171,7 +171,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
           borderRadius: BorderRadius.circular(16),
           child: CachedNetworkImage(
             fit: BoxFit.cover,
-            imageUrl: "http://image.tmdb.org/t/p/original//$logo",
+            imageUrl: "https://image.tmdb.org/t/p/original//$logo",
             placeholder: (context, url) => Container(
               color: const Color.fromRGBO(11, 14, 23, 1),
             ),

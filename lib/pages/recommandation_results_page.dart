@@ -605,7 +605,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       if (item.providerId == selectedWatchObject.watchProviders!.first) {
         return CachedNetworkImage(
           fit: BoxFit.fill,
-          imageUrl: "http://image.tmdb.org/t/p/original//${item.logoPath}",
+          imageUrl: "https://image.tmdb.org/t/p/original//${item.logoPath}",
           placeholder: (context, url) => Container(
             color: const Color.fromRGBO(11, 14, 23, 1),
           ),

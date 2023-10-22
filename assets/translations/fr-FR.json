@@ -57,8 +57,8 @@
     "validation_prompt_series": "Ton travail consiste à valider si une phrase donnée est une demande de recommandation de séries. Voici des exemples d'invites correctes: \"Recommande une série qui a moins de 5 saisons\", \"Recommande une série sur le sport\", \"Recommander une série avec des épisodes de moins de 30 minutes\". Si la requête est valide, renvoyez uniquement le texte YES, sinon NO. La requête est: Recommande un séries",
 
     "prompt_1": "Ton tâche consiste à renvoyer 30 titres (au format \"titre y:date de sortie\",, avec des doubles virgules sur une ligne et non sous forme de liste numérotée!) de films",
-    "prompt_2": "Voici un exemple de réponse: star wars y:1977,, Jurassic Park y:1993. Ne numérotez pas les éléments de réponse! Ne recommandez pas plus d'un film de la même franchise!. Ne pas répondre par bien sur, seulement la liste",
+    "prompt_2": "Voici un exemple de réponse: star wars y:1977,, Jurassic Park y:1993. Ne numérotez pas les éléments de réponse! Ne recommandez pas des films considérés comme des classiques!. Ne pas répondre par bien sur, seulement la liste",
 
     "prompt_series_1": "Ton tâche consiste à renvoyer 30 titres différents (au format \"titre y:date de sortie\",, avec des doubles virgules sur une ligne et non sous forme de liste numérotée!) de séries",
-    "prompt_series_2": "Voici un exemple de réponse: Game of Thrones y:2011,, Stranger Things y:2016. Ne numérotez pas les éléments de réponse!"
+    "prompt_series_2": "Voici un exemple de réponse: Game of Thrones y:2011,, Stranger Things y:2016. Ne numérotez pas les éléments de réponse! Ne recommandez pas des séries considérés comme des classiques!"
 }

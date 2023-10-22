@@ -56,8 +56,8 @@
     "validation_prompt_series": "Il tuo compito e' valutare se una frase e' una richiesta di consigliare una serie tv. Esempi di richieste corrette sono: \"Consigliami una serie tv con meno di 5 stagioni\", \"Consigliami una serie tv sullo sport\", \"Consigliami una serie tv con episodi lunghi meno di 30 minuti\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': Consigliami una serie tv",
 
     "prompt_1": "Il tuo compito è restituire 30 titoli (nel formato \"titolo y:data di uscita\",, con doppie virgole su una riga e non come elenco numerato!) di film",
-    "prompt_2": "Ecco un esempio di risposta: star wars y:1977,, Jurassic Park y:1993. Non numerare gli elementi di risposta! Non consigliare più di un film della stessa serie!",
+    "prompt_2": "Ecco un esempio di risposta: star wars y:1977,, Jurassic Park y:1993. Non numerare gli elementi di risposta! Non raccomandare film considerati classici!",
 
     "prompt_series_1": "Il tuo compito è restituire 30 titoli diversi (nel formato \"titolo y:data di uscita\",, con doppie virgole su una riga e non come elenco numerato!) di serie tv",
-    "prompt_series_2": "Ecco un esempio di risposta: Game of Thrones y:2011,, Stranger Things y:2016. Non numerare gli elementi di risposta!"
+    "prompt_series_2": "Ecco un esempio di risposta: Game of Thrones y:2011,, Stranger Things y:2016. Non numerare gli elementi di risposta! Non raccomandare serie tv considerate classici!"
 }

@@ -57,8 +57,8 @@
     "validation_prompt_series": "Your job is to validate wether a given sentence is a request to recommend a tv show. Examples of correct prompts are: \"Recommend a tv show that has less than 5 seasons\", \"Recommend a tv show about sports\", \"Recommend a tv show with episodes shorter than 30 minutes\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a tv show",
 
     "prompt_1": "Your task is to return 30 unique titles (in the format \"title y:release date\",, with double commas on one line and not as a numbered list!) of movies",
-    "prompt_2": "Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend more than one movie from the same franchise!",
+    "prompt_2": "Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend movies that are regarded as classics!",
 
     "prompt_series_1": "Your task is to return 30 unique titles (in the format \"title y:first air date\",, with double commas on one line and not as a numbered list!) of tv shows",
-    "prompt_series_2": "Here is an example response: Game of Thrones y:2011,, Stranger Things y:2016. Do not number the response elements!"
+    "prompt_series_2": "Here is an example response: Game of Thrones y:2011,, Stranger Things y:2016. Do not number the response elements! Do not recommend tv shows that are regarded as classics!"
 }

@@ -7,6 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -35,6 +36,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   late Future<dynamic> servicesList;
 
+  NativeAd? nativeAd;
+  bool _nativeAdIsLoaded = false;
+
+  final String _adUnitId = Platform.isAndroid ? androidAd : iosAd;
+
   int index = 0;
   int length = 0;
   bool askingGpt = false;
@@ -60,7 +66,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   @override
   initState() {
     super.initState();
-
+    loadAd();
     servicesList = HttpService().getWatchProvidersByLocale(http.Client());
     resultList = askGpt();
   }
@@ -123,10 +129,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
-            if (!filtering && !fetchingMovieInfo && !askingGpt) {
-              length = snapshot.data?.length ?? 0;
-              selectedWatchObject = snapshot.data[index];
-              return recommandationContent(selectedWatchObject);
+            if (snapshot.hasData) {
+              if (!filtering && !fetchingMovieInfo && !askingGpt) {
+                length = snapshot.data?.length ?? 0;
+                selectedWatchObject = snapshot.data[index];
+                return recommandationContent(selectedWatchObject);
+              } else {
+                return loadingWidget();
+              }
             } else {
               return loadingWidget();
             }
@@ -451,10 +461,28 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Widget loadingWidget() {
     return Center(
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
+        height: MediaQuery.of(context).size.height * 0.92,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _nativeAdIsLoaded
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 320, // minimum recommended width
+                        minHeight: 320, // minimum recommended height
+                        maxWidth: 400,
+                        maxHeight: 400,
+                      ),
+                      child: AdWidget(ad: nativeAd!),
+                    ),
+                  )
+                : Container(
+                    height: 400,
+                  ),
+            const SizedBox(
+              height: 46,
+            ),
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.orange,
               size: 50,
@@ -480,9 +508,6 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
-            const SizedBox(
-              height: 46,
-            ),
           ],
         ),
       ),
@@ -840,6 +865,62 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   waitForImages() async {
     await getTrailerImages();
     setState(() {});
+  }
+
+  void loadAd() {
+    nativeAd = NativeAd(
+      adUnitId: _adUnitId,
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          debugPrint('$NativeAd loaded.');
+          setState(() {
+            _nativeAdIsLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Dispose the ad here to free resources.
+          debugPrint('$NativeAd failed to load: $error');
+          ad.dispose();
+        },
+        onAdClicked: (ad) {},
+        onAdImpression: (ad) {},
+        onAdClosed: (ad) {},
+        onAdOpened: (ad) {},
+      ),
+      request: const AdRequest(),
+      // Styling
+      nativeTemplateStyle: NativeTemplateStyle(
+        // Required: Choose a template.
+        templateType: TemplateType.medium,
+        // Optional: Customize the ad's style.
+        mainBackgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        cornerRadius: 15.0,
+        callToActionTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.grey[900],
+          backgroundColor: Colors.orange,
+          style: NativeTemplateFontStyle.monospace,
+          size: 16.0,
+        ),
+        primaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.orange,
+          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          style: NativeTemplateFontStyle.italic,
+          size: 16.0,
+        ),
+        secondaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.grey[200],
+          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          style: NativeTemplateFontStyle.bold,
+          size: 16.0,
+        ),
+        tertiaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.grey[200],
+          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          style: NativeTemplateFontStyle.normal,
+          size: 16.0,
+        ),
+      ),
+    )..load();
   }
 }
 

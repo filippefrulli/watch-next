@@ -34,22 +34,20 @@ class _MainMenuPageState extends State<MainMenuPage> {
   bool isLongEnough = false;
   bool isValidQuery = false;
   bool enableLoading = false;
-  bool hideExample = false;
 
   GlobalKey textFieldKey = GlobalKey();
   GlobalKey goButtonKey = GlobalKey();
 
   late TutorialCoachMark tutorialCoachMark;
   bool noInternet = false;
-  int typeIsMovie = 0; //0 = movie 1 = show
+  int typeIsMovie = 0; //0 = movie , 1 = show
 
   @override
   void initState() {
     createTutorial();
     super.initState();
     _controller.addListener(checkLength);
-    _controller.text = '';
-    hideExample = false;
+    _controller.text = ' ';
     Timer(const Duration(seconds: 2), () {
       showTutorial();
     });
@@ -202,9 +200,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
       child: TextField(
         key: textFieldKey,
         autofocus: false,
-        maxLength: 60,
+        maxLength: 80,
         showCursor: true,
-        maxLines: 1,
+        maxLines: 3,
         minLines: 1,
         controller: _controller,
         cursorColor: Colors.orange,
@@ -213,9 +211,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
           filled: true,
           fillColor: const Color.fromRGBO(35, 35, 50, 1),
           helperText: "complete_sentence".tr(),
-          hintText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
-          prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12),
-          suffixText: "",
+          prefixText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
+          prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12, letterSpacing: 0.5),
           helperStyle: TextStyle(
             color: Colors.grey[500],
             fontSize: 12,

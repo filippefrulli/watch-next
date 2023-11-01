@@ -40,6 +40,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   bool _nativeAdIsLoaded = false;
 
   final String _adUnitId = Platform.isAndroid ? androidAd : iosAd;
+  //final String _adUnitId = 'ca-app-pub-3940256099942544/2247696110';
 
   int index = 0;
   int length = 0;

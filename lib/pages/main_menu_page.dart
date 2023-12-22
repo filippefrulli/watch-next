@@ -6,7 +6,6 @@ import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -74,42 +73,25 @@ class _MainMenuPageState extends State<MainMenuPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
             topBar(),
             Expanded(
-              flex: 2,
               child: Container(),
             ),
             description(),
             const SizedBox(height: 32),
             switchWidget(),
-            Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.help_outline_rounded,
-                  color: Colors.orange,
-                  size: 26,
-                ),
-                onPressed: () {
-                  FirebaseAnalytics.instance.logEvent(
-                    name: 'opened_examples',
-                    parameters: <String, dynamic>{
-                      "type": typeIsMovie == 0 ? "movie" : "show",
-                    },
-                  );
-                  typeIsMovie == 0 ? showExamples() : showExamplesShows();
-                },
-              ),
-            ),
-            const SizedBox(height: 2),
-            promptInput(),
-            const SizedBox(height: 16),
             Expanded(
-              flex: 2,
               child: Container(),
             ),
-            goButton(),
+            examplesWidget(),
+            const SizedBox(
+              height: 16,
+            ),
+            Align(
+              alignment: Alignment.topLeft,
+              child: promptInput(),
+            ),
             const SizedBox(height: 32),
           ],
         ),
@@ -142,23 +124,57 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget settingsButton() {
-    return IconButton(
-      icon: Icon(
-        Icons.settings,
+    return Container(
+      decoration: BoxDecoration(
         color: Colors.grey[400],
-        size: 28,
+        borderRadius: BorderRadius.circular(25),
       ),
-      onPressed: () {
-        FirebaseAnalytics.instance.logEvent(
-          name: 'opened_settings',
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SettingsPage(),
+      child: IconButton(
+        icon: Icon(
+          Icons.settings,
+          color: Colors.grey[900],
+          size: 28,
+        ),
+        onPressed: () {
+          FirebaseAnalytics.instance.logEvent(
+            name: 'opened_settings',
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SettingsPage(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget examplesWidget() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[400],
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: IconButton(
+          icon: Icon(
+            Icons.help_outline_rounded,
+            color: Colors.grey[900],
+            size: 26,
           ),
-        );
-      },
+          onPressed: () {
+            FirebaseAnalytics.instance.logEvent(
+              name: 'opened_examples',
+              parameters: <String, dynamic>{
+                "type": typeIsMovie == 0 ? "movie" : "show",
+              },
+            );
+            typeIsMovie == 0 ? showExamples() : showExamplesShows();
+          },
+        ),
+      ),
     );
   }
 
@@ -195,91 +211,70 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget promptInput() {
-    return SizedBox(
-      height: 80,
-      child: TextField(
-        key: textFieldKey,
-        autofocus: false,
-        maxLength: 80,
-        showCursor: true,
-        maxLines: 3,
-        minLines: 1,
-        controller: _controller,
-        cursorColor: Colors.orange,
-        style: Theme.of(context).textTheme.titleMedium,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: const Color.fromRGBO(35, 35, 50, 1),
-          helperText: "complete_sentence".tr(),
-          prefixText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
-          prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12, letterSpacing: 0.5),
-          helperStyle: TextStyle(
-            color: Colors.grey[500],
-            fontSize: 12,
-          ),
-          hintStyle: TextStyle(
-            color: Colors.grey[500],
-            fontSize: 12,
-          ),
-          contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Colors.orange, width: 2.0),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: const BorderSide(color: Colors.orange, width: 2.0),
-            borderRadius: BorderRadius.circular(15),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 305,
+          child: TextField(
+            key: textFieldKey,
+            autofocus: false,
+            showCursor: true,
+            maxLength: 80,
+            maxLines: 3,
+            minLines: 1,
+            controller: _controller,
+            cursorColor: Colors.orange,
+            style: Theme.of(context).textTheme.titleMedium,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Color.fromARGB(255, 44, 46, 56),
+              helperText: "complete_sentence".tr(),
+              prefixText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
+              prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12, letterSpacing: 0.5),
+              helperStyle: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 12,
+              ),
+              contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+              enabledBorder: UnderlineInputBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+            ),
           ),
         ),
-      ),
+        const SizedBox(
+          width: 8,
+        ),
+        goButton(),
+      ],
     );
   }
 
   Widget goButton() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(),
+    return Container(
+      height: 48,
+      width: 48,
+      decoration: BoxDecoration(
+        color: isLongEnough ? Colors.orange : Colors.grey[700],
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: Center(
+        child: IconButton(
+          key: goButtonKey,
+          onPressed: () async {
+            isLongEnough ? goButtonPressed() : null;
+          },
+          icon: Icon(
+            Icons.arrow_forward,
+            size: 32,
+            color: Colors.grey[900],
           ),
-          TextButton(
-            key: goButtonKey,
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.all(0),
-            ),
-            onPressed: () async {
-              goButtonPressed();
-            },
-            child: Container(
-              height: 50,
-              width: 160,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(25),
-                ),
-                color: isLongEnough ? Colors.orange : Colors.grey,
-              ),
-              child: Center(
-                child: enableLoading
-                    ? LoadingAnimationWidget.threeArchedCircle(
-                        color: Colors.grey[900]!,
-                        size: 30,
-                      )
-                    : Text(
-                        "go".tr(),
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.grey[900],
-                        ),
-                      ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -455,6 +450,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void goButtonPressed() async {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'go_button_pressed',
+      parameters: <String, dynamic>{
+        "type": typeIsMovie == 0 ? "movie" : "show",
+      },
+    );
     FocusScope.of(context).unfocus();
     await checkConnection();
     if (noInternet) {
@@ -473,10 +474,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
         await validateQuery();
         if (isValidQuery && mounted) {
           FirebaseAnalytics.instance.logEvent(
-            name: 'go_button_pressed',
+            name: 'valid_prompt',
             parameters: <String, dynamic>{
               "type": typeIsMovie == 0 ? "movie" : "show",
-              "prompt": _controller.text,
             },
           );
           Navigator.of(context).push(
@@ -488,7 +488,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
           FirebaseAnalytics.instance.logEvent(
             name: 'invalid_prompt',
             parameters: <String, dynamic>{
-              "prompt": _controller.text,
               "type": typeIsMovie == 0 ? "movie" : "show",
             },
           );

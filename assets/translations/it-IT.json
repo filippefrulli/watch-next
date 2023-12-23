@@ -3,11 +3,12 @@
     "hey_there": "Ciao!",
     "find_something": "Trova qualcosa da guardare",
     "complete_sentence": "Completa la frase (almeno 6 caratteri)",
-    "recommend_a_movie": "Consiglia un film... ",
-    "recommend_a_show": "Consiglia una serie... ",
+    "recommend_a_movie": "Consiglia un film ",
+    "recommend_a_show": "Consiglia una serie ",
     "movie": "Film",
     "tv_show": "Serie",
     "go": "VAI",
+    "close": "Chiudi",
     "with_action": "con tanta azione",
     "step_one": "Primo passo: Inserisci la tua richiesta. Semplicemente continua la frase 'consiglia un film...' ",
     "try_with_action": "\nproviamo con 'con tanta azione'",
@@ -16,16 +17,16 @@
     "connect_to_internet": "Perfavore connettiti a internet e riprova",
     "invalid_input": "Frase invalida, perfavore cambia la richiesta e riprova",
     "need_inspiration": "Bisogno di inspirazione? \nEcco alcuni esempi",
-    "example_1": "• che sia romantico e divertente, ideale per un primo appuntamento",
+    "example_1": "• romantico e divertente, ideale per un primo appuntamento",
     "example_2": "• che mi faccia piangere",
     "example_3": "• con Tom Cruise e diretto da Steven Spielberg",
     "example_4": "• basato su una storia vera",
     "example_5": "• sull'intelligenza artificiale, con buone recensioni",
-    "example_show_1": "• che e' completa e ha un lieto fine",
+    "example_show_1": "• finita e che con un lieto fine",
     "example_show_2": "• sullo sport",
     "example_show_3": "• con episodi piu' corti di 30 minuti",
     "example_show_4": "• con meno di 5 stagioni",
-    "example_show_5": "• che e' reality tv",
+    "example_show_5": "• di reality tv",
 
     "here_recommendation": "Ti consigliamo",
     "watch_it_on": "Lo trovi su:",
@@ -37,9 +38,10 @@
     "tmdb_score": "Voto TMDB: ",
     "prompt_issue": "C'e' stato un problema con la richiesta. Perfavore riprova",
     "no_movies": "Non siamo riusciti a trovare risultati sui tuoi servizi di streaming. Perfavore riprova",
-
     "select_country": "Seleziona il tuo paese",
     "done": "Conferma",
+    "new": "Nuovi",
+    "do_not_recommend": "Non consigliare nessuno di questi titoli: ",
 
     "change_region": "Cambia paese",
     "edit_streaming": "Cambia servizi streaming",
@@ -55,8 +57,8 @@
     "validation_prompt_series": "Il tuo compito e' valutare se una frase e' una richiesta di consigliare una serie tv. Esempi di richieste corrette sono: \"Consigliami una serie tv con meno di 5 stagioni\", \"Consigliami una serie tv sullo sport\", \"Consigliami una serie tv con episodi lunghi meno di 30 minuti\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': Consigliami una serie tv",
 
     "prompt_1": "Il tuo compito è restituire 30 titoli (nel formato \"titolo y:data di uscita\",, con doppie virgole su una riga e non come elenco numerato!) di film",
-    "prompt_2": "Ecco un esempio di risposta: star wars y:1977,, Jurassic Park y:1993. Non numerare gli elementi di risposta! Non consigliare più di un film della stessa serie!",
+    "prompt_2": "Ecco un esempio di risposta: star wars y:1977,, Jurassic Park y:1993. Non numerare gli elementi di risposta! Non raccomandare film considerati classici!",
 
     "prompt_series_1": "Il tuo compito è restituire 30 titoli diversi (nel formato \"titolo y:data di uscita\",, con doppie virgole su una riga e non come elenco numerato!) di serie tv",
-    "prompt_series_2": "Ecco un esempio di risposta: Game of Thrones y:2011,, Stranger Things y:2016. Non numerare gli elementi di risposta!"
+    "prompt_series_2": "Ecco un esempio di risposta: Game of Thrones y:2011,, Stranger Things y:2016. Non numerare gli elementi di risposta! Non raccomandare serie tv considerate classici!"
 }

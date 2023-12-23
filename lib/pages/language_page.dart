@@ -31,20 +31,6 @@ class _LanguagePageState extends State<LanguagePage> {
   @override
   initState() {
     super.initState();
-    changeOpacity();
-  }
-
-  changeOpacity() {
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        opacity = opacity == 0.0 ? 1.0 : 0.0;
-      });
-    });
-    Future.delayed(const Duration(seconds: 4), () {
-      setState(() {
-        opacity = opacity == 0.0 ? 1.0 : 0.0;
-      });
-    });
   }
 
   @override
@@ -147,13 +133,14 @@ class _LanguagePageState extends State<LanguagePage> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         if (mounted) {
           context.setLocale(Locale(lang, region));
-        }
-        prefs.setInt('language_number', index);
-        prefs.setString('lang', '$lang-$region');
 
-        setState(() {
-          selected = index;
-        });
+          prefs.setInt('language_number', index);
+          prefs.setString('lang', '$lang-$region');
+
+          setState(() {
+            selected = index;
+          });
+        }
       },
     );
   }

@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watch_next/firebase_options.dart';
 import 'package:watch_next/pages/language_page.dart';
 import 'pages/main_menu_page.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -10,6 +14,10 @@ import 'package:easy_localization/easy_localization.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  MobileAds.instance.initialize();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemStatusBarContrastEnforced: true,
       systemNavigationBarColor: Colors.transparent,
@@ -45,6 +53,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(
       child: MaterialApp(
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+        ],
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
@@ -60,7 +71,7 @@ class MyApp extends StatelessWidget {
         },
         theme: ThemeData(
           colorScheme: theme.colorScheme.copyWith(
-            primary: const Color.fromRGBO(13, 6, 59, 1),
+            primary: const Color.fromRGBO(11, 14, 23, 1),
             secondary: Colors.orange,
             brightness: Brightness.dark,
           ),
@@ -146,7 +157,7 @@ class SplashState extends State<Splash> {
 
     if (seen && mounted) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomePage()));
-    } else {
+    } else if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const LanguagePage(),

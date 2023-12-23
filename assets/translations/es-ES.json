@@ -3,8 +3,8 @@
     "hey_there": "¡Hola!",
     "find_something": "Encuentra algo para ver",
     "complete_sentence": "Completa la frase (Mín. 6 caracteres)",
-    "recommend_a_movie": "Recomiéndame una película... ",
-    "recommend_a_show": "Recomiéndame una serie... ",
+    "recommend_a_movie": "Recomiéndame una película ",
+    "recommend_a_show": "Recomiéndame una serie ",
     "movie": "Película",
     "tv_show": "Serie",
     "go": "VAMOS",
@@ -38,9 +38,10 @@
     "tmdb_score": "Puntuación TMDB: ",
     "prompt_issue": "Tuvimos un problema con tu entrada. Inténtalo de nuevo",
     "no_movies": "No pudimos encontrar ningún resultado en tus servicios de transmisión. Inténtalo de nuevo",
-
     "select_country": "Selecciona tu pais",
     "done": "Confirmar",
+    "new": "Nuevas",
+    "do_not_recommend": "No recomiendo ninguno de estos títulos: ", 
 
     "change_region": "Cambiar pais",
     "edit_streaming": "Cambiar servicios de transmisión",
@@ -56,9 +57,9 @@
     "validation_prompt_series": "Tu trabajo es validar si una oración dada es una solicitud para recomendar una series. Ejemplos de avisos correctos son: \"Recomiéndame una serie de televisión que tenga menos de 5 temporadas\", \"Recomiéndame una serie sobre deportes\", \"Recomiéndame una serie con episodios de menos de 30 minutos\". Si el mensaje es válido, devuelva solo el texto YES, de lo contrario, NO. El aviso es: Recomiéndame una series",
 
     "prompt_1": "Su tarea es devolver 30 títulos diferentes (en el formato \"título y:fecha de lanzamiento\",, con comas dobles en una línea y no como una lista numerada) de películas",
-    "prompt_2": "Aquí hay una respuesta de ejemplo: star wars y:1977,, Jurassic Park y:1993. ¡No numere los elementos de respuesta! ¡No recomiendo más de una película de la misma franquicia!",
+    "prompt_2": "Aquí hay una respuesta de ejemplo: star wars y:1977,, Jurassic Park y:1993. ¡No numere los elementos de respuesta! No recomienden películas que son consideradas clásicas!",
 
     "prompt_series_1": "Su tarea es devolver 30 títulos diferentes (en el formato \"título y:fecha de lanzamiento\",, con comas dobles en una línea y no como una lista numerada) de series",
-    "prompt_series_2": "Aquí hay una respuesta de ejemplo: Game of Thrones y:2011,, Stranger Things y:2016. ¡No numere los elementos de respuesta!"
+    "prompt_series_2": "Aquí hay una respuesta de ejemplo: Game of Thrones y:2011,, Stranger Things y:2016. ¡No numere los elementos de respuesta! No recomienden series que son consideradas clásicas!"
 
 }

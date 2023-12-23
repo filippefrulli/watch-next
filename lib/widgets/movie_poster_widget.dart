@@ -28,7 +28,7 @@ class MoviePosterWidget extends StatelessWidget {
         ),
         child: CachedNetworkImage(
           fit: BoxFit.fitHeight,
-          imageUrl: "http://image.tmdb.org/t/p/original//$poster",
+          imageUrl: "https://image.tmdb.org/t/p/original//$poster",
           placeholder: (context, url) => Container(
             color: const Color.fromRGBO(11, 14, 23, 1),
           ),

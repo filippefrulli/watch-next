@@ -1,10 +1,15 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'dart:io';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -33,6 +38,12 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
   late Future<dynamic> servicesList;
 
+  NativeAd? nativeAd;
+  bool _nativeAdIsLoaded = false;
+
+  final String _adUnitId = Platform.isAndroid ? androidAd : iosAd;
+  //final String _adUnitId = 'ca-app-pub-3940256099942544/2247696110';
+
   int index = 0;
   int length = 0;
   bool askingGpt = false;
@@ -40,6 +51,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   bool filtering = false;
   WatchObject selectedWatchObject = WatchObject();
   PanelController pc = PanelController();
+  String responseItems = '';
+  String itemsToNotRecommend = '';
 
   late Future<dynamic> resultList;
   Future<MovieCredits> movieCredits = Future.value(MovieCredits());
@@ -56,7 +69,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   @override
   initState() {
     super.initState();
-
+    loadAd();
     servicesList = HttpService().getWatchProvidersByLocale(http.Client());
     resultList = askGpt();
   }
@@ -92,7 +105,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data.length > 0) {
+            if (!filtering && !fetchingMovieInfo && !askingGpt) {
               return Column(children: [
                 Text(
                   "here_recommendation".tr(),
@@ -119,10 +132,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data.length > 0) {
-              length = snapshot.data.length;
-              selectedWatchObject = snapshot.data[index];
-              return recommandationContent(selectedWatchObject);
+            if (snapshot.hasData) {
+              if (!filtering && !fetchingMovieInfo && !askingGpt) {
+                length = snapshot.data?.length ?? 0;
+                selectedWatchObject = snapshot.data[index];
+                return recommandationContent(selectedWatchObject);
+              } else {
+                return loadingWidget();
+              }
             } else {
               return loadingWidget();
             }
@@ -156,7 +173,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             child: Container(),
           ),
           Expanded(
-            flex: 3,
+            flex: 2,
             child: buttonsRow(),
           ),
           Expanded(
@@ -183,6 +200,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                 index--;
               }
             });
+            FirebaseAnalytics.instance.logEvent(
+              name: 'moved_back',
+            );
           },
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -206,6 +226,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                   index++;
                 }
               },
+            );
+            FirebaseAnalytics.instance.logEvent(
+              name: 'moved_forward',
             );
           },
           icon: Icon(
@@ -242,56 +265,117 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         Expanded(
           child: Container(),
         ),
-        TextButton(
-          onPressed: () async {
-            movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedWatchObject.id!);
-            if (widget.type == 0) {
-              HttpService().fetchTrailer(http.Client(), selectedWatchObject.id!).then((value) {
-                setState(() {
-                  trailerList = value;
-                });
-
-                waitForImages();
-              });
-            } else {
-              HttpService().fetchTrailerSeries(http.Client(), selectedWatchObject.id!).then((value) {
-                setState(() {
-                  trailerList = value;
-                });
-
-                waitForImages();
-              });
-            }
-            pc.open();
-          },
-          child: Container(
-            height: 50,
-            width: 100,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(15),
-              ),
-              color: Colors.grey[800],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Info",
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                const Icon(Icons.expand_less, size: 32, color: Colors.white),
-              ],
-            ),
-          ),
+        Column(
+          children: [
+            infoButton(),
+            index == length - 1 ? reloadButton() : Container(),
+          ],
         ),
         Expanded(
           child: Container(),
         ),
       ],
+    );
+  }
+
+  Widget reloadButton() {
+    return TextButton(
+      onPressed: () {
+        FirebaseAnalytics.instance.logEvent(
+          name: 'reloaded_recommendations',
+          parameters: <String, dynamic>{
+            "type": widget.type == 0 ? "movie" : "show",
+          },
+        );
+        setState(() {
+          index = 0;
+          resultList.whenComplete(() => []);
+          resultList = askGpt();
+        });
+      },
+      child: Container(
+        height: 42,
+        width: 120,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(15),
+          ),
+          color: Colors.orange,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 80,
+              child: AutoSizeText(
+                "new".tr(),
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+            ),
+            const SizedBox(
+              width: 4,
+            ),
+            Icon(Icons.refresh, size: 32, color: Colors.grey[900]),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget infoButton() {
+    return TextButton(
+      onPressed: () async {
+        movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedWatchObject.id!);
+        if (widget.type == 0) {
+          HttpService().fetchTrailer(http.Client(), selectedWatchObject.id!).then((value) {
+            setState(() {
+              trailerList = value;
+            });
+
+            waitForImages();
+          });
+        } else {
+          HttpService().fetchTrailerSeries(http.Client(), selectedWatchObject.id!).then((value) {
+            setState(() {
+              trailerList = value;
+            });
+
+            waitForImages();
+          });
+        }
+        FirebaseAnalytics.instance.logEvent(
+          name: 'opened_info',
+          parameters: <String, dynamic>{
+            "type": widget.type == 0 ? "movie" : "show",
+          },
+        );
+        pc.open();
+      },
+      child: Container(
+        height: 42,
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(15),
+          ),
+          color: Colors.grey[800],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Info",
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            const Icon(Icons.expand_less, size: 32, color: Colors.white),
+          ],
+        ),
+      ),
     );
   }
 
@@ -380,10 +464,28 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Widget loadingWidget() {
     return Center(
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
+        height: MediaQuery.of(context).size.height * 0.92,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _nativeAdIsLoaded
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 320, // minimum recommended width
+                        minHeight: 320, // minimum recommended height
+                        maxWidth: 400,
+                        maxHeight: 400,
+                      ),
+                      child: AdWidget(ad: nativeAd!),
+                    ),
+                  )
+                : Container(
+                    height: 400,
+                  ),
+            const SizedBox(
+              height: 46,
+            ),
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.orange,
               size: 50,
@@ -409,9 +511,6 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                     style: Theme.of(context).textTheme.displaySmall,
                   )
                 : Container(),
-            const SizedBox(
-              height: 46,
-            ),
           ],
         ),
       ),
@@ -534,7 +633,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       if (item.providerId == selectedWatchObject.watchProviders!.first) {
         return CachedNetworkImage(
           fit: BoxFit.fill,
-          imageUrl: "http://image.tmdb.org/t/p/original//${item.logoPath}",
+          imageUrl: "https://image.tmdb.org/t/p/original//${item.logoPath}",
           placeholder: (context, url) => Container(
             color: const Color.fromRGBO(11, 14, 23, 1),
           ),
@@ -553,13 +652,28 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     setState(() {
       askingGpt = true;
     });
+
+    List<String> itemsList = itemsToNotRecommend.split(',,');
+    itemsToNotRecommend = '';
+    for (String item in itemsList) {
+      if (item.isNotEmpty) {
+        itemsToNotRecommend += '${item.substring(
+          0,
+          item.indexOf('y:'),
+        )},';
+      }
+    }
+    String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
+
+    String queryContent = widget.type == 0
+        ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
+        : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
     final request = ChatCompleteText(
       messages: [
         Messages(
-            role: Role.assistant,
-            content: widget.type == 0
-                ? 'prompt_1'.tr() + widget.requestString + 'prompt_2'.tr()
-                : 'prompt_series_1'.tr() + widget.requestString + 'prompt_series_2'.tr()),
+          role: Role.assistant,
+          content: queryContent,
+        ),
       ],
       temperature: 0.6,
       maxToken: 400,
@@ -567,9 +681,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
 
     final response = await openAI.onChatCompletion(request: request);
+    itemsToNotRecommend = '';
 
     setState(() {
       askingGpt = false;
+      itemsToNotRecommend = response!.choices[0].message!.content;
     });
 
     return parseResponse(response!.choices[0].message!.content).then(
@@ -586,6 +702,10 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
     List<String> responseTitles = response.split(',,');
     if (responseTitles.isEmpty) {
+      FirebaseAnalytics.instance.logEvent(name: 'empty_results', parameters: {
+        'type': widget.type == 0 ? 'movie' : 'show',
+        'query': widget.requestString,
+      });
       Navigator.pop(context);
       Fluttertoast.showToast(
         msg: "prompt_issue".tr(),
@@ -748,6 +868,62 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   waitForImages() async {
     await getTrailerImages();
     setState(() {});
+  }
+
+  void loadAd() {
+    nativeAd = NativeAd(
+      adUnitId: _adUnitId,
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          debugPrint('$NativeAd loaded.');
+          setState(() {
+            _nativeAdIsLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Dispose the ad here to free resources.
+          debugPrint('$NativeAd failed to load: $error');
+          ad.dispose();
+        },
+        onAdClicked: (ad) {},
+        onAdImpression: (ad) {},
+        onAdClosed: (ad) {},
+        onAdOpened: (ad) {},
+      ),
+      request: const AdRequest(),
+      // Styling
+      nativeTemplateStyle: NativeTemplateStyle(
+        // Required: Choose a template.
+        templateType: TemplateType.medium,
+        // Optional: Customize the ad's style.
+        mainBackgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        cornerRadius: 15.0,
+        callToActionTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.grey[900],
+          backgroundColor: Colors.orange,
+          style: NativeTemplateFontStyle.monospace,
+          size: 16.0,
+        ),
+        primaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.orange,
+          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          style: NativeTemplateFontStyle.italic,
+          size: 16.0,
+        ),
+        secondaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.grey[200],
+          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          style: NativeTemplateFontStyle.bold,
+          size: 16.0,
+        ),
+        tertiaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.grey[200],
+          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          style: NativeTemplateFontStyle.normal,
+          size: 16.0,
+        ),
+      ),
+    )..load();
   }
 }
 

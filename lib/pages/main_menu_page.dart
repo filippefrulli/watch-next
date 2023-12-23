@@ -216,7 +216,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 305,
+          width: MediaQuery.of(context).size.width - 88,
           child: TextField(
             key: textFieldKey,
             autofocus: false,
@@ -229,7 +229,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             style: Theme.of(context).textTheme.titleMedium,
             decoration: InputDecoration(
               filled: true,
-              fillColor: Color.fromARGB(255, 44, 46, 56),
+              fillColor: const Color.fromARGB(255, 44, 46, 56),
               helperText: "complete_sentence".tr(),
               prefixText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
               prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12, letterSpacing: 0.5),

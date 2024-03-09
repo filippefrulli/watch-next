@@ -90,7 +90,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         maxHeight: MediaQuery.of(context).size.height * 0.90,
         backdropEnabled: true,
         backdropOpacity: 0.8,
-        color: Theme.of(context).primaryColor,
+        color: const Color.fromRGBO(11, 14, 23, 1),
         body: pageBody(),
       ),
     );
@@ -673,11 +673,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         Messages(
           role: Role.assistant,
           content: queryContent,
-        ),
+        ).toJson(),
       ],
       temperature: 0.6,
       maxToken: 400,
-      model: GptTurboChatModel(),
+      model: Gpt4ChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
@@ -746,7 +746,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                     overview: seriesResult.overview,
                     tmdbRating: seriesResult.voteAverage,
                     id: seriesResult.id,
-                    title: seriesResult.title,
+                    title: seriesResult.name,
                   ),
                 );
               }

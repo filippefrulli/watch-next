@@ -70,7 +70,7 @@ class _LanguagePageState extends State<LanguagePage> {
           onPressed: () async {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             bool seen = prefs.getBool('skip_intro') ?? false;
-            if (context.mounted && seen) {
+            if (mounted && seen) {
               Navigator.of(context).pop();
             } else if (mounted && !seen) {
               Navigator.of(context).pushReplacement(

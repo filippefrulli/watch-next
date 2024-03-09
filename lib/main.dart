@@ -205,11 +205,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
         systemNavigationBarIconBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.dark));
 
-//Setting SystmeUIMode
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: [SystemUiOverlay.top]);
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      onPopInvoked: (didPop) {},
       child: const Scaffold(
         backgroundColor: Color.fromRGBO(11, 14, 23, 1),
         body: MainMenuPage(),

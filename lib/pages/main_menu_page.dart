@@ -226,7 +226,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             minLines: 1,
             controller: _controller,
             cursorColor: Colors.orange,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.displayMedium!.copyWith(fontSize: 16),
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color.fromARGB(255, 44, 46, 56),
@@ -298,13 +298,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
     final request = ChatCompleteText(
       messages: [
         Messages(
-            role: Role.assistant,
-            content: typeIsMovie == 0
-                ? 'validation_prompt'.tr() + _controller.text
-                : 'validation_prompt_series'.tr() + _controller.text),
+          role: Role.assistant,
+          content: typeIsMovie == 0
+              ? 'validation_prompt'.tr() + _controller.text
+              : 'validation_prompt_series'.tr() + _controller.text,
+        ).toJson(),
       ],
       maxToken: 400,
-      model: GptTurbo0301ChatModel(),
+      model: Gpt4ChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);

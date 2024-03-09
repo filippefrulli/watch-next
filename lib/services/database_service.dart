@@ -52,10 +52,10 @@ class DatabaseService {
     db!.rawQuery('DELETE FROM streaming_services');
 
     streamingServices.forEach(
-      (key, value) => {
-        id = key,
-        logo = value,
-        db.rawInsert('INSERT OR REPLACE INTO streaming_services(streaming_id, streaming_logo) VALUES($id, "$logo")')
+      (key, value) {
+        id = key;
+        logo = value;
+        db.rawInsert('INSERT OR REPLACE INTO streaming_services(streaming_id, streaming_logo) VALUES($id, "$logo")');
       },
     );
   }

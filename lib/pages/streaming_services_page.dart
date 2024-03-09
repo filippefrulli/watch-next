@@ -134,7 +134,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                   bool seen = prefs.getBool('skip_intro') ?? false;
                   prefs.setBool('skip_intro', true);
                   await DatabaseService.saveStreamingServices(selectedStreamingServices);
-                  if (context.mounted && seen) {
+                  if (mounted && seen) {
                     Navigator.of(context).pop();
                   } else if (mounted && !seen) {
                     Navigator.of(context).pushReplacement(

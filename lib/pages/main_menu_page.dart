@@ -16,7 +16,7 @@ import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/widgets/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
-  const MainMenuPage({Key? key}) : super(key: key);
+  const MainMenuPage({super.key});
 
   @override
   State<MainMenuPage> createState() => _MainMenuPageState();

@@ -10,8 +10,8 @@ import 'package:watch_next/services/http_service.dart';
 ///This is the page where you enter the movie you saw
 class StreamingServicesPage extends StatefulWidget {
   const StreamingServicesPage({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   @override
   State<StreamingServicesPage> createState() => _StreamingServicesPage();
 }

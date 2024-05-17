@@ -47,7 +47,7 @@ final ThemeData theme = ThemeData();
 
 /// This Widget is the main application.
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +144,7 @@ class MyApp extends StatelessWidget {
 }
 
 class Splash extends StatefulWidget {
-  const Splash({Key? key}) : super(key: key);
+  const Splash({super.key});
 
   @override
   SplashState createState() => SplashState();
@@ -183,7 +183,7 @@ class SplashState extends State<Splash> {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   HomePageState createState() => HomePageState();

@@ -6,7 +6,7 @@ class DividerWidget extends StatelessWidget {
   final double height;
 
   // constructor
-  const DividerWidget({Key? key, required this.padding, required this.height}) : super(key: key);
+  const DividerWidget({super.key, required this.padding, required this.height});
 
   @override
   Widget build(BuildContext context) {

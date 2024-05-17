@@ -26,7 +26,7 @@ class RecommandationResultsPage extends StatefulWidget {
   final String requestString;
   final int type;
 
-  const RecommandationResultsPage({Key? key, required this.requestString, required this.type}) : super(key: key);
+  const RecommandationResultsPage({super.key, required this.requestString, required this.type});
 
   @override
   State<RecommandationResultsPage> createState() => _RecommandationResultsPageState();

@@ -6,7 +6,7 @@ class MoviePosterWidget extends StatelessWidget {
   final String poster;
 
   // constructor
-  const MoviePosterWidget({Key? key, required this.poster}) : super(key: key);
+  const MoviePosterWidget({super.key, required this.poster});
 
   @override
   Widget build(BuildContext context) {

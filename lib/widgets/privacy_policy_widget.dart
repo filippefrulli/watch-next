@@ -3,7 +3,7 @@ import 'package:watch_next/utils/constants.dart';
 
 class PrivacyPolicy extends StatelessWidget {
   // constructor
-  const PrivacyPolicy({Key? key}) : super(key: key);
+  const PrivacyPolicy({super.key});
 
   @override
   Widget build(BuildContext context) {

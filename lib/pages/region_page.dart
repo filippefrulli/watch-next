@@ -6,7 +6,7 @@ import 'package:watch_next/objects/region.dart';
 import 'streaming_services_page.dart';
 
 class RegionIntroPage extends StatefulWidget {
-  const RegionIntroPage({Key? key}) : super(key: key);
+  const RegionIntroPage({super.key});
 
   @override
   State<RegionIntroPage> createState() => _SecondIntroScreenState();

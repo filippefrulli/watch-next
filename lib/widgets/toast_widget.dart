@@ -4,7 +4,7 @@ class ToastWidget extends StatelessWidget {
   final String title;
   final Icon icon;
 
-  const ToastWidget({Key? key, required this.title, required this.icon}) : super(key: key);
+  const ToastWidget({super.key, required this.title, required this.icon});
 
   @override
   Widget build(BuildContext context) {

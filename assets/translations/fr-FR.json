@@ -2,13 +2,11 @@
     "no_internet": "Désolé, pas de connexion Internet",
     "hey_there": "Hey There!",
     "find_something": "Trouvez quelque chose à regarder",
-    "complete_sentence": "Complétez la phrase (au moins 6 caractères)",
-    "recommend_a_movie": "Recommande un film ",
-    "recommend_a_show": "Recommande une série ",
     "movie": "Film",
     "tv_show": "Série",
     "go": "ALLEZ",
     "close": "Fermer",
+    "hint": "Qu’est-ce que tu as envie de regarder?",
     "with_action": "avec beaucoup d'action",
     "step_one": "Étape 1: Tapez votre requête ici. Continue juste la phrase 'Recommande un film...' ",
     "try_with_action": "\nEssayons 'avec beaucoup d'action'",
@@ -53,8 +51,8 @@
 
     "select_streaming": "Choisis tes services de streaming",
 
-    "validation_prompt": "Ton travail consiste à valider si une phrase donnée est une demande de recommandation de film. Voici des exemples d'invites correctes: \"Recommande un film romantique et drôle, idéal pour un premier rendez-vous\", \"Recommande un film avec Tom Cruise et réalisé par Steven Spielberg\", \"Recommande un film sur l'intelligence artificielle, avec de bonnes critiques\". Si la requête est valide, renvoyez uniquement le texte YES, sinon NO. La requête est: Recommande un film",
-    "validation_prompt_series": "Ton travail consiste à valider si une phrase donnée est une demande de recommandation de séries. Voici des exemples d'invites correctes: \"Recommande une série qui a moins de 5 saisons\", \"Recommande une série sur le sport\", \"Recommander une série avec des épisodes de moins de 30 minutes\". Si la requête est valide, renvoyez uniquement le texte YES, sinon NO. La requête est: Recommande un séries",
+    "validation_prompt": "Votre travail consiste à valider si une phrase donnée est une demande de recommandation d'un film ou des critères à partir desquels vous pouvez recommander un film. Exemples de messages corrects: \"Recommander un film romantique et drôle, idéal pour un premier rendez-vous\", \"Recommander un film avec Tom Cruise et réalisé par Steven Spielberg\", \"sur l'intelligence artificielle, avec de bonnes critiques \", \"action et aventure\", \"drôle\". Si l'invite est valide, renvoyez uniquement le texte YES, sinon NO. L'invite est :",
+    "validation_prompt_series": "Ton travail consiste à valider si une phrase donnée est une demande de recommandation de séries ou des critères à partir desquels vous pouvez recommander un séries. Voici des exemples d'invites correctes: \"Recommande une série qui a moins de 5 saisons\", \"Recommande une série sur le sport\", \"avec des épisodes de moins de 30 minutes\", \"drôle\". Si la requête est valide, renvoyez uniquement le texte YES, sinon NO. La requête est: ",
 
     "prompt_1": "Ton tâche consiste à renvoyer 30 titres (au format \"titre y:date de sortie\",, avec des doubles virgules sur une ligne et non sous forme de liste numérotée!) de films",
     "prompt_2": "Voici un exemple de réponse: star wars y:1977,, Jurassic Park y:1993. Ne numérotez pas les éléments de réponse! Ne recommandez pas des films considérés comme des classiques!. Ne pas répondre par bien sur, seulement la liste",

@@ -677,7 +677,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       ],
       temperature: 0.6,
       maxToken: 400,
-      model: Gpt4ChatModel(),
+      model: GptTurboChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);

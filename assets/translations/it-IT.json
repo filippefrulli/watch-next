@@ -2,13 +2,11 @@
     "no_internet": "Nessuna connessione a internet",
     "hey_there": "Ciao!",
     "find_something": "Trova qualcosa da guardare",
-    "complete_sentence": "Completa la frase (almeno 6 caratteri)",
-    "recommend_a_movie": "Consiglia un film ",
-    "recommend_a_show": "Consiglia una serie ",
     "movie": "Film",
     "tv_show": "Serie",
     "go": "VAI",
     "close": "Chiudi",
+    "hint": "Cosa hai voglia di vedere?",
     "with_action": "con tanta azione",
     "step_one": "Primo passo: Inserisci la tua richiesta. Semplicemente continua la frase 'consiglia un film...' ",
     "try_with_action": "\nproviamo con 'con tanta azione'",
@@ -53,12 +51,12 @@
 
     "select_streaming": "Seleziona i tuoi servizi di streaming",
 
-    "validation_prompt": "Il tuo compito e' valutare se una frase e' una richiesta di consigliare un film. Esempi di richieste corrette sono: \"Consiglia un film che sia romantico e divertente, ideale per un primo appuntamento\", \"Consiglia un film con Tom Cruise and diretto da Steven Spielberg\", \"Consiglia un film sull'intelligenza artificiale, con buone recensioni\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': Consigliami un film",
-    "validation_prompt_series": "Il tuo compito e' valutare se una frase e' una richiesta di consigliare una serie tv. Esempi di richieste corrette sono: \"Consigliami una serie tv con meno di 5 stagioni\", \"Consigliami una serie tv sullo sport\", \"Consigliami una serie tv con episodi lunghi meno di 30 minuti\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': Consigliami una serie tv",
+    "validation_prompt": "Il tuo compito e' valutare se una frase e' una richiesta di consigliare un film o dei criteri in base ai quali puoi consigliare un film. Esempi di richieste corrette sono: \"Consiglia un film che sia romantico e divertente, ideale per un primo appuntamento\", \"con Tom Cruise e diretto da Steven Spielberg\", \"sull'intelligenza artificiale, con buone recensioni\", \"azione e avventura\", \"divertente\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': ",
+    "validation_prompt_series": "Il tuo compito e' valutare se una frase e' una richiesta di consigliare una serie tv o dei criteri in base ai quali puoi consigliare una serie tv.. Esempi di richieste corrette sono: \"Consigliami una serie tv con meno di 5 stagioni\", \"Consigliami una serie tv sullo sport\", \"con episodi lunghi meno di 30 minuti\", \"divertente\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': ",
 
     "prompt_1": "Il tuo compito è restituire 30 titoli (nel formato \"titolo y:data di uscita\",, con doppie virgole su una riga e non come elenco numerato!) di film",
-    "prompt_2": "Ecco un esempio di risposta: star wars y:1977,, Jurassic Park y:1993. Non numerare gli elementi di risposta! Non raccomandare film considerati classici!",
+    "prompt_2": "Ecco un esempio di risposta: star wars y:1977,, Jurassic Park y:1993. Non numerare gli elementi di risposta! Non consigliare solo film considerati classici!",
 
     "prompt_series_1": "Il tuo compito è restituire 30 titoli diversi (nel formato \"titolo y:data di uscita\",, con doppie virgole su una riga e non come elenco numerato!) di serie tv",
-    "prompt_series_2": "Ecco un esempio di risposta: Game of Thrones y:2011,, Stranger Things y:2016. Non numerare gli elementi di risposta! Non raccomandare serie tv considerate classici!"
+    "prompt_series_2": "Ecco un esempio di risposta: Game of Thrones y:2011,, Stranger Things y:2016. Non numerare gli elementi di risposta! Non consigliare solo serie tv considerate classici!"
 }

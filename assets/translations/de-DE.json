@@ -2,13 +2,11 @@
     "no_internet": "Keine internet Verbindung vorhanden",
     "hey_there": "Hey!",
     "find_something": "Finde etwas zum schauen",
-    "complete_sentence": "Vervollständige den Satz (mindestens 6 Buchstaben)",
-    "recommend_a_movie": "Empfehle einen Film ",
-    "recommend_a_show": "Empfehle eine Serie ",
     "movie": "Film",
     "tv_show": "Serie",
     "go": "LOS",
     "close": "Schließen",
+    "hint": "Worauf hast du Lust?",
     "with_action": "mit viel Action",
     "step_one": "Schritt 1: Gib deine Anfrage ein. Vervollständige einfach den Satz 'empfehle einen Film...' ",
     "try_with_action": "\nVeruschen wir es mit 'mit viel action'",
@@ -52,12 +50,12 @@
     "privacy_policy": "Datenschutzrichtlinie",
     "select_streaming": "Wähle deine Streaming-Dienste",
 
-    "validation_prompt": "Ihre Aufgabe besteht darin, zu überprüfen, ob ein bestimmter Satz eine Aufforderung zur Empfehlung eines Films darstellt. Beispiele für korrekte Eingabeaufforderungen sind: \"Empfehle einen Film der romantisch und lustig ist, ideal für ein erstes Date\", \"Empfehle einen Film mit Tom Cruise und unter der Regie von Steven Spielberg\", \"Empfehle einen Film über künstliche Intelligenz mit guten Kritiken\". Wenn die Eingabeaufforderung gültig ist, geben Sie nur den Text YES zurück, andernfalls NO. Die Aufforderung lautet: Empfehle einen Film",
-    "validation_prompt_series": "Ihre Aufgabe besteht darin, zu überprüfen, ob ein bestimmter Satz eine Aufforderung zur Empfehlung einer Serie. Beispiele für korrekte Eingabeaufforderungen sind: \"Empfehle eine Serie mit weniger als fünf Staffeln\", \"Empfehle eine Serie über Sport\", \"Empfehle eine Serie mit Episoden, die kürzer als 30 Minuten sind\". Wenn die Eingabeaufforderung gültig ist, geben Sie nur den Text YES zurück, andernfalls NO. Die Aufforderung lautet: Empfehle einen Serie",
+    "validation_prompt": "Deine Aufgabe besteht darin, zu überprüfen, ob es sich bei einem bestimmten Satz um eine Aufforderung zur Empfehlung eines Films oder um Kriterien handelt, anhand derer du einen Film empfehlen kannst. Beispiele für richtige Aufforderungen sind: \"Empfehle einen Film, der romantisch und lustig ist, ideal für ein erstes Date\", \"Empfehlen Sie einen Film mit Tom Cruise in der Hauptrolle und unter der Regie von Steven Spielberg\", \"über künstliche Intelligenz mit guten Kritiken\". \"Action und Abenteuer\", \"lustig\". Wenn die Eingabeaufforderung gültig ist, geben Sie nur den Text YES zurück, andernfalls NO. Die Eingabeaufforderung lautet: ",
+    "validation_prompt_series": "Deine Aufgabe besteht darin, zu überprüfen, ob ein bestimmter Satz eine Aufforderung zur Empfehlung einer Serie oder um Kriterien handelt, anhand derer du eine Serie empfehlen kannst. Beispiele für richtige Aufforderungen sind: \"Empfehle eine Serie mit weniger als fünf Staffeln\", \"Empfehle eine Serie über Sport\", \"mit Episoden, die kürzer als 30 Minuten sind\", \"lustig\". Wenn die Eingabeaufforderung gültig ist, geben Sie nur den Text YES zurück, andernfalls NO. Die Aufforderung lautet: ",
 
     "prompt_1": "Deine Aufgabe besteht darin, 30 unterschiedliche Titel zurückzugeben (im Format „Titel y:Veröffentlichungsdatum“,, mit zwei Kommas, in einer Zeile und nicht als nummerierte Liste!) von Filmen",
-    "prompt_2": "Hier ist eine Beispielantwort: Star Wars y: 1977,, Jurassic Park y: 1993. Nummeriere die Antwortelemente nicht! Empfehle keine Filme, die als Klassiker angesehen werden!",
+    "prompt_2": "Hier ist eine Beispielantwort: Star Wars y: 1977,, Jurassic Park y: 1993. Nummeriere die Antwortelemente nicht! Empfehle nicht nur Filme, die als Klassiker angesehen werden!",
 
     "prompt_series_1": "Deine Aufgabe besteht darin, 30 unterschiedliche Titel zurückzugeben (im Format „Titel y:Erstausstrahlungsdatum,, mit zwei Kommas, in einer Zeile und nicht als nummerierte Liste!) von Serien",
-    "prompt_series_2": "Hier ist eine Beispielantwort: Game of Thrones y:2011,, Stranger Things y:2016. Nummeriere die Antwortelemente nicht! Empfehle keine Serien, die als Klassiker angesehen werden!"
+    "prompt_series_2": "Hier ist eine Beispielantwort: Game of Thrones y:2011,, Stranger Things y:2016. Nummeriere die Antwortelemente nicht! Empfehle nicht nur Serien, die als Klassiker angesehen werden!"
 }

@@ -119,6 +119,11 @@ class MyApp extends StatelessWidget {
               fontWeight: FontWeight.w400,
               letterSpacing: 1.2,
             ),
+            bodyLarge: TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[400],
+              fontWeight: FontWeight.w400,
+            ),
             bodyMedium: const TextStyle(
               fontSize: 20.0,
               color: Colors.orange,
@@ -130,7 +135,7 @@ class MyApp extends StatelessWidget {
               color: Colors.grey[600],
               fontWeight: FontWeight.w400,
             ),
-            bodyLarge: TextStyle(
+            headlineSmall: TextStyle(
               fontSize: 16.0,
               color: Colors.grey[400],
               fontWeight: FontWeight.w400,

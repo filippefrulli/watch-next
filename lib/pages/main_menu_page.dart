@@ -46,7 +46,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     createTutorial();
     super.initState();
     _controller.addListener(checkLength);
-    _controller.text = ' ';
+    _controller.text = '';
     Timer(const Duration(seconds: 2), () {
       showTutorial();
     });
@@ -228,15 +228,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
             cursorColor: Colors.orange,
             style: Theme.of(context).textTheme.displayMedium!.copyWith(fontSize: 16),
             decoration: InputDecoration(
+              hintText: "hint".tr(),
+              hintStyle: const TextStyle(fontSize: 12),
               filled: true,
               fillColor: const Color.fromARGB(255, 44, 46, 56),
-              helperText: "complete_sentence".tr(),
-              prefixText: typeIsMovie == 0 ? "recommend_a_movie".tr() : "recommend_a_show".tr(),
-              prefixStyle: Theme.of(context).textTheme.displaySmall!.copyWith(fontSize: 12, letterSpacing: 0.5),
-              helperStyle: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 12,
-              ),
               contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(25),
@@ -281,7 +276,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   void checkLength() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_controller.text.length > 5 && mounted) {
+      if (_controller.text.length >= 5 && mounted) {
         setState(() {
           isLongEnough = true;
         });
@@ -305,7 +300,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         ).toJson(),
       ],
       maxToken: 400,
-      model: Gpt4ChatModel(),
+      model: GptTurboChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
@@ -514,14 +509,20 @@ class _MainMenuPageState extends State<MainMenuPage> {
           1,
         )!,
         backgroundColor: Colors.grey[900]!,
-        title: Text("need_inspiration".tr()),
+        title: Text(
+          "need_inspiration".tr(),
+          style: TextStyle(
+            color: Colors.grey[300],
+            fontSize: 20,
+          ),
+        ),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               "example_1".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             Container(
@@ -531,7 +532,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             const SizedBox(height: 12),
             Text(
               "example_2".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             Container(
@@ -541,7 +542,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             const SizedBox(height: 12),
             Text(
               "example_3".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             Container(
@@ -551,7 +552,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             const SizedBox(height: 12),
             Text(
               "example_4".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             Container(
@@ -561,7 +562,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             const SizedBox(height: 12),
             Text(
               "example_5".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ],
         ),

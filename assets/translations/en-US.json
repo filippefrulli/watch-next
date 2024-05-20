@@ -2,13 +2,11 @@
     "no_internet": "Sorry, no internet connection",
     "hey_there": "Hey There!",
     "find_something": "Find something to watch next",
-    "complete_sentence": "Complete the sentence (at least 6 characters)",
-    "recommend_a_movie": "Recommend a movie ",
-    "recommend_a_show": "Recommend a show ",
     "movie": "Movie",
     "tv_show": "TV show",
     "go": "GO",
     "close": "Close",
+    "hint": "What do you feel like watching?",
     "with_action": "with a lot of action",
     "step_one": "Step 1: Type your query here. Just continue the phrase 'recommend a movie...' ",
     "try_with_action": "\nLet's try 'with a lot of action'",
@@ -53,12 +51,12 @@
 
     "select_streaming": "Select your streaming services",
 
-    "validation_prompt": "Your job is to validate wether a given sentence is a request to recommend a movie. Examples of correct prompts are: \"Recommend a movie that is romantic and funny, ideal for a first date\", \"Recommend a movie starring Tom Cruise and directed by Steven Spielberg\", \"Recommend a movie about artificial intelligence, with good reviews\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a movie",
-    "validation_prompt_series": "Your job is to validate wether a given sentence is a request to recommend a tv show. Examples of correct prompts are: \"Recommend a tv show that has less than 5 seasons\", \"Recommend a tv show about sports\", \"Recommend a tv show with episodes shorter than 30 minutes\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: Recommend a tv show",
+    "validation_prompt": "Your job is to validate wether a given sentence is a request to recommend a movie or criteria from which you can recommend a movie. Examples of correct prompts are: \"Recommend a movie that is romantic and funny, ideal for a first date\", \"Recommend a movie starring Tom Cruise and directed by Steven Spielberg\", \"about artificial intelligence, with good reviews\", \"action and adventure\", \"funny\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",
+    "validation_prompt_series": "Your job is to validate wether a given sentence is a request to recommend a tv show or criteria from which you can recommend a tv show. Examples of correct prompts are: \"Recommend a tv show that has less than 5 seasons\", \"Recommend a tv show about sports\", \"with episodes shorter than 30 minutes\", \"funny\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",
 
     "prompt_1": "Your task is to return 30 unique titles (in the format \"title y:release date\",, with double commas on one line and not as a numbered list!) of movies",
-    "prompt_2": "Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not recommend movies that are regarded as classics!",
+    "prompt_2": "Here is an example response: star wars y:1977,, Jurassic Park y:1993. Do not number the response elements! Do not only recommend movies that are regarded as classics!",
 
     "prompt_series_1": "Your task is to return 30 unique titles (in the format \"title y:first air date\",, with double commas on one line and not as a numbered list!) of tv shows",
-    "prompt_series_2": "Here is an example response: Game of Thrones y:2011,, Stranger Things y:2016. Do not number the response elements! Do not recommend tv shows that are regarded as classics!"
+    "prompt_series_2": "Here is an example response: Game of Thrones y:2011,, Stranger Things y:2016. Do not number the response elements! Do not only recommend tv shows that are regarded as classics!"
 }

@@ -283,7 +283,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       onPressed: () {
         FirebaseAnalytics.instance.logEvent(
           name: 'reloaded_recommendations',
-          parameters: <String, dynamic>{
+          parameters: <String, Object>{
             "type": widget.type == 0 ? "movie" : "show",
           },
         );
@@ -347,7 +347,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         }
         FirebaseAnalytics.instance.logEvent(
           name: 'opened_info',
-          parameters: <String, dynamic>{
+          parameters: <String, Object>{
             "type": widget.type == 0 ? "movie" : "show",
           },
         );
@@ -420,10 +420,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   }
 
   Widget recommandationsElementWidget(String poster) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.all(
-        Radius.circular(25),
-      ),
+    return Container(
+      color: const Color.fromRGBO(11, 14, 23, 1),
       child: MoviePosterWidget(
         poster: poster,
       ),
@@ -677,7 +675,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       ],
       temperature: 0.6,
       maxToken: 400,
-      model: GptTurboChatModel(),
+      model: Gpt4O2024ChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);

@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/utils/secrets.dart';
@@ -37,19 +34,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
   GlobalKey textFieldKey = GlobalKey();
   GlobalKey goButtonKey = GlobalKey();
 
-  late TutorialCoachMark tutorialCoachMark;
   bool noInternet = false;
   int typeIsMovie = 0; //0 = movie , 1 = show
 
   @override
   void initState() {
-    createTutorial();
     super.initState();
     _controller.addListener(checkLength);
     _controller.text = '';
-    Timer(const Duration(seconds: 2), () {
-      showTutorial();
-    });
   }
 
   @override
@@ -167,7 +159,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           onPressed: () {
             FirebaseAnalytics.instance.logEvent(
               name: 'opened_examples',
-              parameters: <String, dynamic>{
+              parameters: <String, Object>{
                 "type": typeIsMovie == 0 ? "movie" : "show",
               },
             );
@@ -300,7 +292,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         ).toJson(),
       ],
       maxToken: 400,
-      model: GptTurboChatModel(),
+      model: Gpt4O2024ChatModel(),
     );
 
     final response = await openAI.onChatCompletion(request: request);
@@ -332,123 +324,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
   }
 
-  void showTutorial() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int showed = prefs.getInt('showed_tutorial') ?? 0;
-    if (showed == 0 && mounted) {
-      tutorialCoachMark.show(context: context);
-    }
-    prefs.setInt("showed_tutorial", 1);
-  }
-
-  void createTutorial() {
-    tutorialCoachMark = TutorialCoachMark(
-      targets: _createTargets(),
-      colorShadow: Colors.grey[900]!,
-      textSkip: "close".tr(),
-      paddingFocus: 10,
-      opacityShadow: 0.5,
-      focusAnimationDuration: const Duration(seconds: 2),
-      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-      onClickTarget: (target) {
-        if (target.keyTarget == textFieldKey) {
-          setState(() {
-            _controller.text = "with_action".tr();
-          });
-        } else {
-          goButtonPressed();
-        }
-      },
-      onClickOverlay: (target) {
-        setState(
-          () {
-            _controller.text = "with_action".tr();
-          },
-        );
-      },
-    );
-  }
-
-  List<TargetFocus> _createTargets() {
-    List<TargetFocus> targets = [];
-    targets.add(
-      TargetFocus(
-        shape: ShapeLightFocus.RRect,
-        identify: "textFieldKey",
-        keyTarget: textFieldKey,
-        alignSkip: Alignment.topRight,
-        enableOverlayTab: true,
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "step_one".tr(),
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                ],
-              );
-            },
-          ),
-          TargetContent(
-            align: ContentAlign.bottom,
-            builder: (context, controller) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "try_with_action".tr(),
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                  Text(
-                    "tap_text_field".tr(),
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-
-    targets.add(
-      TargetFocus(
-        identify: "goButtonKey",
-        keyTarget: goButtonKey,
-        alignSkip: Alignment.topRight,
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "step_two".tr(),
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-
-    return targets;
-  }
-
   void goButtonPressed() async {
     FirebaseAnalytics.instance.logEvent(
       name: 'go_button_pressed',
-      parameters: <String, dynamic>{
+      parameters: <String, Object>{
         "type": typeIsMovie == 0 ? "movie" : "show",
       },
     );
@@ -471,7 +350,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         if (isValidQuery && mounted) {
           FirebaseAnalytics.instance.logEvent(
             name: 'valid_prompt',
-            parameters: <String, dynamic>{
+            parameters: <String, Object>{
               "type": typeIsMovie == 0 ? "movie" : "show",
             },
           );
@@ -483,7 +362,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         } else {
           FirebaseAnalytics.instance.logEvent(
             name: 'invalid_prompt',
-            parameters: <String, dynamic>{
+            parameters: <String, Object>{
               "type": typeIsMovie == 0 ? "movie" : "show",
             },
           );

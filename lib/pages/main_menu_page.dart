@@ -355,6 +355,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
               "type": typeIsMovie == 0 ? "movie" : "show",
             },
           );
+
+          // Log valid query to Firestore
+          FirebaseFirestore.instance.collection('good_queries').add({
+            'type': typeIsMovie == 0 ? "movie" : "show",
+            'timestamp': FieldValue.serverTimestamp(),
+            'query': _controller.text,
+          });
+
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => RecommandationResultsPage(requestString: _controller.text, type: typeIsMovie),

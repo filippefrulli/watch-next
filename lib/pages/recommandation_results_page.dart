@@ -466,16 +466,31 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         child: Column(
           children: [
             _nativeAdIsLoaded
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        minWidth: 320, // minimum recommended width
-                        minHeight: 320, // minimum recommended height
-                        maxWidth: 400,
-                        maxHeight: 400,
+                ? Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.grey[800]!,
+                        width: 2,
                       ),
-                      child: AdWidget(ad: nativeAd!),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minWidth: 320, // minimum recommended width
+                              minHeight: 320, // minimum recommended height
+                              maxWidth: 380,
+                              maxHeight: 380,
+                            ),
+                            child: AdWidget(ad: nativeAd!),
+                          ),
+                        ),
+                        Text('Advertisement', style: TextStyle(color: Colors.grey[200], fontSize: 14)),
+                      ],
                     ),
                   )
                 : Container(

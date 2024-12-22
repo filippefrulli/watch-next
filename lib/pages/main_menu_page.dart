@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -366,6 +367,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
               "type": typeIsMovie == 0 ? "movie" : "show",
             },
           );
+
+          // Log invalid query to Firestore
+          FirebaseFirestore.instance.collection('invalid_queries').add({
+            'type': typeIsMovie == 0 ? "movie" : "show",
+            'timestamp': FieldValue.serverTimestamp(),
+            'query': _controller.text,
+          });
+
           showToastWidget(
             ToastWidget(
               title: "invalid_input".tr(),

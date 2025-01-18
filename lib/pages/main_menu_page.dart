@@ -222,7 +222,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             style: Theme.of(context).textTheme.displayMedium!.copyWith(fontSize: 16),
             decoration: InputDecoration(
               hintText: "hint".tr(),
-              hintStyle: const TextStyle(fontSize: 12),
+              hintStyle: TextStyle(fontSize: 12, color: Colors.grey[300]),
               filled: true,
               fillColor: const Color.fromARGB(255, 44, 46, 56),
               contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),

@@ -32,6 +32,7 @@
     "tmdb_score": "Score TMDB: ",
     "prompt_issue": "Nous avons eu un problème avec votre promt. Veuillez réessayer",
     "no_movies": "Nous n'avons trouvé aucun résultat sur vos services de streaming. Veuillez réessayer",
+    "error_occurred": "Une erreur s'est produite. Veuillez réessayer",
     "select_country": "Sélectionne ton pays",
     "done": "Confirmer",
     "new": "Nouveau",

@@ -21,52 +21,68 @@ class HttpService {
   final String baseUrl = 'https://www.youtube.com/watch?v=';
 
   Future<Results> findMovieByTitle(http.Client client, String title, String year) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lang = prefs.getString('lang') ?? 'en-US';
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
 
-    var response = await client.get(
-      Uri.https('api.themoviedb.org', '/3/search/movie', {
-        'api_key': apiKey,
-        'language': lang,
-        'query': title,
-        'year': year,
-      }),
-    );
+      var response = await client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/search/movie', {
+              'api_key': apiKey,
+              'language': lang,
+              'query': title,
+              'year': year,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    if (response.statusCode != 200) {
+      if (response.statusCode != 200) {
+        log('TMDB API error: ${response.statusCode}');
+        return Results();
+      }
+      SearchResults? searchResults = SearchResults.fromJson(jsonDecode(response.body));
+
+      if (searchResults.results!.isNotEmpty) {
+        return searchResults.results![0];
+      }
+      return Results();
+    } catch (e) {
+      log('Error finding movie by title: $e');
       return Results();
     }
-    SearchResults? searchResults = SearchResults.fromJson(jsonDecode(response.body));
-
-    if (searchResults.results!.isNotEmpty) {
-      return searchResults.results![0];
-    }
-    return Results();
   }
 
   Future<SeriesResults> findShowByTitle(http.Client client, String title, String year) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lang = prefs.getString('lang') ?? 'en-US';
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
 
-    var response = await client.get(
-      Uri.https('api.themoviedb.org', '/3/search/tv', {
-        'api_key': apiKey,
-        'language': lang,
-        'query': title,
-        'first_air_date_year': year,
-        'include_adult': 'true',
-      }),
-    );
+      var response = await client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/search/tv', {
+              'api_key': apiKey,
+              'language': lang,
+              'query': title,
+              'first_air_date_year': year,
+              'include_adult': 'true',
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    if (response.statusCode != 200) {
+      if (response.statusCode != 200) {
+        log('TMDB API error: ${response.statusCode}');
+        return SeriesResults();
+      }
+      SeriesSearchResults? searchResults = SeriesSearchResults.fromJson(jsonDecode(response.body));
+
+      if (searchResults.results!.isNotEmpty) {
+        return searchResults.results![0];
+      }
+      return SeriesResults();
+    } catch (e) {
+      log('Error finding show by title: $e');
       return SeriesResults();
     }
-    SeriesSearchResults? searchResults = SeriesSearchResults.fromJson(jsonDecode(response.body));
-
-    if (searchResults.results!.isNotEmpty) {
-      return searchResults.results![0];
-    }
-    return SeriesResults();
   }
 
   Future<MovieDetails> fetchMovieDetails(http.Client client, int id) async {
@@ -104,67 +120,91 @@ class HttpService {
   }
 
   Future<List<int>> getWatchProviders(http.Client client, int id) async {
-    final response = await client.get(
-      Uri.https(
-        'api.themoviedb.org',
-        '/3/movie/$id/watch/providers',
-        {'api_key': apiKey, 'language': 'en-US'},
-      ),
-    );
+    try {
+      final response = await client
+          .get(
+            Uri.https(
+              'api.themoviedb.org',
+              '/3/movie/$id/watch/providers',
+              {'api_key': apiKey, 'language': 'en-US'},
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String region = prefs.getString('region') ?? 'DE';
+      if (response.statusCode != 200) {
+        log('TMDB API error getting watch providers: ${response.statusCode}');
+        return [];
+      }
 
-    List<String> providers = jsonDecode(response.body)["results"].keys.toList();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String region = prefs.getString('region') ?? 'DE';
 
-    List<int> movieProvidersIds = [];
+      List<String> providers = jsonDecode(response.body)["results"].keys.toList();
 
-    if (providers.contains(region)) {
-      List<int> myProvidersIds = await DatabaseService.getStreamingServicesIds();
+      List<int> movieProvidersIds = [];
 
-      ProviderRegion provider = ProviderRegion.fromJson(jsonDecode(response.body)["results"][region]);
-      if (provider.flatrate != null) {
-        for (StreamingType item in provider.flatrate!) {
-          if (myProvidersIds.contains(item.providerId)) {
-            movieProvidersIds.add(item.providerId!);
+      if (providers.contains(region)) {
+        List<int> myProvidersIds = await DatabaseService.getStreamingServicesIds();
+
+        ProviderRegion provider = ProviderRegion.fromJson(jsonDecode(response.body)["results"][region]);
+        if (provider.flatrate != null) {
+          for (StreamingType item in provider.flatrate!) {
+            if (myProvidersIds.contains(item.providerId)) {
+              movieProvidersIds.add(item.providerId!);
+            }
           }
         }
       }
-    }
 
-    return movieProvidersIds;
+      return movieProvidersIds;
+    } catch (e) {
+      log('Error getting watch providers: $e');
+      return [];
+    }
   }
 
   Future<List<int>> getWatchProvidersSeries(http.Client client, int id) async {
-    final response = await client.get(
-      Uri.https(
-        'api.themoviedb.org',
-        '/3/tv/$id/watch/providers',
-        {'api_key': apiKey, 'language': 'en-US'},
-      ),
-    );
+    try {
+      final response = await client
+          .get(
+            Uri.https(
+              'api.themoviedb.org',
+              '/3/tv/$id/watch/providers',
+              {'api_key': apiKey, 'language': 'en-US'},
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String region = prefs.getString('region') ?? 'DE';
+      if (response.statusCode != 200) {
+        log('TMDB API error getting watch providers for series: ${response.statusCode}');
+        return [];
+      }
 
-    List<String> providers = jsonDecode(response.body)["results"].keys.toList();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String region = prefs.getString('region') ?? 'DE';
 
-    List<int> movieProvidersIds = [];
+      List<String> providers = jsonDecode(response.body)["results"].keys.toList();
 
-    if (providers.contains(region)) {
-      List<int> myProvidersIds = await DatabaseService.getStreamingServicesIds();
+      List<int> movieProvidersIds = [];
 
-      ProviderRegion provider = ProviderRegion.fromJson(jsonDecode(response.body)["results"][region]);
-      if (provider.flatrate != null) {
-        for (StreamingType item in provider.flatrate!) {
-          if (myProvidersIds.contains(item.providerId)) {
-            movieProvidersIds.add(item.providerId!);
+      if (providers.contains(region)) {
+        List<int> myProvidersIds = await DatabaseService.getStreamingServicesIds();
+
+        ProviderRegion provider = ProviderRegion.fromJson(jsonDecode(response.body)["results"][region]);
+        if (provider.flatrate != null) {
+          for (StreamingType item in provider.flatrate!) {
+            if (myProvidersIds.contains(item.providerId)) {
+              movieProvidersIds.add(item.providerId!);
+            }
           }
         }
       }
-    }
 
-    return movieProvidersIds;
+      return movieProvidersIds;
+    } catch (e) {
+      log('Error getting watch providers for series: $e');
+      return [];
+    }
   }
 
   Future<List<StreamingService>> getWatchProvidersByLocale(http.Client client) async {

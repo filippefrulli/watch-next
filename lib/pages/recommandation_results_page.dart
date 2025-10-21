@@ -666,46 +666,77 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       askingGpt = true;
     });
 
-    List<String> itemsList = itemsToNotRecommend.split(',,');
-    itemsToNotRecommend = '';
-    for (String item in itemsList) {
-      if (item.isNotEmpty) {
-        itemsToNotRecommend += '${item.substring(
-          0,
-          item.indexOf('y:'),
-        )},';
+    try {
+      List<String> itemsList = itemsToNotRecommend.split(',,');
+      itemsToNotRecommend = '';
+      for (String item in itemsList) {
+        if (item.isNotEmpty) {
+          itemsToNotRecommend += '${item.substring(
+            0,
+            item.indexOf('y:'),
+          )},';
+        }
       }
+      String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
+
+      String queryContent = widget.type == 0
+          ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
+          : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
+
+      final response = await openAI.createChatCompletion(
+        request: CreateChatCompletionRequest(
+          model: ChatCompletionModel.modelId('gpt-5-mini'),
+          messages: [
+            ChatCompletionMessage.user(
+              content: ChatCompletionUserMessageContent.string(queryContent),
+            ),
+          ],
+          reasoningEffort: ReasoningEffort.low,
+        ),
+      );
+
+      itemsToNotRecommend = '';
+
+      final responseContent = response.choices.first.message.content ?? '';
+
+      setState(() {
+        askingGpt = false;
+        itemsToNotRecommend = responseContent;
+      });
+
+      return parseResponse(responseContent).then(
+        (value) => filterProviders(value),
+      );
+    } catch (e) {
+      // Log error to Firebase Analytics
+      FirebaseAnalytics.instance.logEvent(
+        name: 'api_error',
+        parameters: <String, Object>{
+          'error': 'gpt_request_failed',
+          'type': widget.type == 0 ? 'movie' : 'show',
+          'message': e.toString(),
+        },
+      );
+
+      setState(() {
+        askingGpt = false;
+      });
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        Fluttertoast.showToast(
+          msg: "error_occurred".tr(),
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+
+      return [];
     }
-    String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
-
-    String queryContent = widget.type == 0
-        ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
-        : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
-
-    final response = await openAI.createChatCompletion(
-      request: CreateChatCompletionRequest(
-        model: ChatCompletionModel.modelId('gpt-5-mini'),
-        messages: [
-          ChatCompletionMessage.user(
-            content: ChatCompletionUserMessageContent.string(queryContent),
-          ),
-        ],
-        reasoningEffort: ReasoningEffort.low,
-      ),
-    );
-
-    itemsToNotRecommend = '';
-
-    final responseContent = response.choices.first.message.content ?? '';
-
-    setState(() {
-      askingGpt = false;
-      itemsToNotRecommend = responseContent;
-    });
-
-    return parseResponse(responseContent).then(
-      (value) => filterProviders(value),
-    );
   }
 
   parseResponse(String response) async {

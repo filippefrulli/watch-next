@@ -283,31 +283,57 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Future<void> validateQuery() async {
-    final response = await openAI.createChatCompletion(
-      request: CreateChatCompletionRequest(
-        model: ChatCompletionModel.modelId('gpt-5-mini'),
-        messages: [
-          ChatCompletionMessage.system(
-            content: typeIsMovie == 0 ? 'validation_prompt'.tr() : 'validation_prompt_series'.tr(),
-          ),
-          ChatCompletionMessage.user(
-            content: ChatCompletionUserMessageContent.string(_controller.text),
-          ),
-        ],
-        reasoningEffort: ReasoningEffort.low,
-      ),
-    );
+    try {
+      final response = await openAI.createChatCompletion(
+        request: CreateChatCompletionRequest(
+          model: ChatCompletionModel.modelId('gpt-5-mini'),
+          messages: [
+            ChatCompletionMessage.system(
+              content: typeIsMovie == 0 ? 'validation_prompt'.tr() : 'validation_prompt_series'.tr(),
+            ),
+            ChatCompletionMessage.user(
+              content: ChatCompletionUserMessageContent.string(_controller.text),
+            ),
+          ],
+          reasoningEffort: ReasoningEffort.low,
+        ),
+      );
 
-    if (response.choices.first.message.content == "YES" && mounted) {
-      setState(() {
-        isValidQuery = true;
-        enableLoading = false;
-      });
-    } else {
-      setState(() {
-        isValidQuery = false;
-        enableLoading = false;
-      });
+      if (response.choices.first.message.content == "YES" && mounted) {
+        setState(() {
+          isValidQuery = true;
+          enableLoading = false;
+        });
+      } else {
+        setState(() {
+          isValidQuery = false;
+          enableLoading = false;
+        });
+      }
+    } catch (e) {
+      // Log error to Firebase Analytics
+      FirebaseAnalytics.instance.logEvent(
+        name: 'api_error',
+        parameters: <String, Object>{
+          'error': 'validation_query_failed',
+          'message': e.toString(),
+        },
+      );
+
+      if (mounted) {
+        setState(() {
+          enableLoading = false;
+        });
+
+        // Show user-friendly error message
+        showToastWidget(
+          ToastWidget(
+            title: "error_occurred".tr(),
+            icon: const Icon(Icons.error_outline, color: Colors.red, size: 36),
+          ),
+          duration: const Duration(seconds: 4),
+        );
+      }
     }
   }
 

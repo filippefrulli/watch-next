@@ -32,6 +32,7 @@
     "tmdb_score": "Puntuación TMDB: ",
     "prompt_issue": "Tuvimos un problema con tu entrada. Inténtalo de nuevo",
     "no_movies": "No pudimos encontrar ningún resultado en tus plataformas de streaming. Inténtalo de nuevo",
+    "error_occurred": "Se produjo un error. Por favor, inténtalo de nuevo",
     "select_country": "Selecciona tu pais",
     "done": "Confirmar",
     "new": "Nuevas",

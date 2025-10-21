@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
+import 'package:openai_dart/openai_dart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -23,8 +23,7 @@ class MainMenuPage extends StatefulWidget {
 class _MainMenuPageState extends State<MainMenuPage> {
   int currentIndex = -1;
 
-  final openAI = OpenAI.instance
-      .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
+  late final OpenAIClient openAI;
 
   final _controller = TextEditingController();
 
@@ -41,6 +40,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   void initState() {
     super.initState();
+    openAI = OpenAIClient(apiKey: openApiKey);
     _controller.addListener(checkLength);
     _controller.text = '';
   }
@@ -282,22 +282,19 @@ class _MainMenuPageState extends State<MainMenuPage> {
     });
   }
 
-  validateQuery() async {
-    final request = ChatCompleteText(
-      messages: [
-        Messages(
-          role: Role.assistant,
-          content: typeIsMovie == 0
-              ? 'validation_prompt'.tr() + _controller.text
-              : 'validation_prompt_series'.tr() + _controller.text,
-        ).toJson(),
-      ],
-      maxToken: 400,
-      model: Gpt4O2024ChatModel(),
+  Future<void> validateQuery() async {
+    final response = await openAI.createChatCompletion(
+      request: CreateChatCompletionRequest(model: ChatCompletionModel.modelId('gpt-5-mini'), messages: [
+        ChatCompletionMessage.system(
+          content: typeIsMovie == 0 ? 'validation_prompt'.tr() : 'validation_prompt_series'.tr(),
+        ),
+        ChatCompletionMessage.user(
+          content: ChatCompletionUserMessageContent.string(_controller.text),
+        ),
+      ]),
     );
 
-    final response = await openAI.onChatCompletion(request: request);
-    if (response!.choices[0].message!.content == "YES" && mounted) {
+    if (response.choices.first.message.content == "YES" && mounted) {
       setState(() {
         isValidQuery = true;
         enableLoading = false;

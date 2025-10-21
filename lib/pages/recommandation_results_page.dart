@@ -3,7 +3,7 @@
 import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
+import 'package:openai_dart/openai_dart.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -33,8 +33,7 @@ class RecommandationResultsPage extends StatefulWidget {
 }
 
 class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
-  final openAI = OpenAI.instance
-      .build(token: openApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 20)), enableLog: true);
+  late final OpenAIClient openAI;
 
   late Future<dynamic> servicesList;
 
@@ -69,6 +68,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   @override
   initState() {
     super.initState();
+    openAI = OpenAIClient(apiKey: openApiKey);
     loadAd();
     servicesList = HttpService().getWatchProvidersByLocale(http.Client());
     resultList = askGpt();
@@ -681,27 +681,29 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     String queryContent = widget.type == 0
         ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
         : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
-    final request = ChatCompleteText(
-      messages: [
-        Messages(
-          role: Role.assistant,
-          content: queryContent,
-        ).toJson(),
-      ],
-      temperature: 0.6,
-      maxToken: 400,
-      model: Gpt4O2024ChatModel(),
+
+    final response = await openAI.createChatCompletion(
+      request: CreateChatCompletionRequest(
+        model: ChatCompletionModel.modelId('gpt-5-mini'),
+        messages: [
+          ChatCompletionMessage.user(
+            content: ChatCompletionUserMessageContent.string(queryContent),
+          ),
+        ],
+      ),
     );
 
-    final response = await openAI.onChatCompletion(request: request);
     itemsToNotRecommend = '';
+
+    final responseContent = response.choices.first.message.content ?? '';
+    print('GPT Response: $response');
 
     setState(() {
       askingGpt = false;
-      itemsToNotRecommend = response!.choices[0].message!.content;
+      itemsToNotRecommend = responseContent;
     });
 
-    return parseResponse(response!.choices[0].message!.content).then(
+    return parseResponse(responseContent).then(
       (value) => filterProviders(value),
     );
   }

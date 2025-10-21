@@ -20,12 +20,18 @@ class HttpService {
 
   final String baseUrl = 'https://www.youtube.com/watch?v=';
 
-  Future<Results> findMovieByTitle(http.Client client, String title, String year) async {
+  // Singleton HTTP client for connection reuse
+  static final http.Client _client = http.Client();
+
+  // Getter to access the shared client
+  static http.Client get client => _client;
+
+  Future<Results> findMovieByTitle(String title, String year) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String lang = prefs.getString('lang') ?? 'en-US';
 
-      var response = await client
+      var response = await _client
           .get(
             Uri.https('api.themoviedb.org', '/3/search/movie', {
               'api_key': apiKey,
@@ -52,12 +58,12 @@ class HttpService {
     }
   }
 
-  Future<SeriesResults> findShowByTitle(http.Client client, String title, String year) async {
+  Future<SeriesResults> findShowByTitle(String title, String year) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String lang = prefs.getString('lang') ?? 'en-US';
 
-      var response = await client
+      var response = await _client
           .get(
             Uri.https('api.themoviedb.org', '/3/search/tv', {
               'api_key': apiKey,
@@ -85,11 +91,11 @@ class HttpService {
     }
   }
 
-  Future<MovieDetails> fetchMovieDetails(http.Client client, int id) async {
+  Future<MovieDetails> fetchMovieDetails(int id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String lang = prefs.getString('lang') ?? 'en-US';
 
-    final response = await client.get(
+    final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/movie/$id',
@@ -102,11 +108,11 @@ class HttpService {
     return details;
   }
 
-  Future<SeriesDetails> fetchSeriesDetails(http.Client client, int id) async {
+  Future<SeriesDetails> fetchSeriesDetails(int id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String lang = prefs.getString('lang') ?? 'en-US';
 
-    final response = await client.get(
+    final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/tv/$id',
@@ -119,9 +125,9 @@ class HttpService {
     return details;
   }
 
-  Future<List<int>> getWatchProviders(http.Client client, int id) async {
+  Future<List<int>> getWatchProviders(int id) async {
     try {
-      final response = await client
+      final response = await _client
           .get(
             Uri.https(
               'api.themoviedb.org',
@@ -163,9 +169,9 @@ class HttpService {
     }
   }
 
-  Future<List<int>> getWatchProvidersSeries(http.Client client, int id) async {
+  Future<List<int>> getWatchProvidersSeries(int id) async {
     try {
-      final response = await client
+      final response = await _client
           .get(
             Uri.https(
               'api.themoviedb.org',
@@ -207,10 +213,10 @@ class HttpService {
     }
   }
 
-  Future<List<StreamingService>> getWatchProvidersByLocale(http.Client client) async {
+  Future<List<StreamingService>> getWatchProvidersByLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String region = prefs.getString('region') ?? 'DE';
-    final response = await client.get(
+    final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/watch/providers/movie',
@@ -236,8 +242,8 @@ class HttpService {
     return list;
   }
 
-  Future<MovieCredits> fetchMovieCredits(http.Client client, int id) async {
-    final response = await client.get(
+  Future<MovieCredits> fetchMovieCredits(int id) async {
+    final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/movie/$id/credits',
@@ -250,10 +256,10 @@ class HttpService {
     return credits;
   }
 
-  Future<List<TrailerResults>> fetchTrailer(http.Client client, int id) async {
+  Future<List<TrailerResults>> fetchTrailer(int id) async {
     List<TrailerResults> trailerList = [];
 
-    final response = await client.get(
+    final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/movie/$id/videos',
@@ -276,10 +282,10 @@ class HttpService {
     }
   }
 
-  Future<List<TrailerResults>> fetchTrailerSeries(http.Client client, int id) async {
+  Future<List<TrailerResults>> fetchTrailerSeries(int id) async {
     List<TrailerResults> trailerList = [];
 
-    final response = await client.get(
+    final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/tv/$id/videos',

@@ -20,7 +20,6 @@ import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/widgets/movie_poster_widget.dart';
-import 'package:http/http.dart' as http;
 
 class RecommandationResultsPage extends StatefulWidget {
   final String requestString;
@@ -70,7 +69,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     super.initState();
     openAI = OpenAIClient(apiKey: openApiKey);
     loadAd();
-    servicesList = HttpService().getWatchProvidersByLocale(http.Client());
+    servicesList = HttpService().getWatchProvidersByLocale();
     resultList = askGpt();
   }
 
@@ -327,9 +326,9 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Widget infoButton() {
     return TextButton(
       onPressed: () async {
-        movieCredits = HttpService().fetchMovieCredits(http.Client(), selectedWatchObject.id!);
+        movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
         if (widget.type == 0) {
-          HttpService().fetchTrailer(http.Client(), selectedWatchObject.id!).then((value) {
+          HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
             setState(() {
               trailerList = value;
             });
@@ -337,7 +336,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             waitForImages();
           });
         } else {
-          HttpService().fetchTrailerSeries(http.Client(), selectedWatchObject.id!).then((value) {
+          HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
             setState(() {
               trailerList = value;
             });
@@ -767,7 +766,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       List<String> list = movieTitle.split('y:');
       if (list.length > 1) {
         if (widget.type == 0) {
-          final movieResult = await HttpService().findMovieByTitle(http.Client(), list[0], list[1]);
+          final movieResult = await HttpService().findMovieByTitle(list[0], list[1]);
           if (movieResult.id != null) {
             return WatchObject(
               posterPath: movieResult.posterPath,
@@ -778,7 +777,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             );
           }
         } else {
-          final seriesResult = await HttpService().findShowByTitle(http.Client(), list[0], list[1]);
+          final seriesResult = await HttpService().findShowByTitle(list[0], list[1]);
           if (seriesResult.id != null) {
             return WatchObject(
               posterPath: seriesResult.posterPath,
@@ -812,7 +811,6 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     final futures = watchObjectList.map((watchObject) async {
       if (widget.type == 0) {
         final value = await HttpService().getWatchProviders(
-          http.Client(),
           watchObject.id!,
         );
         if (value.isNotEmpty) {
@@ -821,7 +819,6 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         }
       } else {
         final value = await HttpService().getWatchProvidersSeries(
-          http.Client(),
           watchObject.id!,
         );
         if (value.isNotEmpty) {

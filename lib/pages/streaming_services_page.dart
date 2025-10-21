@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
@@ -23,7 +22,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
 
   @override
   void initState() {
-    resultList = HttpService().getWatchProvidersByLocale(http.Client());
+    resultList = HttpService().getWatchProvidersByLocale();
     DatabaseService.getAllStreamingServices().then(
       (mapList) => {
         for (var map in mapList)

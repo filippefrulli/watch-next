@@ -696,7 +696,6 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     itemsToNotRecommend = '';
 
     final responseContent = response.choices.first.message.content ?? '';
-    print('GPT Response: $response');
 
     setState(() {
       askingGpt = false;
@@ -890,14 +889,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       adUnitId: _adUnitId,
       listener: NativeAdListener(
         onAdLoaded: (ad) {
-          debugPrint('$NativeAd loaded.');
           setState(() {
             _nativeAdIsLoaded = true;
           });
         },
         onAdFailedToLoad: (ad, error) {
-          // Dispose the ad here to free resources.
-          debugPrint('$NativeAd failed to load: $error');
           ad.dispose();
         },
         onAdClicked: (ad) {},

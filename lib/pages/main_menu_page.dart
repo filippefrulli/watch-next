@@ -284,14 +284,18 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Future<void> validateQuery() async {
     final response = await openAI.createChatCompletion(
-      request: CreateChatCompletionRequest(model: ChatCompletionModel.modelId('gpt-5-mini'), messages: [
-        ChatCompletionMessage.system(
-          content: typeIsMovie == 0 ? 'validation_prompt'.tr() : 'validation_prompt_series'.tr(),
-        ),
-        ChatCompletionMessage.user(
-          content: ChatCompletionUserMessageContent.string(_controller.text),
-        ),
-      ]),
+      request: CreateChatCompletionRequest(
+        model: ChatCompletionModel.modelId('gpt-5-mini'),
+        messages: [
+          ChatCompletionMessage.system(
+            content: typeIsMovie == 0 ? 'validation_prompt'.tr() : 'validation_prompt_series'.tr(),
+          ),
+          ChatCompletionMessage.user(
+            content: ChatCompletionUserMessageContent.string(_controller.text),
+          ),
+        ],
+        reasoningEffort: ReasoningEffort.low,
+      ),
     );
 
     if (response.choices.first.message.content == "YES" && mounted) {

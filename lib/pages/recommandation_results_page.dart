@@ -690,6 +690,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             content: ChatCompletionUserMessageContent.string(queryContent),
           ),
         ],
+        reasoningEffort: ReasoningEffort.low,
       ),
     );
 
@@ -712,8 +713,6 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       fetchingMovieInfo = true;
     });
 
-    List<WatchObject> watchObjectsList = [];
-
     List<String> responseTitles = response.split(',,');
     if (responseTitles.isEmpty) {
       FirebaseAnalytics.instance.logEvent(name: 'empty_results', parameters: {
@@ -731,44 +730,40 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         fontSize: 16.0,
       );
     }
-    for (String movieTitle in responseTitles) {
+
+    // Parallelize HTTP requests using Future.wait
+    final futures = responseTitles.map((movieTitle) async {
       List<String> list = movieTitle.split('y:');
       if (list.length > 1) {
         if (widget.type == 0) {
-          await HttpService().findMovieByTitle(http.Client(), list[0], list[1]).then(
-            (movieResult) {
-              if (movieResult.id != null) {
-                watchObjectsList.add(
-                  WatchObject(
-                    posterPath: movieResult.posterPath,
-                    overview: movieResult.overview,
-                    tmdbRating: movieResult.voteAverage,
-                    id: movieResult.id,
-                    title: movieResult.title,
-                  ),
-                );
-              }
-            },
-          );
+          final movieResult = await HttpService().findMovieByTitle(http.Client(), list[0], list[1]);
+          if (movieResult.id != null) {
+            return WatchObject(
+              posterPath: movieResult.posterPath,
+              overview: movieResult.overview,
+              tmdbRating: movieResult.voteAverage,
+              id: movieResult.id,
+              title: movieResult.title,
+            );
+          }
         } else {
-          await HttpService().findShowByTitle(http.Client(), list[0], list[1]).then(
-            (seriesResult) {
-              if (seriesResult.id != null) {
-                watchObjectsList.add(
-                  WatchObject(
-                    posterPath: seriesResult.posterPath,
-                    overview: seriesResult.overview,
-                    tmdbRating: seriesResult.voteAverage,
-                    id: seriesResult.id,
-                    title: seriesResult.name,
-                  ),
-                );
-              }
-            },
-          );
+          final seriesResult = await HttpService().findShowByTitle(http.Client(), list[0], list[1]);
+          if (seriesResult.id != null) {
+            return WatchObject(
+              posterPath: seriesResult.posterPath,
+              overview: seriesResult.overview,
+              tmdbRating: seriesResult.voteAverage,
+              id: seriesResult.id,
+              title: seriesResult.name,
+            );
+          }
         }
-      } else {}
-    }
+      }
+      return null;
+    }).toList();
+
+    final results = await Future.wait(futures);
+    final watchObjectsList = results.whereType<WatchObject>().toList();
 
     setState(() {
       fetchingMovieInfo = false;
@@ -782,44 +777,38 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       filtering = true;
     });
 
-    Map<int, WatchObject> watchObjectMap = {};
-    for (WatchObject watchObject in List<WatchObject>.from(watchObjectList)) {
+    // Parallelize HTTP requests using Future.wait
+    final futures = watchObjectList.map((watchObject) async {
       if (widget.type == 0) {
-        await HttpService()
-            .getWatchProviders(
-              http.Client(),
-              watchObject.id!,
-            )
-            .then(
-              (value) => {
-                if (value.isNotEmpty)
-                  {
-                    watchObject.watchProviders = value,
-                    watchObjectMap[watchObject.id!] = watchObject,
-                  }
-              },
-            );
+        final value = await HttpService().getWatchProviders(
+          http.Client(),
+          watchObject.id!,
+        );
+        if (value.isNotEmpty) {
+          watchObject.watchProviders = value;
+          return watchObject;
+        }
       } else {
-        await HttpService()
-            .getWatchProvidersSeries(
-              http.Client(),
-              watchObject.id!,
-            )
-            .then(
-              (value) => {
-                if (value.isNotEmpty)
-                  {
-                    watchObject.watchProviders = value,
-                    watchObjectMap[watchObject.id!] = watchObject,
-                  }
-              },
-            );
+        final value = await HttpService().getWatchProvidersSeries(
+          http.Client(),
+          watchObject.id!,
+        );
+        if (value.isNotEmpty) {
+          watchObject.watchProviders = value;
+          return watchObject;
+        }
       }
-    }
+      return null;
+    }).toList();
+
+    final results = await Future.wait(futures);
+    final watchObjectsWithProviders = results.whereType<WatchObject>().toList();
+
     setState(() {
       filtering = false;
     });
-    if (watchObjectMap.values.toList().isEmpty && mounted) {
+
+    if (watchObjectsWithProviders.isEmpty && mounted) {
       Navigator.of(context).pop();
       Fluttertoast.showToast(
           msg: "no_movies".tr(),
@@ -830,7 +819,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           textColor: Colors.white,
           fontSize: 16.0);
     } else {
-      return watchObjectMap.values.toList();
+      return watchObjectsWithProviders;
     }
   }
 

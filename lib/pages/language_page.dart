@@ -24,9 +24,9 @@ class _LanguagePageState extends State<LanguagePage> {
 
   static List<String> regions = ['US', 'DE', 'IT', 'FR', 'ES'];
 
-  int selected = 21;
+  static List<String> languageFlags = ['🇺🇸', '🇩🇪', '🇮🇹', '🇫🇷', '🇪🇸'];
 
-  double opacity = 1.0;
+  int selected = 21;
 
   @override
   initState() {
@@ -44,14 +44,22 @@ class _LanguagePageState extends State<LanguagePage> {
   Widget body() {
     return Column(
       children: <Widget>[
-        const SizedBox(height: 48),
-        Text(
-          'Select your language',
-          maxLines: 1,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.displayLarge,
+        const SizedBox(height: 60),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              const SizedBox(height: 16),
+              Text(
+                'Select your language',
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.displayLarge,
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 48),
+        const SizedBox(height: 40),
         _languages(),
         Expanded(
           child: Container(),
@@ -66,23 +74,52 @@ class _LanguagePageState extends State<LanguagePage> {
     if (selected < 10) {
       return DelayedDisplay(
         delay: const Duration(milliseconds: 100),
-        child: TextButton(
-          onPressed: () async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            bool seen = prefs.getBool('skip_intro') ?? false;
-            if (mounted && seen) {
-              Navigator.of(context).pop();
-            } else if (mounted && !seen) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const RegionIntroPage(),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          width: double.infinity,
+          height: 56,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange, Colors.orange[700]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                bool seen = prefs.getBool('skip_intro') ?? false;
+                if (mounted && seen) {
+                  Navigator.of(context).pop();
+                } else if (mounted && !seen) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const RegionIntroPage(),
+                    ),
+                  );
+                }
+              },
+              child: Center(
+                child: Text(
+                  "done".tr().toUpperCase(),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
                 ),
-              );
-            }
-          },
-          child: Text(
-            "done".tr(),
-            style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
           ),
         ),
       );
@@ -93,22 +130,28 @@ class _LanguagePageState extends State<LanguagePage> {
 
   Widget _languages() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[900],
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.grey[700]!,
+            color: Colors.grey[800]!,
+            width: 1,
           ),
-          borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
-        height: 260,
-        child: MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: ListView.builder(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: languages.length,
+            separatorBuilder: (context, index) => Divider(
+              height: 1,
+              thickness: 1,
+              color: Colors.grey[800],
+              indent: 72,
+            ),
             itemBuilder: (context, index) {
               return _listTile(languages[index], lang[index], regions[index], index);
             },
@@ -119,43 +162,74 @@ class _LanguagePageState extends State<LanguagePage> {
   }
 
   Widget _listTile(String language, String lang, String region, int index) {
-    return TextButton(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _text(language, index),
-          const SizedBox(height: 6),
-          Container(height: 1, color: Colors.grey[600]),
-        ],
+    bool isSelected = selected == index;
+
+    return Material(
+      color: isSelected ? Colors.orange.withOpacity(0.1) : Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          if (mounted) {
+            context.setLocale(Locale(lang, region));
+
+            prefs.setInt('language_number', index);
+            prefs.setString('lang', '$lang-$region');
+
+            setState(() {
+              selected = index;
+            });
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.orange : Colors.grey[800],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    languageFlags[index],
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  language,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 16,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? Colors.orange : Colors.white,
+                      ),
+                ),
+              ),
+              AnimatedScale(
+                scale: isSelected ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      onPressed: () async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        if (mounted) {
-          context.setLocale(Locale(lang, region));
-
-          prefs.setInt('language_number', index);
-          prefs.setString('lang', '$lang-$region');
-
-          setState(() {
-            selected = index;
-          });
-        }
-      },
     );
-  }
-
-  Widget _text(String language, int index) {
-    if (selected == index) {
-      return Text(
-        language,
-        style: Theme.of(context).textTheme.bodyMedium,
-      );
-    } else {
-      return Text(
-        language,
-        style: Theme.of(context).textTheme.displayMedium,
-      );
-    }
   }
 }

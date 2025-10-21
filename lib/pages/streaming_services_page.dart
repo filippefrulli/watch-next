@@ -69,6 +69,34 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
     return FutureBuilder<dynamic>(
       future: resultList,
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64, color: Colors.red),
+                SizedBox(height: 16),
+                Text(
+                  "error_occurred".tr(),
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+                SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      resultList = HttpService().getWatchProvidersByLocale();
+                    });
+                  },
+                  child: Text(
+                    "Try Again",
+                    style: TextStyle(color: Colors.orange),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
         if (snapshot.hasData && snapshot.data.length > 0) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),

@@ -131,6 +131,34 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    SizedBox(height: 16),
+                    Text(
+                      "error_occurred".tr(),
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                    SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          resultList = askGpt();
+                        });
+                      },
+                      child: Text(
+                        "Try Again",
+                        style: TextStyle(color: Colors.orange),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
             if (snapshot.hasData) {
               if (!filtering && !fetchingMovieInfo && !askingGpt) {
                 length = snapshot.data?.length ?? 0;
@@ -386,6 +414,13 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         return FutureBuilder(
           future: servicesList,
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Container(
+                padding: EdgeInsets.all(8),
+                child: Icon(Icons.error_outline, color: Colors.red, size: 32),
+              );
+            }
+
             if (snapshot.hasData && snapshot.data.length > 0) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),

@@ -725,7 +725,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               content: ChatCompletionUserMessageContent.string(queryContent),
             ),
           ],
-          reasoningEffort: ReasoningEffort.low,
+          reasoningEffort: ReasoningEffort.medium,
         ),
       );
 

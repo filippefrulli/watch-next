@@ -244,25 +244,35 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget goButton() {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       height: 48,
       width: 48,
       decoration: BoxDecoration(
-        color: isLongEnough ? Colors.orange : Colors.grey[700],
+        color: enableLoading ? Colors.orange.withOpacity(0.8) : (isLongEnough ? Colors.orange : Colors.grey[700]),
         borderRadius: BorderRadius.circular(50),
       ),
       child: Center(
-        child: IconButton(
-          key: goButtonKey,
-          onPressed: () async {
-            isLongEnough ? goButtonPressed() : null;
-          },
-          icon: Icon(
-            Icons.arrow_forward,
-            size: 32,
-            color: Colors.grey[900],
-          ),
-        ),
+        child: enableLoading
+            ? SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[900]!),
+                ),
+              )
+            : IconButton(
+                key: goButtonKey,
+                onPressed: () async {
+                  isLongEnough ? goButtonPressed() : null;
+                },
+                icon: Icon(
+                  Icons.arrow_forward,
+                  size: 32,
+                  color: Colors.grey[900],
+                ),
+              ),
       ),
     );
   }

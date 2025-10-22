@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -47,6 +48,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   bool fetchingMovieInfo = false;
   bool filtering = false;
   WatchObject selectedWatchObject = WatchObject();
+  List<WatchObject> watchObjectsList = [];
   PanelController pc = PanelController();
   String responseItems = '';
   String itemsToNotRecommend = '';
@@ -70,6 +72,23 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     loadAd();
     servicesList = HttpService().getWatchProvidersByLocale();
     resultList = askGpt();
+  }
+
+  @override
+  void dispose() {
+    nativeAd?.dispose();
+    super.dispose();
+  }
+
+  // Preload next poster image to cache
+  void _preloadNextPoster() {
+    if (index < length - 1 && watchObjectsList.isNotEmpty) {
+      final nextPoster = watchObjectsList[index + 1].posterPath;
+      if (nextPoster != null) {
+        final imageUrl = "https://image.tmdb.org/t/p/original//$nextPoster";
+        precacheImage(CachedNetworkImageProvider(imageUrl), context);
+      }
+    }
   }
 
   @override
@@ -136,7 +155,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             if (snapshot.hasData) {
               if (!filtering && !fetchingMovieInfo && !askingGpt) {
                 length = snapshot.data?.length ?? 0;
+                watchObjectsList = snapshot.data ?? [];
                 selectedWatchObject = snapshot.data[index];
+
+                // Preload next poster after current frame is rendered
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _preloadNextPoster();
+                });
+
                 return RecommendationContent(
                   posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
                   watchProviders: selectedWatchObject.watchProviders,
@@ -148,11 +174,13 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                     setState(() {
                       if (index > 0) index--;
                     });
+                    _preloadNextPoster();
                   },
                   onNext: () {
                     setState(() {
                       if (index < length - 1) index++;
                     });
+                    _preloadNextPoster();
                   },
                   onAccept: () async {
                     final prefs = await SharedPreferences.getInstance();
@@ -182,6 +210,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                   onReloadPressed: () {
                     setState(() {
                       index = 0;
+                      watchObjectsList = [];
                       resultList.whenComplete(() => []);
                       resultList = askGpt();
                     });

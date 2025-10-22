@@ -1,25 +1,24 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 import 'dart:io';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:openai_dart/openai_dart.dart';
-import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/objects/movie_credits.dart';
-import 'package:watch_next/objects/streaming_service.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/utils/secrets.dart';
-import 'package:watch_next/widgets/movie_poster_widget.dart';
+import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
+import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
+import 'package:watch_next/widgets/recommendation_results/loading_state_widget.dart';
+import 'package:watch_next/widgets/recommendation_results/error_state_widget.dart';
+import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
 
 class RecommandationResultsPage extends StatefulWidget {
   final String requestString;
@@ -80,7 +79,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
       body: SlidingUpPanel(
         controller: pc,
         margin: const EdgeInsets.all(8.0),
-        panel: movieInfoPanel(),
+        panel: MovieInfoPanel(
+          title: selectedWatchObject.title ?? '',
+          overview: selectedWatchObject.overview ?? '',
+          tmdbRating: selectedWatchObject.tmdbRating,
+          trailerList: trailerList,
+          trailerImages: trailerImages,
+          onTrailerTap: _launchURL,
+        ),
         borderRadius: const BorderRadius.all(
           Radius.circular(25),
         ),
@@ -104,25 +110,11 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
-            if (!filtering && !fetchingMovieInfo && !askingGpt) {
-              return Column(children: [
-                Text(
-                  "here_recommendation".tr(),
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  length != 0 ? '${index + 1} / $length' : '',
-                  style: Theme.of(context).textTheme.bodySmall,
-                )
-              ]);
-            } else {
-              return Expanded(
-                child: Container(),
-              );
-            }
+            return RecommendationHeader(
+              currentIndex: index,
+              totalCount: length,
+              isLoading: filtering || fetchingMovieInfo || askingGpt,
+            );
           },
         ),
         const SizedBox(
@@ -132,30 +124,12 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           future: resultList,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, size: 64, color: Colors.red),
-                    SizedBox(height: 16),
-                    Text(
-                      "error_occurred".tr(),
-                      style: Theme.of(context).textTheme.displayMedium,
-                    ),
-                    SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          resultList = askGpt();
-                        });
-                      },
-                      child: Text(
-                        "Try Again",
-                        style: TextStyle(color: Colors.orange),
-                      ),
-                    ),
-                  ],
-                ),
+              return ErrorStateWidget(
+                onRetry: () {
+                  setState(() {
+                    resultList = askGpt();
+                  });
+                },
               );
             }
 
@@ -163,536 +137,79 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
               if (!filtering && !fetchingMovieInfo && !askingGpt) {
                 length = snapshot.data?.length ?? 0;
                 selectedWatchObject = snapshot.data[index];
-                return recommandationContent(selectedWatchObject);
+                return RecommendationContent(
+                  posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
+                  watchProviders: selectedWatchObject.watchProviders,
+                  servicesList: servicesList,
+                  currentIndex: index,
+                  totalCount: length,
+                  mediaType: widget.type,
+                  onPrevious: () {
+                    setState(() {
+                      if (index > 0) index--;
+                    });
+                  },
+                  onNext: () {
+                    setState(() {
+                      if (index < length - 1) index++;
+                    });
+                  },
+                  onAccept: () async {
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    prefs.setInt('accepted_movie', selectedWatchObject.id!);
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  onInfoPressed: () async {
+                    movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
+                    if (widget.type == 0) {
+                      HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
+                        setState(() {
+                          trailerList = value;
+                        });
+                        waitForImages();
+                      });
+                    } else {
+                      HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
+                        setState(() {
+                          trailerList = value;
+                        });
+                        waitForImages();
+                      });
+                    }
+                    pc.open();
+                  },
+                  onReloadPressed: () {
+                    setState(() {
+                      index = 0;
+                      resultList.whenComplete(() => []);
+                      resultList = askGpt();
+                    });
+                  },
+                );
               } else {
-                return loadingWidget();
+                return LoadingStateWidget(
+                  nativeAdIsLoaded: _nativeAdIsLoaded,
+                  nativeAd: nativeAd,
+                  askingGpt: askingGpt,
+                  fetchingMovieInfo: fetchingMovieInfo,
+                  filtering: filtering,
+                );
               }
             } else {
-              return loadingWidget();
+              return LoadingStateWidget(
+                nativeAdIsLoaded: _nativeAdIsLoaded,
+                nativeAd: nativeAd,
+                askingGpt: askingGpt,
+                fetchingMovieInfo: fetchingMovieInfo,
+                filtering: filtering,
+              );
             }
           },
         ),
       ],
     );
-  }
-
-  Widget recommandationContent(WatchObject watchObject) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.85,
-      child: Column(
-        children: [
-          Expanded(
-            flex: 20,
-            child: recommandationsElementWidget(
-              watchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(),
-          ),
-          Expanded(
-            flex: 5,
-            child: streamingWidget(),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(),
-          ),
-          Expanded(
-            flex: 2,
-            child: buttonsRow(),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buttonsRow() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Container(),
-        ),
-        IconButton(
-          onPressed: () {
-            setState(() {
-              if (index == 0) {
-              } else {
-                index--;
-              }
-            });
-            FirebaseAnalytics.instance.logEvent(
-              name: 'moved_back',
-            );
-          },
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 32,
-            color: index == 0 ? Colors.grey[600] : Colors.white,
-          ),
-        ),
-        Expanded(
-          child: Container(),
-        ),
-        acceptButton(),
-        Expanded(
-          child: Container(),
-        ),
-        IconButton(
-          onPressed: () {
-            setState(
-              () {
-                if (index == length - 1) {
-                } else {
-                  index++;
-                }
-              },
-            );
-            FirebaseAnalytics.instance.logEvent(
-              name: 'moved_forward',
-            );
-          },
-          icon: Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 32,
-            color: index == length - 1 ? Colors.grey[600] : Colors.white,
-          ),
-        ),
-        Expanded(
-          child: Container(),
-        ),
-      ],
-    );
-  }
-
-  Widget streamingWidget() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "watch_it_on".tr(),
-              textAlign: TextAlign.left,
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(height: 4),
-            streamingOption(),
-          ],
-        ),
-        Expanded(
-          child: Container(),
-        ),
-        Column(
-          children: [
-            infoButton(),
-            index == length - 1 ? reloadButton() : Container(),
-          ],
-        ),
-        Expanded(
-          child: Container(),
-        ),
-      ],
-    );
-  }
-
-  Widget reloadButton() {
-    return TextButton(
-      onPressed: () {
-        FirebaseAnalytics.instance.logEvent(
-          name: 'reloaded_recommendations',
-          parameters: <String, Object>{
-            "type": widget.type == 0 ? "movie" : "show",
-          },
-        );
-        setState(() {
-          index = 0;
-          resultList.whenComplete(() => []);
-          resultList = askGpt();
-        });
-      },
-      child: Container(
-        height: 42,
-        width: 120,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(15),
-          ),
-          color: Colors.orange,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 80,
-              child: AutoSizeText(
-                "new".tr(),
-                maxLines: 1,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-            ),
-            const SizedBox(
-              width: 4,
-            ),
-            Icon(Icons.refresh, size: 32, color: Colors.grey[900]),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget infoButton() {
-    return TextButton(
-      onPressed: () async {
-        movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
-        if (widget.type == 0) {
-          HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
-            setState(() {
-              trailerList = value;
-            });
-
-            waitForImages();
-          });
-        } else {
-          HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
-            setState(() {
-              trailerList = value;
-            });
-
-            waitForImages();
-          });
-        }
-        FirebaseAnalytics.instance.logEvent(
-          name: 'opened_info',
-          parameters: <String, Object>{
-            "type": widget.type == 0 ? "movie" : "show",
-          },
-        );
-        pc.open();
-      },
-      child: Container(
-        height: 42,
-        width: 120,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(
-            Radius.circular(15),
-          ),
-          color: Colors.grey[800],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Info",
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
-            const SizedBox(
-              width: 8,
-            ),
-            const Icon(Icons.expand_less, size: 32, color: Colors.white),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget streamingOption() {
-    if (selectedWatchObject.watchProviders != null) {
-      if (selectedWatchObject.watchProviders?.first == null) {
-        return Container();
-      } else {
-        return FutureBuilder(
-          future: servicesList,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Container(
-                padding: EdgeInsets.all(8),
-                child: Icon(Icons.error_outline, color: Colors.red, size: 32),
-              );
-            }
-
-            if (snapshot.hasData && snapshot.data.length > 0) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: DelayedDisplay(
-                  delay: const Duration(milliseconds: 1000),
-                  child: SizedBox(
-                    height: 64,
-                    width: 64,
-                    child: Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: streamingLogo(
-                          snapshot.data,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              return Expanded(
-                child: Container(),
-              );
-            }
-          },
-        );
-      }
-    } else {
-      return Container();
-    }
-  }
-
-  Widget recommandationsElementWidget(String poster) {
-    return Container(
-      color: const Color.fromRGBO(11, 14, 23, 1),
-      child: MoviePosterWidget(
-        poster: poster,
-      ),
-    );
-  }
-
-  Widget acceptButton() {
-    return Center(
-      child: DelayedDisplay(
-        delay: const Duration(milliseconds: 100),
-        child: Container(
-          height: 50,
-          width: 150,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(
-              Radius.circular(25),
-            ),
-            color: Colors.orange,
-          ),
-          child: TextButton(
-            onPressed: () async {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setInt('accepted_movie', selectedWatchObject.id!);
-              if (mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-            child: Text(
-              "accept".tr(),
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget loadingWidget() {
-    return Center(
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.92,
-        child: Column(
-          children: [
-            _nativeAdIsLoaded
-                ? Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey[800]!,
-                        width: 2,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              minWidth: 320, // minimum recommended width
-                              minHeight: 320, // minimum recommended height
-                              maxWidth: 380,
-                              maxHeight: 380,
-                            ),
-                            child: AdWidget(ad: nativeAd!),
-                          ),
-                        ),
-                        Text('Advertisement', style: TextStyle(color: Colors.grey[200], fontSize: 14)),
-                      ],
-                    ),
-                  )
-                : Container(
-                    height: 400,
-                  ),
-            const SizedBox(
-              height: 46,
-            ),
-            LoadingAnimationWidget.threeArchedCircle(
-              color: Colors.orange,
-              size: 50,
-            ),
-            const SizedBox(
-              height: 46,
-            ),
-            askingGpt
-                ? Text(
-                    "generating".tr(),
-                    style: Theme.of(context).textTheme.displaySmall,
-                  )
-                : Container(),
-            fetchingMovieInfo
-                ? Text(
-                    "fetching".tr(),
-                    style: Theme.of(context).textTheme.displaySmall,
-                  )
-                : Container(),
-            filtering
-                ? Text(
-                    "filtering".tr(),
-                    style: Theme.of(context).textTheme.displaySmall,
-                  )
-                : Container(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget movieInfoPanel() {
-    return DelayedDisplay(
-        child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          Center(
-            child: Container(width: 50, height: 5, color: Colors.grey[800]),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(child: Container()),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: Text(
-                  selectedWatchObject.title ?? '',
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-              Expanded(child: Container()),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(height: 1, color: Colors.grey[800]),
-          const SizedBox(height: 16),
-          Text(
-            selectedWatchObject.overview ?? '',
-            maxLines: 17,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.displaySmall,
-          ),
-          const SizedBox(height: 16),
-          Container(height: 1, color: Colors.grey[800]),
-          const SizedBox(height: 16),
-          Text(
-            "tmdb_score".tr() + (selectedWatchObject.tmdbRating?.toStringAsFixed(1) ?? ''),
-            style: Theme.of(context).textTheme.displaySmall,
-          ),
-          const SizedBox(height: 16),
-          Container(height: 1, color: Colors.grey[800]),
-          const SizedBox(height: 8),
-          trailerWidget(),
-        ],
-      ),
-    ));
-  }
-
-  Widget trailerWidget() {
-    if (trailerList.isNotEmpty && trailerImages.isNotEmpty) {
-      return DelayedDisplay(
-        child: SizedBox(
-          height: 142,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: trailerList.length,
-            itemBuilder: (context, index) {
-              trailerUrl = trailerList[index].key;
-              title = trailerList[index].name;
-              thumbnail = trailerImages[index];
-              return TextButton(
-                onPressed: () => _launchURL(trailerUrl!),
-                child: SizedBox(
-                  width: 150,
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 2,
-                          ),
-                        ),
-                        height: 86,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: AspectRatio(
-                            aspectRatio: 21 / 9,
-                            child: CachedNetworkImage(
-                              imageUrl: thumbnail,
-                              fit: BoxFit.fitWidth,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Text(
-                        title!,
-                        maxLines: 2,
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      );
-    } else {
-      return Container();
-    }
-  }
-
-  Widget streamingLogo(List<StreamingService> streamingList) {
-    for (StreamingService item in streamingList) {
-      if (item.providerId == selectedWatchObject.watchProviders!.first) {
-        return CachedNetworkImage(
-          fit: BoxFit.fill,
-          imageUrl: "https://image.tmdb.org/t/p/original//${item.logoPath}",
-          placeholder: (context, url) => Container(
-            color: const Color.fromRGBO(11, 14, 23, 1),
-          ),
-          errorWidget: (context, url, error) => Expanded(
-            child: Container(
-              color: Colors.grey[800],
-            ),
-          ),
-        );
-      }
-    }
-    return Container();
   }
 
   Future<dynamic> askGpt() async {

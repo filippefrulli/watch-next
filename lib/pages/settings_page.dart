@@ -6,8 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/pages/language_page.dart';
 import 'package:watch_next/pages/region_page.dart';
 import 'package:watch_next/pages/streaming_services_page.dart';
-import 'package:watch_next/widgets/divider.dart';
-import 'package:watch_next/widgets/privacy_policy_widget.dart';
+import 'package:watch_next/widgets/shared/divider.dart';
+import 'package:watch_next/widgets/shared/privacy_policy_widget.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

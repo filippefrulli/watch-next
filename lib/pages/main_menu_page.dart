@@ -11,7 +11,7 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/utils/secrets.dart';
-import 'package:watch_next/widgets/toast_widget.dart';
+import 'package:watch_next/widgets/shared/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
   const MainMenuPage({super.key});

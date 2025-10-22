@@ -68,6 +68,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           children: [
             const SizedBox(height: 32),
             topBar(),
+            titleSection(),
             Expanded(
               child: Container(),
             ),
@@ -94,20 +95,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget topBar() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const SizedBox(
-          width: 48,
-        ),
-        Expanded(
-          child: Container(),
-        ),
-        DelayedDisplay(
-          fadingDuration: const Duration(milliseconds: 1000),
-          child: Text(
-            "hey_there".tr(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
+        // Placeholder for symmetry
+        const SizedBox(width: 48, height: 48),
         Expanded(
           child: Container(),
         ),
@@ -118,27 +109,37 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget settingsButton() {
     return Container(
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
-        color: Colors.grey[400],
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: IconButton(
-        icon: Icon(
-          Icons.settings,
-          color: Colors.grey[900],
-          size: 28,
+        color: Colors.grey[850],
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Colors.grey[800]!,
+          width: 1,
         ),
-        onPressed: () {
-          FirebaseAnalytics.instance.logEvent(
-            name: 'opened_settings',
-          );
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SettingsPage(),
-            ),
-          );
-        },
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            FirebaseAnalytics.instance.logEvent(
+              name: 'opened_settings',
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingsPage(),
+              ),
+            );
+          },
+          child: Icon(
+            Icons.settings_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
       ),
     );
   }
@@ -172,34 +173,77 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget switchWidget() {
-    return ToggleSwitch(
-      minWidth: 110.0,
-      initialLabelIndex: typeIsMovie,
-      cornerRadius: 15.0,
-      animate: true,
-      animationDuration: 400,
-      activeFgColor: Colors.white,
-      inactiveBgColor: Colors.grey[900],
-      inactiveFgColor: Colors.white,
-      totalSwitches: 2,
-      labels: ['movie'.tr(), 'tv_show'.tr()],
-      activeBgColors: const [
-        [Colors.orange],
-        [Colors.orange],
-      ],
-      onToggle: (index) {
-        setState(() {
-          typeIsMovie = index!;
-        });
-      },
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.grey[800]!,
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: ToggleSwitch(
+        minWidth: 140.0,
+        minHeight: 48.0,
+        initialLabelIndex: typeIsMovie,
+        cornerRadius: 12.0,
+        animate: true,
+        animationDuration: 300,
+        activeFgColor: Colors.white,
+        inactiveBgColor: Colors.transparent,
+        inactiveFgColor: Colors.grey[400],
+        totalSwitches: 2,
+        labels: ['movie'.tr(), 'tv_show'.tr()],
+        customTextStyles: [
+          TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ],
+        activeBgColors: [
+          [Colors.orange],
+          [Colors.orange],
+        ],
+        onToggle: (index) {
+          setState(() {
+            typeIsMovie = index!;
+          });
+        },
+      ),
     );
   }
 
   Widget description() {
-    return Text(
-      "find_something".tr(),
-      textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.displayMedium,
+    return Column(
+      children: [
+        Text(
+          "find_something".tr(),
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget titleSection() {
+    return Column(
+      children: [
+        DelayedDisplay(
+          fadingDuration: const Duration(milliseconds: 1000),
+          child: Text(
+            "hey_there".tr(),
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -435,69 +479,73 @@ class _MainMenuPageState extends State<MainMenuPage> {
   void showExamples() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: ShapeBorder.lerp(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          1,
-        )!,
-        backgroundColor: Colors.grey[900]!,
-        title: Text(
-          "need_inspiration".tr(),
-          style: TextStyle(
-            color: Colors.grey[300],
-            fontSize: 20,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
           ),
-        ),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "example_1".tr(),
-              style: Theme.of(context).textTheme.headlineSmall,
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(11, 14, 23, 1),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.grey[800]!,
+              width: 1,
             ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_2".tr(),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_3".tr(),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_4".tr(),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_5".tr(),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "need_inspiration".tr(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Content
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _exampleItem("example_1".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_2".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_3".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_4".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_5".tr(), Icons.auto_awesome_rounded),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -506,64 +554,117 @@ class _MainMenuPageState extends State<MainMenuPage> {
   void showExamplesShows() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: ShapeBorder.lerp(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          1,
-        )!,
-        backgroundColor: Colors.grey[900]!,
-        title: Text("need_inspiration".tr()),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "example_show_1".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+          ),
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(11, 14, 23, 1),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.grey[800]!,
+              width: 1,
             ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_show_2".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_show_3".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_show_4".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 1,
-              color: Colors.grey[800],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "example_show_5".tr(),
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-          ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "need_inspiration".tr(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Content
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _exampleItem("example_show_1".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_show_2".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_show_3".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_show_4".tr(), Icons.auto_awesome_rounded),
+                      _exampleItem("example_show_5".tr(), Icons.auto_awesome_rounded),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _exampleItem(String text, IconData icon) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Colors.grey[800]!,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: Colors.orange,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

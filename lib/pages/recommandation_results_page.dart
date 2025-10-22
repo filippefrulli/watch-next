@@ -155,11 +155,10 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                     });
                   },
                   onAccept: () async {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    final prefs = await SharedPreferences.getInstance();
                     prefs.setInt('accepted_movie', selectedWatchObject.id!);
-                    if (mounted) {
-                      Navigator.of(context).pop();
-                    }
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop();
                   },
                   onInfoPressed: () async {
                     movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
@@ -290,7 +289,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     }
   }
 
-  parseResponse(String response) async {
+  Future<List<WatchObject>> parseResponse(String response) async {
     setState(() {
       fetchingMovieInfo = true;
     });
@@ -354,7 +353,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     return watchObjectsList;
   }
 
-  filterProviders(List<WatchObject> watchObjectList) async {
+  Future<List<WatchObject>> filterProviders(List<WatchObject> watchObjectList) async {
     setState(() {
       filtering = true;
     });
@@ -398,9 +397,10 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
-    } else {
-      return watchObjectsWithProviders;
+      return [];
     }
+
+    return watchObjectsWithProviders;
   }
 
   String getDirector(MovieCredits credits) {
@@ -414,7 +414,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     return list[index].name!;
   }
 
-  _launchURL(String trailerUrl) async {
+  Future<void> _launchURL(String trailerUrl) async {
     Uri uri = Uri.parse(baseUrl + trailerUrl);
     if (Platform.isIOS) {
       if (await canLaunchUrl(uri)) {
@@ -435,7 +435,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     }
   }
 
-  getTrailerImages() async {
+  Future<void> getTrailerImages() async {
     trailerImages = [];
     for (int i = 0; i < trailerList.length; i++) {
       var jsonData = await HttpService().getDetail(baseUrl + trailerList[i].key!);
@@ -448,7 +448,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     }
   }
 
-  waitForImages() async {
+  Future<void> waitForImages() async {
     await getTrailerImages();
     setState(() {});
   }

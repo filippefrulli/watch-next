@@ -248,42 +248,64 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget promptInput() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: MediaQuery.of(context).size.width - 88,
-          child: TextField(
-            key: textFieldKey,
-            autofocus: false,
-            showCursor: true,
-            maxLength: 80,
-            maxLines: 3,
-            minLines: 1,
-            controller: _controller,
-            cursorColor: Colors.orange,
-            style: Theme.of(context).textTheme.displayMedium!.copyWith(fontSize: 16),
-            decoration: InputDecoration(
-              hintText: "hint".tr(),
-              hintStyle: TextStyle(fontSize: 12, color: Colors.grey[300]),
-              filled: true,
-              fillColor: const Color.fromARGB(255, 44, 46, 56),
-              contentPadding: const EdgeInsets.only(left: 14.0, bottom: 10.0, top: 10.0),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.grey[800]!,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: TextField(
+              key: textFieldKey,
+              autofocus: false,
+              showCursor: true,
+              maxLines: 4,
+              minLines: 1,
+              controller: _controller,
+              cursorColor: Colors.orange,
+              style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+              decoration: InputDecoration(
+                hintText: "hint".tr(),
+                hintStyle: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  height: 1.4,
+                ),
+                filled: true,
+                fillColor: Colors.grey[850],
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Colors.orange,
+                    width: 2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(
-          width: 8,
-        ),
-        goButton(),
-      ],
+          const SizedBox(width: 8),
+          goButton(),
+        ],
+      ),
     );
   }
 
@@ -293,30 +315,48 @@ class _MainMenuPageState extends State<MainMenuPage> {
       height: 48,
       width: 48,
       decoration: BoxDecoration(
-        color: enableLoading ? Colors.orange.withOpacity(0.8) : (isLongEnough ? Colors.orange : Colors.grey[700]),
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: Center(
-        child: enableLoading
-            ? SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[900]!),
-                ),
+        gradient: isLongEnough && !enableLoading
+            ? LinearGradient(
+                colors: [Colors.orange, Colors.orange[700]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               )
-            : IconButton(
-                key: goButtonKey,
-                onPressed: () async {
-                  isLongEnough ? goButtonPressed() : null;
-                },
-                icon: Icon(
-                  Icons.arrow_forward,
-                  size: 32,
-                  color: Colors.grey[900],
+            : null,
+        color: enableLoading ? Colors.orange.withOpacity(0.7) : (isLongEnough ? null : Colors.grey[800]),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: isLongEnough && !enableLoading
+            ? [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-              ),
+              ]
+            : [],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: goButtonKey,
+          borderRadius: BorderRadius.circular(12),
+          onTap: isLongEnough && !enableLoading ? goButtonPressed : null,
+          child: Center(
+            child: enableLoading
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 24,
+                    color: isLongEnough ? Colors.white : Colors.grey[600],
+                  ),
+          ),
+        ),
       ),
     );
   }
@@ -518,13 +558,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: Colors.grey[500],
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -591,13 +624,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: Colors.grey[500],
                       ),
                     ),
                   ],

@@ -28,32 +28,44 @@ class ActionButtons extends StatelessWidget {
   }
 
   Widget _buildInfoButton(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        FirebaseAnalytics.instance.logEvent(
-          name: 'opened_info',
-          parameters: <String, Object>{
-            "type": mediaType == 0 ? "movie" : "show",
-          },
-        );
-        onInfoPressed();
-      },
-      child: Container(
-        height: 42,
-        width: 120,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(15)),
-          color: Colors.grey[800],
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[800]!, width: 1),
+      ),
+      child: TextButton(
+        onPressed: () {
+          FirebaseAnalytics.instance.logEvent(
+            name: 'opened_info',
+            parameters: <String, Object>{
+              "type": mediaType == 0 ? "movie" : "show",
+            },
+          );
+          onInfoPressed();
+        },
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              "Info",
-              style: Theme.of(context).textTheme.displayMedium,
+            const Icon(
+              Icons.info_outline,
+              color: Colors.white,
+              size: 20,
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.expand_less, size: 32, color: Colors.white),
+            Text(
+              "Info",
+              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    fontSize: 15,
+                  ),
+            ),
           ],
         ),
       ),
@@ -61,38 +73,52 @@ class ActionButtons extends StatelessWidget {
   }
 
   Widget _buildReloadButton(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        FirebaseAnalytics.instance.logEvent(
-          name: 'reloaded_recommendations',
-          parameters: <String, Object>{
-            "type": mediaType == 0 ? "movie" : "show",
-          },
-        );
-        onReloadPressed();
-      },
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
       child: Container(
-        height: 42,
-        width: 120,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-          color: Colors.orange,
+        height: 48,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: const LinearGradient(
+            colors: [Colors.orange, Color(0xFFFF8C00)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 80,
-              child: AutoSizeText(
+        child: TextButton(
+          onPressed: () {
+            FirebaseAnalytics.instance.logEvent(
+              name: 'reloaded_recommendations',
+              parameters: <String, Object>{
+                "type": mediaType == 0 ? "movie" : "show",
+              },
+            );
+            onReloadPressed();
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.refresh_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+              const SizedBox(width: 6),
+              AutoSizeText(
                 "new".tr(),
                 maxLines: 1,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelMedium,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontSize: 15,
+                    ),
               ),
-            ),
-            const SizedBox(width: 4),
-            Icon(Icons.refresh, size: 32, color: Colors.grey[900]),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -25,33 +25,55 @@ class NavigationButtons extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(child: Container()),
-        IconButton(
-          onPressed: () {
-            if (currentIndex > 0) {
-              onPrevious();
-              FirebaseAnalytics.instance.logEvent(name: 'moved_back');
-            }
-          },
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 32,
-            color: currentIndex == 0 ? Colors.grey[600] : Colors.white,
+        // Previous button
+        Container(
+          decoration: BoxDecoration(
+            color: currentIndex == 0 ? Colors.grey[850] : Colors.grey[900],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: currentIndex == 0 ? Colors.grey[800]! : Colors.orange.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: IconButton(
+            onPressed: () {
+              if (currentIndex > 0) {
+                onPrevious();
+                FirebaseAnalytics.instance.logEvent(name: 'moved_back');
+              }
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: 24,
+              color: currentIndex == 0 ? Colors.grey[600] : Colors.white,
+            ),
           ),
         ),
         Expanded(child: Container()),
         _buildAcceptButton(context),
         Expanded(child: Container()),
-        IconButton(
-          onPressed: () {
-            if (currentIndex < totalCount - 1) {
-              onNext();
-              FirebaseAnalytics.instance.logEvent(name: 'moved_forward');
-            }
-          },
-          icon: Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 32,
-            color: currentIndex == totalCount - 1 ? Colors.grey[600] : Colors.white,
+        // Next button
+        Container(
+          decoration: BoxDecoration(
+            color: currentIndex == totalCount - 1 ? Colors.grey[850] : Colors.grey[900],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: currentIndex == totalCount - 1 ? Colors.grey[800]! : Colors.orange.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: IconButton(
+            onPressed: () {
+              if (currentIndex < totalCount - 1) {
+                onNext();
+                FirebaseAnalytics.instance.logEvent(name: 'moved_forward');
+              }
+            },
+            icon: Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 24,
+              color: currentIndex == totalCount - 1 ? Colors.grey[600] : Colors.white,
+            ),
           ),
         ),
         Expanded(child: Container()),
@@ -64,17 +86,36 @@ class NavigationButtons extends StatelessWidget {
       child: DelayedDisplay(
         delay: const Duration(milliseconds: 100),
         child: Container(
-          height: 50,
-          width: 150,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(25)),
-            color: Colors.orange,
+          height: 56,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            gradient: const LinearGradient(
+              colors: [Colors.orange, Color(0xFFFF8C00)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: TextButton(
             onPressed: onAccept,
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+              ),
+            ),
             child: Text(
               "accept".tr(),
-              style: Theme.of(context).textTheme.labelMedium,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
             ),
           ),
         ),

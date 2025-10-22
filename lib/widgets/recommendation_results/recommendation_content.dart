@@ -34,52 +34,42 @@ class RecommendationContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.85,
-      child: Column(
-        children: [
-          Expanded(
-            flex: 20,
-            child: Container(
-              color: const Color.fromRGBO(11, 14, 23, 1),
-              child: MoviePosterWidget(poster: posterPath),
-            ),
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            color: const Color.fromRGBO(11, 14, 23, 1),
+            child: MoviePosterWidget(poster: posterPath),
           ),
-          Expanded(flex: 1, child: Container()),
-          Expanded(
-            flex: 5,
-            child: Row(
-              children: [
-                Expanded(child: Container()),
-                StreamingInfoWidget(
-                  watchProviders: watchProviders,
-                  servicesList: servicesList,
-                ),
-                Expanded(child: Container()),
-                ActionButtons(
-                  showReloadButton: currentIndex == totalCount - 1,
-                  onInfoPressed: onInfoPressed,
-                  onReloadPressed: onReloadPressed,
-                  mediaType: mediaType,
-                ),
-                Expanded(child: Container()),
-              ],
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            StreamingInfoWidget(
+              watchProviders: watchProviders,
+              servicesList: servicesList,
             ),
-          ),
-          Expanded(flex: 1, child: Container()),
-          Expanded(
-            flex: 2,
-            child: NavigationButtons(
-              currentIndex: currentIndex,
-              totalCount: totalCount,
-              onPrevious: onPrevious,
-              onNext: onNext,
-              onAccept: onAccept,
+            const SizedBox(width: 16),
+            ActionButtons(
+              showReloadButton: currentIndex == totalCount - 1,
+              onInfoPressed: onInfoPressed,
+              onReloadPressed: onReloadPressed,
+              mediaType: mediaType,
             ),
-          ),
-          Expanded(flex: 1, child: Container()),
-        ],
-      ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        NavigationButtons(
+          currentIndex: currentIndex,
+          totalCount: totalCount,
+          onPrevious: onPrevious,
+          onNext: onNext,
+          onAccept: onAccept,
+        ),
+        const SizedBox(height: 12),
+      ],
     );
   }
 }

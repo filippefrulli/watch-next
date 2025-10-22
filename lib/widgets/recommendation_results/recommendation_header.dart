@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class RecommendationHeader extends StatelessWidget {
@@ -21,15 +20,22 @@ class RecommendationHeader extends StatelessWidget {
 
     return Column(
       children: [
-        Text(
-          "here_recommendation".tr(),
-          style: Theme.of(context).textTheme.displayMedium,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          totalCount != 0 ? '${currentIndex + 1} / $totalCount' : '',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        if (totalCount != 0) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '${currentIndex + 1} / $totalCount',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+        ],
       ],
     );
   }

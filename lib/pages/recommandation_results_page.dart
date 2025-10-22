@@ -123,9 +123,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   Widget pageBody() {
     return Column(
       children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.05,
-        ),
+        const SizedBox(height: 24),
         FutureBuilder<dynamic>(
           future: resultList,
           builder: (context, snapshot) {
@@ -136,86 +134,94 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
             );
           },
         ),
-        const SizedBox(
-          height: 8,
-        ),
-        FutureBuilder<dynamic>(
-          future: resultList,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return ErrorStateWidget(
-                onRetry: () {
-                  setState(() {
-                    resultList = askGpt();
-                  });
-                },
-              );
-            }
-
-            if (snapshot.hasData) {
-              if (!filtering && !fetchingMovieInfo && !askingGpt) {
-                length = snapshot.data?.length ?? 0;
-                watchObjectsList = snapshot.data ?? [];
-                selectedWatchObject = snapshot.data[index];
-
-                // Preload next poster after current frame is rendered
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _preloadNextPoster();
-                });
-
-                return RecommendationContent(
-                  posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
-                  watchProviders: selectedWatchObject.watchProviders,
-                  servicesList: servicesList,
-                  currentIndex: index,
-                  totalCount: length,
-                  mediaType: widget.type,
-                  onPrevious: () {
+        const SizedBox(height: 8),
+        Expanded(
+          child: FutureBuilder<dynamic>(
+            future: resultList,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return ErrorStateWidget(
+                  onRetry: () {
                     setState(() {
-                      if (index > 0) index--;
-                    });
-                    _preloadNextPoster();
-                  },
-                  onNext: () {
-                    setState(() {
-                      if (index < length - 1) index++;
-                    });
-                    _preloadNextPoster();
-                  },
-                  onAccept: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    prefs.setInt('accepted_movie', selectedWatchObject.id!);
-                    if (!context.mounted) return;
-                    Navigator.of(context).pop();
-                  },
-                  onInfoPressed: () async {
-                    movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
-                    if (widget.type == 0) {
-                      HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
-                        setState(() {
-                          trailerList = value;
-                        });
-                        waitForImages();
-                      });
-                    } else {
-                      HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
-                        setState(() {
-                          trailerList = value;
-                        });
-                        waitForImages();
-                      });
-                    }
-                    pc.open();
-                  },
-                  onReloadPressed: () {
-                    setState(() {
-                      index = 0;
-                      watchObjectsList = [];
-                      resultList.whenComplete(() => []);
                       resultList = askGpt();
                     });
                   },
                 );
+              }
+
+              if (snapshot.hasData) {
+                if (!filtering && !fetchingMovieInfo && !askingGpt) {
+                  length = snapshot.data?.length ?? 0;
+                  watchObjectsList = snapshot.data ?? [];
+                  selectedWatchObject = snapshot.data[index];
+
+                  // Preload next poster after current frame is rendered
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _preloadNextPoster();
+                  });
+
+                  return RecommendationContent(
+                    posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
+                    watchProviders: selectedWatchObject.watchProviders,
+                    servicesList: servicesList,
+                    currentIndex: index,
+                    totalCount: length,
+                    mediaType: widget.type,
+                    onPrevious: () {
+                      setState(() {
+                        if (index > 0) index--;
+                      });
+                      _preloadNextPoster();
+                    },
+                    onNext: () {
+                      setState(() {
+                        if (index < length - 1) index++;
+                      });
+                      _preloadNextPoster();
+                    },
+                    onAccept: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      prefs.setInt('accepted_movie', selectedWatchObject.id!);
+                      if (!context.mounted) return;
+                      Navigator.of(context).pop();
+                    },
+                    onInfoPressed: () async {
+                      movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
+                      if (widget.type == 0) {
+                        HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
+                          setState(() {
+                            trailerList = value;
+                          });
+                          waitForImages();
+                        });
+                      } else {
+                        HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
+                          setState(() {
+                            trailerList = value;
+                          });
+                          waitForImages();
+                        });
+                      }
+                      pc.open();
+                    },
+                    onReloadPressed: () {
+                      setState(() {
+                        index = 0;
+                        watchObjectsList = [];
+                        resultList.whenComplete(() => []);
+                        resultList = askGpt();
+                      });
+                    },
+                  );
+                } else {
+                  return LoadingStateWidget(
+                    nativeAdIsLoaded: _nativeAdIsLoaded,
+                    nativeAd: nativeAd,
+                    askingGpt: askingGpt,
+                    fetchingMovieInfo: fetchingMovieInfo,
+                    filtering: filtering,
+                  );
+                }
               } else {
                 return LoadingStateWidget(
                   nativeAdIsLoaded: _nativeAdIsLoaded,
@@ -225,16 +231,8 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                   filtering: filtering,
                 );
               }
-            } else {
-              return LoadingStateWidget(
-                nativeAdIsLoaded: _nativeAdIsLoaded,
-                nativeAd: nativeAd,
-                askingGpt: askingGpt,
-                fetchingMovieInfo: fetchingMovieInfo,
-                filtering: filtering,
-              );
-            }
-          },
+            },
+          ),
         ),
       ],
     );

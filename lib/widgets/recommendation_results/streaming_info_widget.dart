@@ -20,17 +20,29 @@ class StreamingInfoWidget extends StatelessWidget {
       return Container();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "watch_it_on".tr(),
-          textAlign: TextAlign.left,
-          style: Theme.of(context).textTheme.displaySmall,
-        ),
-        const SizedBox(height: 4),
-        _streamingLogo(),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[800]!, width: 1),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "watch_it_on".tr(),
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: 6),
+          _streamingLogo(),
+        ],
+      ),
     );
   }
 
@@ -46,18 +58,26 @@ class StreamingInfoWidget extends StatelessWidget {
         }
 
         if (snapshot.hasData && snapshot.data.length > 0) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: DelayedDisplay(
-              delay: const Duration(milliseconds: 1000),
-              child: SizedBox(
-                height: 64,
-                width: 64,
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: _buildStreamingImage(snapshot.data),
+          return DelayedDisplay(
+            delay: const Duration(milliseconds: 800),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3), width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: SizedBox(
+                  height: 56,
+                  width: 56,
+                  child: _buildStreamingImage(snapshot.data),
                 ),
               ),
             ),

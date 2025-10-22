@@ -262,13 +262,13 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
       final response = await openAI.createChatCompletion(
         request: CreateChatCompletionRequest(
-          model: ChatCompletionModel.modelId('gpt-5-mini'),
+          model: ChatCompletionModel.modelId('gpt-5-nano'),
           messages: [
             ChatCompletionMessage.user(
               content: ChatCompletionUserMessageContent.string(queryContent),
             ),
           ],
-          reasoningEffort: ReasoningEffort.medium,
+          reasoningEffort: ReasoningEffort.low,
         ),
       );
 

@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/http_service.dart';
-import 'package:watch_next/utils/secrets.dart';
 
 class RecommendationLoadingPage extends StatefulWidget {
   final String requestString;
@@ -30,8 +29,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
 
   // Use test ad for debugging - switch to production ad for release
   final String _adUnitId = Platform.isAndroid
-      ? androidAd //'ca-app-pub-3940256099942544/2247696110' Test ad for Android
-      : iosAd; //'ca-app-pub-3940256099942544/3986624511'; Test ad for iOS
+      ? 'ca-app-pub-3940256099942544/2247696110' //Test ad for Android
+      : 'ca-app-pub-3940256099942544/3986624511'; //Test ad for iOS
 
   bool askingGpt = false;
   bool fetchingMovieInfo = false;
@@ -167,25 +166,41 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       }
       String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
 
+      // Initialize the Gemini Developer API backend service
+      // Create a `GenerativeModel` instance with a model that supports your use case
+      final model = FirebaseAI.googleAI().generativeModel(model: 'gemini-2.0-flash');
+
       String queryContent = widget.type == 0
           ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
           : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
 
-      // Use await to properly wait for the Gemini response
-      final value = await Gemini.instance.prompt(parts: [
-        Part.text(queryContent),
-      ]);
+      final prompt = [Content.text(queryContent)];
 
-      itemsToNotRecommend = '';
-      final responseContent = value?.output ?? '';
+      try {
+        final response = await model.generateContent(prompt);
 
-      setState(() {
-        askingGpt = false;
-        itemsToNotRecommend = responseContent;
-      });
+        if (response.text == null || response.text!.isEmpty) {
+          throw Exception('Empty response from AI model');
+        }
 
-      final parsed = await parseResponse(responseContent);
-      return await filterProviders(parsed);
+        print('RESPONSE_TEXT:${response.text}');
+        itemsToNotRecommend = '';
+        final responseContent = response.text!;
+
+        setState(() {
+          askingGpt = false;
+          itemsToNotRecommend = responseContent;
+        });
+
+        final parsed = await parseResponse(responseContent);
+        return await filterProviders(parsed);
+      } on FormatException catch (e) {
+        debugPrint('❌ Format error from AI: $e');
+        throw Exception('Invalid response format from AI: $e');
+      } on Exception catch (e) {
+        debugPrint('❌ AI generation error: $e');
+        throw Exception('AI generation failed: $e');
+      }
     } catch (e) {
       // Log error to Firebase Analytics
       FirebaseAnalytics.instance.logEvent(
@@ -196,6 +211,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           'message': e.toString(),
         },
       );
+
+      debugPrint('❌ Full error details: $e');
 
       setState(() {
         askingGpt = false;

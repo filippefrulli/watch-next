@@ -3,13 +3,11 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
 import 'package:watch_next/pages/language_page.dart';
-import 'package:watch_next/utils/secrets.dart';
 import 'pages/main_menu_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -20,8 +18,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  Gemini.init(apiKey: geminiApiKey);
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemStatusBarContrastEnforced: true,

@@ -145,7 +145,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
             onAccept: () async {
               final prefs = await SharedPreferences.getInstance();
               prefs.setInt('accepted_movie', selectedWatchObject.id!);
-              if (!context.mounted) return;
+              if (!mounted) return;
               Navigator.of(context).pop();
               Navigator.of(context).pop();
             },

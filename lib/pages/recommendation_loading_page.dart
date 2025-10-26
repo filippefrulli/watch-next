@@ -8,6 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/utils/secrets.dart';
 
 class RecommendationLoadingPage extends StatefulWidget {
   final String requestString;
@@ -29,8 +30,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
 
   // Use test ad for debugging - switch to production ad for release
   final String _adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-3940256099942544/2247696110' // Test ad for Android
-      : 'ca-app-pub-3940256099942544/3986624511'; // Test ad for iOS
+      ? androidAd //'ca-app-pub-3940256099942544/2247696110' Test ad for Android
+      : iosAd; //'ca-app-pub-3940256099942544/3986624511'; Test ad for iOS
 
   bool askingGpt = false;
   bool fetchingMovieInfo = false;

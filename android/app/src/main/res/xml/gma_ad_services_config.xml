@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ad-services-config>
-    <!-- Replace with your actual AdMob App ID from AdMob console -->
-    <!-- For testing, you can use the test app ID: ca-app-pub-3940256099942544~3347511713 -->
-    <include-data-in-atl>true</include-data-in-atl>
-</ad-services-config>

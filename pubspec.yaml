@@ -57,6 +57,7 @@ dependencies:
   in_app_review: ^2.0.11
   google_mobile_ads: ^6.0.0
   cloud_firestore: ^6.0.3
+  flutter_gemini: ^3.0.0
 
 dev_dependencies:
   flutter_test:

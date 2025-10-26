@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -53,7 +54,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
   String responseItems = '';
   String itemsToNotRecommend = '';
 
-  late Future<dynamic> resultList;
+  late Future<List<WatchObject>> resultList;
   Future<MovieCredits> movieCredits = Future.value(MovieCredits());
 
   String? trailerUrl = '';
@@ -71,7 +72,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     openAI = OpenAIClient(apiKey: openApiKey);
     loadAd();
     servicesList = HttpService().getWatchProvidersByLocale();
-    resultList = askGpt();
+    resultList = askLLM();
   }
 
   @override
@@ -124,7 +125,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     return Column(
       children: [
         const SizedBox(height: 24),
-        FutureBuilder<dynamic>(
+        FutureBuilder<List<WatchObject>>(
           future: resultList,
           builder: (context, snapshot) {
             return RecommendationHeader(
@@ -136,14 +137,14 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
         ),
         const SizedBox(height: 8),
         Expanded(
-          child: FutureBuilder<dynamic>(
+          child: FutureBuilder<List<WatchObject>>(
             future: resultList,
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return ErrorStateWidget(
                   onRetry: () {
                     setState(() {
-                      resultList = askGpt();
+                      resultList = askLLM();
                     });
                   },
                 );
@@ -151,9 +152,10 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
 
               if (snapshot.hasData) {
                 if (!filtering && !fetchingMovieInfo && !askingGpt) {
-                  length = snapshot.data?.length ?? 0;
-                  watchObjectsList = snapshot.data ?? [];
-                  selectedWatchObject = snapshot.data[index];
+                  final data = snapshot.data!;
+                  length = data.length;
+                  watchObjectsList = data;
+                  selectedWatchObject = data[index];
 
                   // Preload next poster after current frame is rendered
                   WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -209,7 +211,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
                         index = 0;
                         watchObjectsList = [];
                         resultList.whenComplete(() => []);
-                        resultList = askGpt();
+                        resultList = askLLM();
                       });
                     },
                   );
@@ -238,7 +240,7 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
     );
   }
 
-  Future<dynamic> askGpt() async {
+  Future<List<WatchObject>> askLLM() async {
     setState(() {
       askingGpt = true;
     });
@@ -260,21 +262,13 @@ class _RecommandationResultsPageState extends State<RecommandationResultsPage> {
           ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
           : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
 
-      final response = await openAI.createChatCompletion(
-        request: CreateChatCompletionRequest(
-          model: ChatCompletionModel.modelId('gpt-5-nano'),
-          messages: [
-            ChatCompletionMessage.user(
-              content: ChatCompletionUserMessageContent.string(queryContent),
-            ),
-          ],
-          reasoningEffort: ReasoningEffort.low,
-        ),
-      );
+      // Use await to properly wait for the Gemini response
+      final value = await Gemini.instance.prompt(parts: [
+        Part.text(queryContent),
+      ]);
 
       itemsToNotRecommend = '';
-
-      final responseContent = response.choices.first.message.content ?? '';
+      final responseContent = value?.output ?? '';
 
       setState(() {
         askingGpt = false;

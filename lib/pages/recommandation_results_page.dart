@@ -146,7 +146,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               final prefs = await SharedPreferences.getInstance();
               prefs.setInt('accepted_movie', selectedWatchObject.id!);
               if (!mounted) return;
-              Navigator.of(context).pop();
+              // Only pop once since loading page used pushReplacement
               Navigator.of(context).pop();
             },
             onInfoPressed: () async {

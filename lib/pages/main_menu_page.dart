@@ -8,7 +8,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-import 'package:watch_next/pages/recommandation_results_page.dart';
+import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
@@ -486,7 +486,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => RecommandationResultsPage(requestString: _controller.text, type: typeIsMovie),
+              builder: (context) => RecommendationLoadingPage(requestString: _controller.text, type: typeIsMovie),
             ),
           );
         } else {

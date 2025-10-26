@@ -11,10 +11,10 @@ class MoviePosterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
-      fit: BoxFit.fitHeight,
+      fit: BoxFit.fitWidth,
       imageUrl: "https://image.tmdb.org/t/p/original//$poster",
       imageBuilder: (context, imageProvider) => Container(
-        width: 350,
+        width: 380,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(25)),
           image: DecorationImage(

@@ -1,10 +1,11 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/http_service.dart';
@@ -171,13 +172,39 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
           : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
 
-      // Use await to properly wait for the Gemini response
-      final value = await Gemini.instance.prompt(parts: [
-        Part.text(queryContent),
-      ]);
+      // Direct HTTP request to Gemini API
+      final url =
+          Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent');
+
+      final response = await http.post(
+        url,
+        headers: {
+          'x-goog-api-key': geminiApiKey,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'contents': [
+            {
+              'parts': [
+                {'text': queryContent}
+              ]
+            }
+          ]
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Gemini API request failed: ${response.statusCode} - ${response.body}');
+      }
+
+      final responseData = jsonDecode(response.body);
+      final responseContent = responseData['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '';
+
+      if (responseContent.isEmpty) {
+        throw Exception('Empty response from Gemini API');
+      }
 
       itemsToNotRecommend = '';
-      final responseContent = value?.output ?? '';
 
       setState(() {
         askingGpt = false;

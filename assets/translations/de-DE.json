@@ -33,6 +33,8 @@
     "prompt_issue": "Es gab ein Problem mit deiner Eingabe. Bitte versuche es nochmal",
     "no_movies": "Wir konnten keine Ergebnisse für deine Streaming-Dienste finden. Bitte versuche es nochmal",
     "error_occurred": "Ein Fehler ist aufgetreten. Bitte versuche es erneut",
+    "invalid_query": "Wir konnten deine Anfrage nicht verarbeiten. Bitte gib eine spezifischere Anfrage mit klaren Details darüber an, was du sehen möchtest",
+    "dismiss": "Schließen",
     "select_country": "Wähle dein Land aus",
     "done": "Bestätigen",
     "new": "Neue",

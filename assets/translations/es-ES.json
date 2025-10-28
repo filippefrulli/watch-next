@@ -33,6 +33,8 @@
     "prompt_issue": "Tuvimos un problema con tu entrada. Inténtalo de nuevo",
     "no_movies": "No pudimos encontrar ningún resultado en tus plataformas de streaming. Inténtalo de nuevo",
     "error_occurred": "Se produjo un error. Por favor, inténtalo de nuevo",
+    "invalid_query": "No pudimos procesar tu solicitud. Por favor, proporciona una consulta más específica con detalles claros sobre lo que te gustaría ver",
+    "dismiss": "Cerrar",
     "select_country": "Selecciona tu pais",
     "done": "Confirmar",
     "new": "Nuevas",

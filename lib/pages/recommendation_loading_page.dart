@@ -70,9 +70,15 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             ),
           ),
         );
+      } else {
+        // If results are empty but no error was thrown, navigate back
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       }
     } catch (e) {
       // Error handling is done in askLLM
+      // This catch ensures the app doesn't crash if an error propagates here
     }
   }
 
@@ -231,7 +237,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       if (mounted) {
         Navigator.of(context).pop();
         Fluttertoast.showToast(
-          msg: "error_occurred".tr(),
+          msg: "invalid_query".tr(),
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 3,

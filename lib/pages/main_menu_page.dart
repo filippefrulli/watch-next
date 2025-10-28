@@ -504,12 +504,46 @@ class _MainMenuPageState extends State<MainMenuPage> {
             'query': _controller.text,
           });
 
-          showToastWidget(
-            ToastWidget(
-              title: "invalid_input".tr(),
-              icon: const Icon(Icons.dangerous_outlined, color: Colors.red, size: 36),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "invalid_query".tr(),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: const Color.fromRGBO(220, 38, 38, 1),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              duration: const Duration(seconds: 8),
             ),
-            duration: const Duration(seconds: 4),
           );
         }
       }

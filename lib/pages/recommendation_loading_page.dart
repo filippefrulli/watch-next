@@ -195,7 +195,10 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
                 {'text': queryContent}
               ]
             }
-          ]
+          ],
+          'generationConfig': {
+            'temperature': 1.0,
+          }
         }),
       );
 

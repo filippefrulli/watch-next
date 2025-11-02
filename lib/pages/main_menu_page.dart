@@ -61,34 +61,36 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget body() {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            const SizedBox(height: 32),
-            topBar(),
-            titleSection(),
-            Expanded(
-              child: Container(),
-            ),
-            description(),
-            const SizedBox(height: 32),
-            switchWidget(),
-            Expanded(
-              child: Container(),
-            ),
-            examplesWidget(),
-            const SizedBox(
-              height: 16,
-            ),
-            Align(
-              alignment: Alignment.topLeft,
-              child: promptInput(),
-            ),
-            const SizedBox(height: 32),
-          ],
+    return SafeArea(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              topBar(),
+              const SizedBox(height: 32),
+              titleSection(),
+              Expanded(
+                child: Container(),
+              ),
+              description(),
+              const SizedBox(height: 32),
+              switchWidget(),
+              Expanded(
+                child: Container(),
+              ),
+              examplesWidget(),
+              const SizedBox(
+                height: 16,
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: promptInput(),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );
@@ -115,12 +117,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: Colors.orange,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.grey[800]!,
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,

@@ -25,7 +25,9 @@ class MediaDetailPage extends StatefulWidget {
 
 class _MediaDetailPageState extends State<MediaDetailPage> {
   bool _isLoading = true;
-  List<StreamingService> _availableProviders = [];
+  List<StreamingService> _streamingProviders = [];
+  List<StreamingService> _rentProviders = [];
+  List<StreamingService> _buyProviders = [];
   List<int> _userServiceIds = [];
   String _errorMessage = '';
 
@@ -54,22 +56,16 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
       // Load user's streaming service IDs
       _userServiceIds = await DatabaseService.getStreamingServicesIds();
 
-      // Fetch watch provider IDs for this media
-      List<int> providerIds;
-      if (widget.isMovie) {
-        providerIds = await HttpService().getWatchProviders(widget.mediaId);
-      } else {
-        providerIds = await HttpService().getWatchProvidersSeries(widget.mediaId);
-      }
-
-      // Get all available providers with details
-      final allProviders = await HttpService().getWatchProvidersByLocale();
-
-      // Filter to only show providers that have this content
-      final availableProviders = allProviders.where((service) => providerIds.contains(service.providerId)).toList();
+      // Fetch categorized watch providers
+      final categorizedProviders = await HttpService().getCategorizedWatchProviders(
+        widget.mediaId,
+        widget.isMovie,
+      );
 
       setState(() {
-        _availableProviders = availableProviders;
+        _streamingProviders = categorizedProviders.streaming;
+        _rentProviders = categorizedProviders.rent;
+        _buyProviders = categorizedProviders.buy;
         _isLoading = false;
       });
     } catch (e) {
@@ -240,11 +236,13 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
   }
 
   Widget _buildStreamingProvidersSection() {
+    final hasAnyContent = _streamingProviders.isNotEmpty || _rentProviders.isNotEmpty || _buyProviders.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Available On',
+          'Availability',
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -252,7 +250,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           ),
         ),
         const SizedBox(height: 16),
-        if (_availableProviders.isEmpty)
+        if (!hasAnyContent)
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -273,7 +271,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    'Not available on any streaming service in your region',
+                    'Not available in your region',
                     style: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 15,
@@ -283,16 +281,63 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
               ],
             ),
           )
-        else
-          ..._availableProviders.map((provider) {
-            final isSubscribed = _userServiceIds.contains(provider.providerId);
-            return _buildProviderCard(provider, isSubscribed);
-          }).toList(),
+        else ...[
+          // Streaming section
+          if (_streamingProviders.isNotEmpty) ...[
+            _buildSectionHeader('Stream', Icons.play_circle_outline, Colors.green),
+            const SizedBox(height: 12),
+            ..._streamingProviders.map((provider) {
+              final isSubscribed = _userServiceIds.contains(provider.providerId);
+              return _buildProviderCard(provider, isSubscribed);
+            }).toList(),
+            const SizedBox(height: 24),
+          ],
+
+          // Rent section
+          if (_rentProviders.isNotEmpty) ...[
+            _buildSectionHeader('Rent', Icons.schedule, Colors.orange),
+            const SizedBox(height: 12),
+            ..._rentProviders.map((provider) {
+              return _buildProviderCard(provider, false, showCheckmark: false);
+            }).toList(),
+            const SizedBox(height: 24),
+          ],
+
+          // Buy section
+          if (_buyProviders.isNotEmpty) ...[
+            _buildSectionHeader('Buy', Icons.shopping_cart_outlined, Colors.blue),
+            const SizedBox(height: 12),
+            ..._buyProviders.map((provider) {
+              return _buildProviderCard(provider, false, showCheckmark: false);
+            }).toList(),
+          ],
+        ],
       ],
     );
   }
 
-  Widget _buildProviderCard(StreamingService provider, bool isSubscribed) {
+  Widget _buildSectionHeader(String title, IconData icon, Color color) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: color,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProviderCard(StreamingService provider, bool isSubscribed, {bool showCheckmark = true}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -355,7 +400,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
             ),
           ),
           // Checkmark if subscribed
-          if (isSubscribed)
+          if (showCheckmark && isSubscribed)
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(

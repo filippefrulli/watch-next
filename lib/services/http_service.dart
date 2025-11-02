@@ -324,7 +324,57 @@ class HttpService {
       }
     } on FormatException catch (e) {
       log(e.message);
-      return null;
+      return [];
+    }
+  }
+
+  Future<CategorizedWatchProviders> getCategorizedWatchProviders(int id, bool isMovie) async {
+    try {
+      final endpoint = isMovie ? '/3/movie/$id/watch/providers' : '/3/tv/$id/watch/providers';
+
+      final response = await _client
+          .get(
+            Uri.https(
+              'api.themoviedb.org',
+              endpoint,
+              {'api_key': apiKey, 'language': 'en-US'},
+            ),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        log('TMDB API error getting watch providers: ${response.statusCode}');
+        return CategorizedWatchProviders(streaming: [], rent: [], buy: []);
+      }
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String region = prefs.getString('region') ?? 'DE';
+
+      final results = jsonDecode(response.body)["results"];
+      if (results == null || !results.keys.toList().contains(region)) {
+        return CategorizedWatchProviders(streaming: [], rent: [], buy: []);
+      }
+
+      ProviderRegion provider = ProviderRegion.fromJson(results[region]);
+
+      // Get all available providers with details
+      final allProviders = await getWatchProvidersByLocale();
+
+      // Helper function to convert provider IDs to StreamingService objects
+      List<StreamingService> getServicesByIds(List<StreamingType>? types) {
+        if (types == null) return [];
+        final ids = types.map((t) => t.providerId).whereType<int>().toList();
+        return allProviders.where((service) => ids.contains(service.providerId)).toList();
+      }
+
+      return CategorizedWatchProviders(
+        streaming: getServicesByIds(provider.flatrate),
+        rent: getServicesByIds(provider.rent),
+        buy: getServicesByIds(provider.buy),
+      );
+    } catch (e) {
+      log('Error getting categorized watch providers: $e');
+      return CategorizedWatchProviders(streaming: [], rent: [], buy: []);
     }
   }
 
@@ -413,4 +463,19 @@ class MultiSearchResult {
   }
 
   bool get isMovie => mediaType == 'movie';
+}
+
+// Model for categorized watch providers
+class CategorizedWatchProviders {
+  final List<StreamingService> streaming;
+  final List<StreamingService> rent;
+  final List<StreamingService> buy;
+
+  CategorizedWatchProviders({
+    required this.streaming,
+    required this.rent,
+    required this.buy,
+  });
+
+  bool get isEmpty => streaming.isEmpty && rent.isEmpty && buy.isEmpty;
 }

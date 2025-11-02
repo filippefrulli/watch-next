@@ -327,4 +327,90 @@ class HttpService {
       return null;
     }
   }
+
+  Future<List<MultiSearchResult>> multiSearch(String query) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+
+      var response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/search/multi', {
+              'api_key': apiKey,
+              'language': lang,
+              'query': query,
+              'include_adult': 'false',
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        log('TMDB API error: ${response.statusCode}');
+        return [];
+      }
+
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+      final List results = jsonData['results'] ?? [];
+
+      // Filter for only movies and TV shows, convert to our model
+      return results
+          .where((item) => item['media_type'] == 'movie' || item['media_type'] == 'tv')
+          .map((item) => MultiSearchResult.fromJson(item))
+          .toList();
+    } catch (e) {
+      log('Error in multi search: $e');
+      return [];
+    }
+  }
+}
+
+// Model for multi-search results
+class MultiSearchResult {
+  final int id;
+  final String? title;
+  final String? name;
+  final String? posterPath;
+  final String mediaType;
+  final String? releaseDate;
+  final String? firstAirDate;
+  final double? voteAverage;
+  final String? overview;
+
+  MultiSearchResult({
+    required this.id,
+    this.title,
+    this.name,
+    this.posterPath,
+    required this.mediaType,
+    this.releaseDate,
+    this.firstAirDate,
+    this.voteAverage,
+    this.overview,
+  });
+
+  factory MultiSearchResult.fromJson(Map<String, dynamic> json) {
+    return MultiSearchResult(
+      id: json['id'],
+      title: json['title'],
+      name: json['name'],
+      posterPath: json['poster_path'],
+      mediaType: json['media_type'],
+      releaseDate: json['release_date'],
+      firstAirDate: json['first_air_date'],
+      voteAverage: json['vote_average']?.toDouble(),
+      overview: json['overview'],
+    );
+  }
+
+  String get displayTitle => title ?? name ?? 'Unknown';
+
+  String get year {
+    final date = releaseDate ?? firstAirDate;
+    if (date != null && date.length >= 4) {
+      return date.substring(0, 4);
+    }
+    return '';
+  }
+
+  bool get isMovie => mediaType == 'movie';
 }

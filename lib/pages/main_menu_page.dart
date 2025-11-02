@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
+import 'package:watch_next/pages/search_media_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
@@ -102,8 +103,61 @@ class _MainMenuPageState extends State<MainMenuPage> {
         Expanded(
           child: Container(),
         ),
+        searchButton(),
+        const SizedBox(width: 12),
         settingsButton(),
       ],
+    );
+  }
+
+  Widget searchButton() {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[850],
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Colors.grey[800]!,
+          width: 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            FirebaseAnalytics.instance.logEvent(
+              name: 'opened_search',
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SearchMediaPage(),
+              ),
+            );
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.search,
+                color: Colors.white,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Search',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
@@ -53,7 +54,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
     } catch (e) {
       setState(() {
         _isSearching = false;
-        _errorMessage = 'An error occurred while searching';
+        _errorMessage = 'search_error'.tr();
       });
 
       FirebaseAnalytics.instance.logEvent(
@@ -77,7 +78,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Search Media',
+          'search_media'.tr(),
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -107,7 +108,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
                   fontSize: 16,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Search for a movie or TV show...',
+                  hintText: 'search_for_media'.tr(),
                   hintStyle: TextStyle(
                     color: Colors.grey[600],
                     fontSize: 16,
@@ -165,7 +166,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Searching...',
+              'searching'.tr(),
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 16,
@@ -217,7 +218,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Search for any movie or TV show',
+                'search_media_description'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.grey[400],
@@ -227,7 +228,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Start typing to see results',
+                'search_media_start_typing'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.grey[600],
@@ -254,7 +255,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'No results found',
+                'no_results_found'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.grey[400],
@@ -264,7 +265,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Try searching for something else',
+                'try_something_else'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.grey[600],
@@ -376,7 +377,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              result.isMovie ? 'Movie' : 'TV Show',
+                              result.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,

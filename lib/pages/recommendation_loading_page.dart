@@ -261,10 +261,13 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
 
     List<String> responseTitles = response.split(',,');
     if (responseTitles.isEmpty) {
-      FirebaseAnalytics.instance.logEvent(name: 'empty_results', parameters: {
-        'type': widget.type == 0 ? 'movie' : 'show',
-        'query': widget.requestString,
-      });
+      FirebaseAnalytics.instance.logEvent(
+        name: 'empty_results',
+        parameters: {
+          'type': widget.type == 0 ? 'movie' : 'show',
+          'query': widget.requestString,
+        },
+      );
       Navigator.pop(context);
       Fluttertoast.showToast(
         msg: "prompt_issue".tr(),

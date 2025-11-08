@@ -1,6 +1,5 @@
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 class NavigationButtons extends StatelessWidget {
@@ -39,7 +38,6 @@ class NavigationButtons extends StatelessWidget {
             onPressed: () {
               if (currentIndex > 0) {
                 onPrevious();
-                FirebaseAnalytics.instance.logEvent(name: 'moved_back');
               }
             },
             icon: Icon(
@@ -66,7 +64,6 @@ class NavigationButtons extends StatelessWidget {
             onPressed: () {
               if (currentIndex < totalCount - 1) {
                 onNext();
-                FirebaseAnalytics.instance.logEvent(name: 'moved_forward');
               }
             },
             icon: Icon(

@@ -63,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(width: 16),
                 Text(
-                  'Settings',
+                  'settings'.tr(),
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
               ],
@@ -79,7 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     const SizedBox(height: 8),
-                    _sectionTitle('Preferences'),
+                    _sectionTitle('preferences'.tr()),
                     const SizedBox(height: 12),
                     _settingsCard(
                       children: [
@@ -124,7 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _sectionTitle('Support'),
+                    _sectionTitle('support'.tr()),
                     const SizedBox(height: 12),
                     _settingsCard(
                       children: [
@@ -164,7 +164,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _sectionTitle('Information'),
+                    _sectionTitle('information'.tr()),
                     const SizedBox(height: 12),
                     _settingsCard(
                       children: [

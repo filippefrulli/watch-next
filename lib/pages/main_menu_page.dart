@@ -121,7 +121,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(0.3),
+            color: Colors.orange.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -152,7 +152,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Search',
+                'search'.tr(),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
@@ -183,9 +183,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
           onTap: () {
-            FirebaseAnalytics.instance.logEvent(
-              name: 'opened_settings',
-            );
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -381,12 +378,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 end: Alignment.bottomRight,
               )
             : null,
-        color: enableLoading ? Colors.orange.withOpacity(0.7) : (isLongEnough ? null : Colors.grey[800]),
+        color: enableLoading ? Colors.orange.withValues(alpha: 0.7) : (isLongEnough ? null : Colors.grey[800]),
         borderRadius: BorderRadius.circular(12),
         boxShadow: isLongEnough && !enableLoading
             ? [
                 BoxShadow(
-                  color: Colors.orange.withOpacity(0.3),
+                  color: Colors.orange.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -506,12 +503,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void goButtonPressed() async {
-    FirebaseAnalytics.instance.logEvent(
-      name: 'go_button_pressed',
-      parameters: <String, Object>{
-        "type": typeIsMovie == 0 ? "movie" : "show",
-      },
-    );
     FocusScope.of(context).unfocus();
     await checkConnection();
     if (noInternet) {
@@ -526,9 +517,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
       if (isLongEnough && mounted) {
         setState(() {
           enableLoading = true;
+          isValidQuery = false; // Reset state before validation
         });
         await validateQuery();
-        if (isValidQuery && mounted) {
+
+        // Only proceed if still mounted and validation completed
+        if (!mounted) return;
+
+        if (isValidQuery) {
+          // Log valid query with actual query text
           FirebaseAnalytics.instance.logEvent(
             name: 'valid_prompt',
             parameters: <String, Object>{
@@ -549,6 +546,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             ),
           );
         } else {
+          // Log invalid query with actual query text
           FirebaseAnalytics.instance.logEvent(
             name: 'invalid_prompt',
             parameters: <String, Object>{
@@ -763,7 +761,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.15),
+              color: Colors.orange.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(

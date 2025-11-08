@@ -36,12 +36,8 @@ class RecommendationContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(
-          child: Container(
-            color: const Color.fromRGBO(11, 14, 23, 1),
-            child: MoviePosterWidget(poster: posterPath),
-          ),
-        ),
+        const SizedBox(height: 20),
+        MoviePosterWidget(poster: posterPath),
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

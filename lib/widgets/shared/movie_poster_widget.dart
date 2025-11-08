@@ -10,28 +10,26 @@ class MoviePosterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      fit: BoxFit.fitWidth,
-      imageUrl: "https://image.tmdb.org/t/p/original//$poster",
-      imageBuilder: (context, imageProvider) => Container(
-        width: 380,
-        decoration: BoxDecoration(
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 360,
+        ),
+        child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(25)),
-          image: DecorationImage(
-            image: imageProvider,
-            fit: BoxFit.cover,
+          child: CachedNetworkImage(
+            fit: BoxFit.contain,
+            imageUrl: "https://image.tmdb.org/t/p/original//$poster",
+            placeholder: (context, url) => Container(
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(11, 14, 23, 1),
+                borderRadius: BorderRadius.circular(25),
+              ),
+            ),
+            errorWidget: (context, url, error) => Container(
+              color: Colors.grey[800],
+            ),
           ),
-        ),
-      ),
-      placeholder: (context, url) => Container(
-        decoration: BoxDecoration(
-          color: const Color.fromRGBO(11, 14, 23, 1),
-          borderRadius: BorderRadius.circular(25),
-        ),
-      ),
-      errorWidget: (context, url, error) => Expanded(
-        child: Container(
-          color: Colors.grey[800],
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/services/http_service.dart';
@@ -71,7 +72,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Failed to load streaming information';
+        _errorMessage = 'failed_load_streaming'.tr();
       });
 
       FirebaseAnalytics.instance.logEvent(
@@ -120,7 +121,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Loading...',
+              'loading'.tr(),
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 16,
@@ -163,7 +164,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
                     vertical: 12,
                   ),
                 ),
-                child: Text('Retry'),
+                child: Text('retry'.tr()),
               ),
             ],
           ),
@@ -242,7 +243,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Availability',
+          'availability'.tr(),
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -271,7 +272,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    'Not available in your region',
+                    'not_available_region'.tr(),
                     style: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 15,
@@ -284,7 +285,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
         else ...[
           // Streaming section
           if (_streamingProviders.isNotEmpty) ...[
-            _buildSectionHeader('Stream', Icons.play_circle_outline, Colors.green),
+            _buildSectionHeader('stream'.tr(), Icons.play_circle_outline, Colors.green),
             const SizedBox(height: 12),
             ..._streamingProviders.map((provider) {
               final isSubscribed = _userServiceIds.contains(provider.providerId);
@@ -295,7 +296,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
 
           // Rent section
           if (_rentProviders.isNotEmpty) ...[
-            _buildSectionHeader('Rent', Icons.schedule, Colors.orange),
+            _buildSectionHeader('rent'.tr(), Icons.schedule, Colors.orange),
             const SizedBox(height: 12),
             ..._rentProviders.map((provider) {
               return _buildProviderCard(provider, false, showCheckmark: false);
@@ -305,7 +306,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
 
           // Buy section
           if (_buyProviders.isNotEmpty) ...[
-            _buildSectionHeader('Buy', Icons.shopping_cart_outlined, Colors.blue),
+            _buildSectionHeader('buy'.tr(), Icons.shopping_cart_outlined, Colors.blue),
             const SizedBox(height: 12),
             ..._buyProviders.map((provider) {
               return _buildProviderCard(provider, false, showCheckmark: false);
@@ -391,7 +392,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           // Provider name
           Expanded(
             child: Text(
-              provider.providerName ?? 'Unknown',
+              provider.providerName ?? 'unknown'.tr(),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,

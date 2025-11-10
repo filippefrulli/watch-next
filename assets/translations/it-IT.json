@@ -72,6 +72,22 @@
     "information": "Informazioni",
     "search": "Cerca",
 
+    "watchlist": "Lista preferiti",
+    "watchlist_empty": "La tua lista è vuota",
+    "watchlist_empty_hint": "Aggiungi film e serie per seguire la loro disponibilità",
+    "error_loading_watchlist": "Errore nel caricamento della lista",
+    "available": "Disponibile",
+    "not_available": "Non disponibile",
+    "last_checked": "Ultimo controllo {time}",
+    "just_now": "proprio ora",
+    "remove_from_watchlist": "Rimuovi dalla lista",
+    "remove_watchlist_confirm": "Sei sicuro di voler rimuovere questo dalla tua lista?",
+    "cancel": "Annulla",
+    "remove": "Rimuovi",
+    "add_to_watchlist": "Aggiungi alla lista",
+    "added_to_watchlist": "Aggiunto alla lista",
+    "removed_from_watchlist": "Rimosso dalla lista",
+
     "select_streaming": "Seleziona i tuoi servizi di streaming",
 
     "validation_prompt": "Il tuo compito e' valutare se una frase o una parola e' una richiesta di consigliare un film, dei criteri in base ai quali puoi consigliare un film o il nome di un film. Esempi di richieste corrette sono: \"romantico e divertente, ideale per un primo appuntamento\", \"con Tom Cruise e diretto da Steven Spielberg\", \"sull'intelligenza artificiale, con buone recensioni\", \"azione e avventura\", \"divertente\", \"Moana\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': ",

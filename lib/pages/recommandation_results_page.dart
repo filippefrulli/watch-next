@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,9 +11,11 @@ import 'package:watch_next/objects/movie_credits.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RecommendationResultsPage extends StatefulWidget {
   final List<WatchObject> watchObjects;
@@ -34,12 +37,14 @@ class RecommendationResultsPage extends StatefulWidget {
 
 class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   late Future<dynamic> servicesList;
+  final WatchlistService _watchlistService = WatchlistService();
 
   int index = 0;
   late int length;
   late WatchObject selectedWatchObject;
   late List<WatchObject> watchObjectsList;
   PanelController pc = PanelController();
+  bool _isInWatchlist = false;
 
   Future<MovieCredits> movieCredits = Future.value(MovieCredits());
 
@@ -59,11 +64,62 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
     watchObjectsList = widget.watchObjects;
     length = watchObjectsList.length;
     selectedWatchObject = watchObjectsList[index];
+    _checkIfInWatchlist();
 
     // Preload the first poster
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadNextPoster();
     });
+  }
+
+  Future<void> _checkIfInWatchlist() async {
+    if (selectedWatchObject.id != null) {
+      final inWatchlist = await _watchlistService.isInWatchlist(selectedWatchObject.id!);
+      if (mounted) {
+        setState(() {
+          _isInWatchlist = inWatchlist;
+        });
+      }
+    }
+  }
+
+  Future<void> _toggleWatchlist() async {
+    if (selectedWatchObject.id == null) return;
+
+    try {
+      if (_isInWatchlist) {
+        await _watchlistService.removeFromWatchlist(selectedWatchObject.id!);
+        if (mounted) {
+          setState(() => _isInWatchlist = false);
+          Fluttertoast.showToast(
+            msg: 'removed_from_watchlist'.tr(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey[850],
+            textColor: Colors.white,
+          );
+        }
+      } else {
+        await _watchlistService.addToWatchlist(
+          mediaId: selectedWatchObject.id!,
+          title: selectedWatchObject.title ?? '',
+          isMovie: widget.type == 0,
+          posterPath: selectedWatchObject.posterPath,
+        );
+        if (mounted) {
+          setState(() => _isInWatchlist = true);
+          Fluttertoast.showToast(
+            msg: 'added_to_watchlist'.tr(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey[850],
+            textColor: Colors.white,
+          );
+        }
+      }
+    } catch (e) {
+      print('Error toggling watchlist: $e');
+    }
   }
 
   // Preload next poster image to cache
@@ -85,9 +141,12 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         controller: pc,
         margin: const EdgeInsets.all(8.0),
         panel: MovieInfoPanel(
+          mediaId: selectedWatchObject.id!,
           title: selectedWatchObject.title ?? '',
           overview: selectedWatchObject.overview ?? '',
           tmdbRating: selectedWatchObject.tmdbRating,
+          isMovie: widget.type == 0,
+          posterPath: selectedWatchObject.posterPath,
           trailerList: trailerList,
           trailerImages: trailerImages,
           onTrailerTap: _launchURL,
@@ -124,6 +183,8 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
             currentIndex: index,
             totalCount: length,
             mediaType: widget.type,
+            isInWatchlist: _isInWatchlist,
+            onWatchlistPressed: _toggleWatchlist,
             onPrevious: () {
               setState(() {
                 if (index > 0) {
@@ -131,6 +192,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                   selectedWatchObject = watchObjectsList[index];
                 }
               });
+              _checkIfInWatchlist();
               _preloadNextPoster();
             },
             onNext: () {
@@ -140,6 +202,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                   selectedWatchObject = watchObjectsList[index];
                 }
               });
+              _checkIfInWatchlist();
               _preloadNextPoster();
             },
             onAccept: () async {

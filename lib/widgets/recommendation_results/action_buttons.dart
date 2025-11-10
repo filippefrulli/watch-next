@@ -1,5 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +5,8 @@ class ActionButtons extends StatelessWidget {
   final bool showReloadButton;
   final VoidCallback onInfoPressed;
   final VoidCallback onReloadPressed;
+  final VoidCallback? onWatchlistPressed;
+  final bool isInWatchlist;
   final int mediaType;
 
   const ActionButtons({
@@ -14,15 +14,25 @@ class ActionButtons extends StatelessWidget {
     required this.showReloadButton,
     required this.onInfoPressed,
     required this.onReloadPressed,
+    this.onWatchlistPressed,
+    this.isInWatchlist = false,
     required this.mediaType,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildInfoButton(context),
-        showReloadButton ? _buildReloadButton(context) : Container(),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            if (onWatchlistPressed != null) _buildWatchlistButton(context),
+            if (onWatchlistPressed != null && showReloadButton) const SizedBox(width: 8),
+            if (showReloadButton) _buildReloadButton(context),
+          ],
+        ),
       ],
     );
   }
@@ -72,21 +82,50 @@ class ActionButtons extends StatelessWidget {
     );
   }
 
-  Widget _buildReloadButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Container(
-        height: 48,
-        decoration: BoxDecoration(
+  Widget _buildWatchlistButton(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: isInWatchlist ? Colors.orange.withOpacity(0.2) : Colors.grey[900],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isInWatchlist ? Colors.orange : Colors.grey[800]!,
+          width: 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            colors: [Colors.orange, Color(0xFFFF8C00)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          onTap: onWatchlistPressed,
+          child: Icon(
+            isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+            color: isInWatchlist ? Colors.orange : Colors.white,
+            size: 24,
           ),
         ),
-        child: TextButton(
-          onPressed: () {
+      ),
+    );
+  }
+
+  Widget _buildReloadButton(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Colors.orange, Color(0xFFFF8C00)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
             FirebaseAnalytics.instance.logEvent(
               name: 'reloaded_recommendations',
               parameters: <String, Object>{
@@ -95,29 +134,10 @@ class ActionButtons extends StatelessWidget {
             );
             onReloadPressed();
           },
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.refresh_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-              const SizedBox(width: 6),
-              AutoSizeText(
-                "new".tr(),
-                maxLines: 1,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      fontSize: 15,
-                    ),
-              ),
-            ],
+          child: const Icon(
+            Icons.refresh_rounded,
+            color: Colors.white,
+            size: 24,
           ),
         ),
       ),

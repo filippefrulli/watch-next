@@ -16,6 +16,8 @@ class RecommendationContent extends StatelessWidget {
   final VoidCallback onAccept;
   final VoidCallback onInfoPressed;
   final VoidCallback onReloadPressed;
+  final VoidCallback? onWatchlistPressed;
+  final bool isInWatchlist;
 
   const RecommendationContent({
     super.key,
@@ -30,6 +32,8 @@ class RecommendationContent extends StatelessWidget {
     required this.onAccept,
     required this.onInfoPressed,
     required this.onReloadPressed,
+    this.onWatchlistPressed,
+    this.isInWatchlist = false,
   });
 
   @override
@@ -52,6 +56,8 @@ class RecommendationContent extends StatelessWidget {
               showReloadButton: currentIndex == totalCount - 1,
               onInfoPressed: onInfoPressed,
               onReloadPressed: onReloadPressed,
+              onWatchlistPressed: onWatchlistPressed,
+              isInWatchlist: isInWatchlist,
               mediaType: mediaType,
             ),
           ],

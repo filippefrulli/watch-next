@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/watchlist_service.dart';
 
 class SearchMediaPage extends StatefulWidget {
   const SearchMediaPage({super.key});
@@ -290,6 +292,77 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
   }
 
   Widget _buildSearchResultCard(MultiSearchResult result) {
+    return _SearchResultCard(result: result);
+  }
+}
+
+class _SearchResultCard extends StatefulWidget {
+  final MultiSearchResult result;
+
+  const _SearchResultCard({required this.result});
+
+  @override
+  State<_SearchResultCard> createState() => _SearchResultCardState();
+}
+
+class _SearchResultCardState extends State<_SearchResultCard> {
+  final WatchlistService _watchlistService = WatchlistService();
+  bool _isInWatchlist = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfInWatchlist();
+  }
+
+  Future<void> _checkIfInWatchlist() async {
+    final inWatchlist = await _watchlistService.isInWatchlist(widget.result.id);
+    if (mounted) {
+      setState(() => _isInWatchlist = inWatchlist);
+    }
+  }
+
+  Future<void> _toggleWatchlist() async {
+    try {
+      if (_isInWatchlist) {
+        await _watchlistService.removeFromWatchlist(widget.result.id);
+        if (mounted) {
+          setState(() => _isInWatchlist = false);
+          Fluttertoast.showToast(
+            msg: 'removed_from_watchlist'.tr(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey[850],
+            textColor: Colors.white,
+          );
+        }
+      } else {
+        await _watchlistService.addToWatchlist(
+          mediaId: widget.result.id,
+          title: widget.result.displayTitle,
+          isMovie: widget.result.isMovie,
+          posterPath: widget.result.posterPath,
+        );
+        if (mounted) {
+          setState(() => _isInWatchlist = true);
+          Fluttertoast.showToast(
+            msg: 'added_to_watchlist'.tr(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.grey[850],
+            textColor: Colors.white,
+          );
+        }
+      }
+    } catch (e) {
+      print('Error toggling watchlist: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final result = widget.result;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -302,134 +375,142 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            FirebaseAnalytics.instance.logEvent(
-              name: 'search_result_tapped',
-              parameters: <String, Object>{
-                'id': result.id,
-                'title': result.displayTitle,
-                'media_type': result.mediaType,
-              },
-            );
+        child: Row(
+          children: [
+            Expanded(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () {
+                  FirebaseAnalytics.instance.logEvent(
+                    name: 'search_result_tapped',
+                    parameters: <String, Object>{
+                      'id': result.id,
+                      'title': result.displayTitle,
+                      'media_type': result.mediaType,
+                    },
+                  );
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MediaDetailPage(
-                  mediaId: result.id,
-                  title: result.displayTitle,
-                  isMovie: result.isMovie,
-                  posterPath: result.posterPath,
-                ),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Poster
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: result.posterPath != null
-                      ? Image.network(
-                          'https://image.tmdb.org/t/p/w200${result.posterPath}',
-                          width: 60,
-                          height: 90,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildPlaceholderPoster();
-                          },
-                        )
-                      : _buildPlaceholderPoster(),
-                ),
-                const SizedBox(width: 12),
-                // Info
-                Expanded(
-                  child: Column(
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MediaDetailPage(
+                        mediaId: result.id,
+                        title: result.displayTitle,
+                        isMovie: result.isMovie,
+                        posterPath: result.posterPath,
+                      ),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
-                      Text(
-                        result.displayTitle,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      // Poster
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: result.posterPath != null
+                            ? Image.network(
+                                'https://image.tmdb.org/t/p/w200${result.posterPath}',
+                                width: 60,
+                                height: 90,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return _buildPlaceholderPoster();
+                                },
+                              )
+                            : _buildPlaceholderPoster(),
                       ),
-                      const SizedBox(height: 6),
-                      // Media type badge and year
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: result.isMovie ? Colors.orange : Colors.blue,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              result.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
+                      const SizedBox(width: 12),
+                      // Info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Title
+                            Text(
+                              result.displayTitle,
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 11,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          if (result.year.isNotEmpty) ...[
-                            const SizedBox(width: 8),
-                            Text(
-                              result.year,
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: 14,
+                            const SizedBox(height: 6),
+                            // Media type badge and year
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: result.isMovie ? Colors.orange : Colors.blue,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    result.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                if (result.year.isNotEmpty) ...[
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    result.year,
+                                    style: TextStyle(
+                                      color: Colors.grey[400],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            if (result.voteAverage != null && result.voteAverage! > 0) ...[
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.orange,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    result.voteAverage!.toStringAsFixed(1),
+                                    style: TextStyle(
+                                      color: Colors.grey[300],
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      if (result.voteAverage != null && result.voteAverage! > 0) ...[
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.star,
-                              color: Colors.orange,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              result.voteAverage!.toStringAsFixed(1),
-                              style: TextStyle(
-                                color: Colors.grey[300],
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                            ],
                           ],
                         ),
-                      ],
+                      ),
                     ],
                   ),
                 ),
-                // Arrow icon
-                Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey[600],
-                  size: 24,
-                ),
-              ],
+              ),
             ),
-          ),
+            // Watchlist button
+            IconButton(
+              icon: Icon(
+                _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+                color: _isInWatchlist ? Colors.orange : Colors.grey[400],
+              ),
+              onPressed: _toggleWatchlist,
+            ),
+          ],
         ),
       ),
     );

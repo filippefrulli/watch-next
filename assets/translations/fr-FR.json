@@ -68,9 +68,25 @@
 
     "settings": "Paramètres",
     "preferences": "Préférences",
-    "support": "Assistance",
+    "support": "Support",
     "information": "Information",
     "search": "Rechercher",
+
+    "watchlist": "Liste de suivi",
+    "watchlist_empty": "Votre liste de suivi est vide",
+    "watchlist_empty_hint": "Ajoutez des films et des séries pour suivre leur disponibilité",
+    "error_loading_watchlist": "Erreur lors du chargement de la liste",
+    "available": "Disponible",
+    "not_available": "Non disponible",
+    "last_checked": "Dernière vérification {time}",
+    "just_now": "à l'instant",
+    "remove_from_watchlist": "Retirer de la liste",
+    "remove_watchlist_confirm": "Êtes-vous sûr de vouloir retirer ceci de votre liste ?",
+    "cancel": "Annuler",
+    "remove": "Retirer",
+    "add_to_watchlist": "Ajouter à la liste",
+    "added_to_watchlist": "Ajouté à la liste",
+    "removed_from_watchlist": "Retiré de la liste",
 
     "select_streaming": "Sélectionnez vos services de streaming",
 

@@ -72,6 +72,22 @@
     "information": "Information",
     "search": "Search",
 
+    "watchlist": "Watchlist",
+    "watchlist_empty": "Your watchlist is empty",
+    "watchlist_empty_hint": "Add movies and TV shows to track their availability",
+    "error_loading_watchlist": "Error loading watchlist",
+    "available": "Available",
+    "not_available": "Not available",
+    "last_checked": "Last checked {time}",
+    "just_now": "just now",
+    "remove_from_watchlist": "Remove from watchlist",
+    "remove_watchlist_confirm": "Are you sure you want to remove this from your watchlist?",
+    "cancel": "Cancel",
+    "remove": "Remove",
+    "add_to_watchlist": "Add to watchlist",
+    "added_to_watchlist": "Added to watchlist",
+    "removed_from_watchlist": "Removed from watchlist",
+
     "select_streaming": "Select your streaming services",
 
     "validation_prompt": "Your job is to validate wether a given sentence or word is a request to recommend a movie, criteria from which you can recommend a movie or a movie name. Examples of correct prompts are: \"romantic and funny, ideal for a first date\", \"starring Tom Cruise and directed by Steven Spielberg\", \"about artificial intelligence, with good reviews\", \"action and adventure\", \"funny\", \"Moana\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",

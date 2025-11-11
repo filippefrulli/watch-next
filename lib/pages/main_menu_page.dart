@@ -12,7 +12,9 @@ import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/pages/search_media_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/pages/watchlist_page.dart';
+import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/widgets/feedback_dialog.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
@@ -580,11 +582,32 @@ class _MainMenuPageState extends State<MainMenuPage> {
             'query': _controller.text,
           });
 
-          Navigator.of(context).push(
+          // Increment successful query counter for feedback system
+          await FeedbackService.incrementSuccessfulQuery();
+
+          // Navigate to recommendation page and check for feedback dialog when returning
+          await Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => RecommendationLoadingPage(requestString: _controller.text, type: typeIsMovie),
             ),
           );
+
+          // After returning from recommendation page, check if we should show feedback dialog
+          if (mounted) {
+            final shouldShow = await FeedbackService.shouldShowFeedbackDialog();
+            if (shouldShow && mounted) {
+              // Show dialog after user returns to main screen
+              Future.delayed(const Duration(milliseconds: 300), () {
+                if (mounted) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => const FeedbackDialog(),
+                  );
+                }
+              });
+            }
+          }
         } else {
           // Log invalid query with actual query text
           FirebaseAnalytics.instance.logEvent(

@@ -3,8 +3,10 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
+import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
+import 'package:watch_next/widgets/feedback_dialog.dart';
 
 class SearchMediaPage extends StatefulWidget {
   const SearchMediaPage({super.key});
@@ -380,7 +382,7 @@ class _SearchResultCardState extends State<_SearchResultCard> {
             Expanded(
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () {
+                onTap: () async {
                   FirebaseAnalytics.instance.logEvent(
                     name: 'search_result_tapped',
                     parameters: <String, Object>{
@@ -390,7 +392,11 @@ class _SearchResultCardState extends State<_SearchResultCard> {
                     },
                   );
 
-                  Navigator.push(
+                  // Increment successful query counter for feedback system
+                  await FeedbackService.incrementSuccessfulQuery();
+
+                  // Navigate to detail page and check for feedback dialog when returning
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => MediaDetailPage(
@@ -401,6 +407,23 @@ class _SearchResultCardState extends State<_SearchResultCard> {
                       ),
                     ),
                   );
+
+                  // After returning from detail page, check if we should show feedback dialog
+                  if (mounted) {
+                    final shouldShow = await FeedbackService.shouldShowFeedbackDialog();
+                    if (shouldShow && mounted) {
+                      // Show dialog after user returns to search screen
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        if (mounted) {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (_) => const FeedbackDialog(),
+                          );
+                        }
+                      });
+                    }
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12),

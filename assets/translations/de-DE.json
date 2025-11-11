@@ -88,6 +88,21 @@
     "added_to_watchlist": "Zur Merkliste hinzugefügt",
     "removed_from_watchlist": "Von Merkliste entfernt",
 
+    "enjoying_watch_next": "Gefällt dir Watch Next?",
+    "yes": "Ja",
+    "not_really": "Nicht wirklich",
+    "leave_review_title": "Schön zu hören!",
+    "leave_review_message": "Würdest du eine Bewertung abgeben? Das hilft uns sehr!",
+    "leave_review": "Bewerten",
+    "maybe_later": "Vielleicht später",
+    "send_feedback_title": "Das tut uns leid!",
+    "send_feedback_message": "Möchtest du uns Feedback schicken, damit wir uns verbessern können?",
+    "feedback_hint": "Sag uns, was wir besser machen können...",
+    "send": "Senden",
+    "sending": "Wird gesendet...",
+    "feedback_sent": "Vielen Dank für dein Feedback!",
+    "feedback_error": "Feedback konnte nicht gesendet werden. Bitte versuche es erneut.",
+
     "select_streaming": "Wähle deine Streaming-Dienste",
 
     "validation_prompt": "Deine Aufgabe besteht darin, zu überprüfen, ob es sich bei einem bestimmten Wort oder Satz um eine Aufforderung zur Empfehlung eines Films, um Kriterien die Filme entsprechen, oder einen Film namen handelt, anhand derer du einen oder mehr Filme empfehlen kannst. Beispiele für richtige Aufforderungen sind: \"romantisch und lustig, ideal für ein erstes Date\", \"mit Tom Cruise und Regie von Steven Spielberg\", \"über künstliche Intelligenz mit guten Bewertungen\". \"Action und Abenteuer\", \"lustig\", \"Moana\". Wenn die Eingabeaufforderung gültig ist, geben Sie nur den Text YES zurück, andernfalls NO. Die Eingabeaufforderung lautet: ",

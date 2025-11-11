@@ -88,7 +88,22 @@
     "added_to_watchlist": "Ajouté à la liste",
     "removed_from_watchlist": "Retiré de la liste",
 
-    "select_streaming": "Sélectionnez vos services de streaming",
+    "enjoying_watch_next": "Appréciez-vous Watch Next?",
+    "yes": "Oui",
+    "not_really": "Pas vraiment",
+    "leave_review_title": "Ravi de l'entendre!",
+    "leave_review_message": "Cela vous dérangerait-il de laisser un avis? Cela nous aide beaucoup!",
+    "leave_review": "Laisser un avis",
+    "maybe_later": "Peut-être plus tard",
+    "send_feedback_title": "Nous sommes désolés!",
+    "send_feedback_message": "Souhaitez-vous nous envoyer des commentaires pour que nous puissions nous améliorer?",
+    "feedback_hint": "Dites-nous ce que nous pouvons améliorer...",
+    "send": "Envoyer",
+    "sending": "Envoi en cours...",
+    "feedback_sent": "Merci pour vos commentaires!",
+    "feedback_error": "Échec de l'envoi des commentaires. Veuillez réessayer.",
+
+    "select_streaming": "Sélectionne tes services de streaming",
 
     "validation_prompt": "Votre travail consiste à valider si une phrase ou un mot donnée est une demande de recommandation d'un film, des critères à partir desquels vous pouvez recommander un film ou le nom d'un film. Exemples de messages corrects: \"Recommander un film romantique et drôle, idéal pour un premier rendez-vous\", \"Recommander un film avec Tom Cruise et réalisé par Steven Spielberg\", \"sur l'intelligence artificielle, avec de bonnes critiques \", \"action et aventure\", \"drôle\", \"Moana\". Si l'invite est valide, renvoyez uniquement le texte YES, sinon NO. L'invite est :",
     "validation_prompt_series": "Ton travail consiste à valider si une phrase donnée est une demande de recommandation de séries, des critères à partir desquels vous pouvez recommander un séries ou le nom d'une séries. Voici des exemples d'invites correctes: \"qui a moins de 5 saisons\", \"sur le sport\", \"avec des épisodes de moins de 30 minutes\", \"drôle\", \"Lost\". Si la requête est valide, renvoyez uniquement le texte YES, sinon NO. La requête est: ",

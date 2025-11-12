@@ -81,6 +81,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
           title: widget.title,
           isMovie: widget.isMovie,
           posterPath: widget.posterPath,
+          context: context,
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);

@@ -105,6 +105,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
           title: selectedWatchObject.title ?? '',
           isMovie: widget.type == 0,
           posterPath: selectedWatchObject.posterPath,
+          context: context,
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);

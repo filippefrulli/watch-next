@@ -48,3 +48,5 @@ app.*.map.json
 secrets.dart
 
 key.properties
+
+.env.local

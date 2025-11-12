@@ -8,6 +8,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
 import 'package:watch_next/pages/language_page.dart';
+import 'package:watch_next/services/notification_service.dart';
 import 'pages/main_menu_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -18,6 +19,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize notification service
+  await NotificationService.initialize();
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemStatusBarContrastEnforced: true,
@@ -46,6 +50,9 @@ void main() async {
 
 final ThemeData theme = ThemeData();
 
+// Global navigator key for handling notifications when app is in background
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 /// This Widget is the main application.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -54,6 +61,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         navigatorObservers: [
           FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
         ],

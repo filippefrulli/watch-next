@@ -40,9 +40,11 @@ class RecommendationContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 20),
-        MoviePosterWidget(poster: posterPath),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
+        Expanded(
+          child: MoviePosterWidget(poster: posterPath),
+        ),
+        const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +64,7 @@ class RecommendationContent extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         NavigationButtons(
           currentIndex: currentIndex,
           totalCount: totalCount,

@@ -167,85 +167,87 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   }
 
   Widget pageBody() {
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        RecommendationHeader(
-          currentIndex: index,
-          totalCount: length,
-          isLoading: false,
-        ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: RecommendationContent(
-            posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
-            watchProviders: selectedWatchObject.watchProviders,
-            servicesList: servicesList,
+    return SafeArea(
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          RecommendationHeader(
             currentIndex: index,
             totalCount: length,
-            mediaType: widget.type,
-            isInWatchlist: _isInWatchlist,
-            onWatchlistPressed: _toggleWatchlist,
-            onPrevious: () {
-              setState(() {
-                if (index > 0) {
-                  index--;
-                  selectedWatchObject = watchObjectsList[index];
-                }
-              });
-              _checkIfInWatchlist();
-              _preloadNextPoster();
-            },
-            onNext: () {
-              setState(() {
-                if (index < length - 1) {
-                  index++;
-                  selectedWatchObject = watchObjectsList[index];
-                }
-              });
-              _checkIfInWatchlist();
-              _preloadNextPoster();
-            },
-            onAccept: () async {
-              final prefs = await SharedPreferences.getInstance();
-              prefs.setInt('accepted_movie', selectedWatchObject.id!);
-              if (!mounted) return;
-              // Only pop once since loading page used pushReplacement
-              Navigator.of(context).pop();
-            },
-            onInfoPressed: () async {
-              movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
-              if (widget.type == 0) {
-                HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
-                  setState(() {
-                    trailerList = value;
-                  });
-                  waitForImages();
-                });
-              } else {
-                HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
-                  setState(() {
-                    trailerList = value;
-                  });
-                  waitForImages();
-                });
-              }
-              pc.open();
-            },
-            onReloadPressed: () {
-              // Navigate back to loading page for new recommendations
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => RecommendationLoadingPage(
-                    requestString: widget.requestString,
-                    type: widget.type,
-                  ),
-                ),
-              );
-            },
+            isLoading: false,
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Expanded(
+            child: RecommendationContent(
+              posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
+              watchProviders: selectedWatchObject.watchProviders,
+              servicesList: servicesList,
+              currentIndex: index,
+              totalCount: length,
+              mediaType: widget.type,
+              isInWatchlist: _isInWatchlist,
+              onWatchlistPressed: _toggleWatchlist,
+              onPrevious: () {
+                setState(() {
+                  if (index > 0) {
+                    index--;
+                    selectedWatchObject = watchObjectsList[index];
+                  }
+                });
+                _checkIfInWatchlist();
+                _preloadNextPoster();
+              },
+              onNext: () {
+                setState(() {
+                  if (index < length - 1) {
+                    index++;
+                    selectedWatchObject = watchObjectsList[index];
+                  }
+                });
+                _checkIfInWatchlist();
+                _preloadNextPoster();
+              },
+              onAccept: () async {
+                final prefs = await SharedPreferences.getInstance();
+                prefs.setInt('accepted_movie', selectedWatchObject.id!);
+                if (!mounted) return;
+                // Only pop once since loading page used pushReplacement
+                Navigator.of(context).pop();
+              },
+              onInfoPressed: () async {
+                movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
+                if (widget.type == 0) {
+                  HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
+                    setState(() {
+                      trailerList = value;
+                    });
+                    waitForImages();
+                  });
+                } else {
+                  HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
+                    setState(() {
+                      trailerList = value;
+                    });
+                    waitForImages();
+                  });
+                }
+                pc.open();
+              },
+              onReloadPressed: () {
+                // Navigate back to loading page for new recommendations
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => RecommendationLoadingPage(
+                      requestString: widget.requestString,
+                      type: widget.type,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 

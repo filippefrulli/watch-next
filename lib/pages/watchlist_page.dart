@@ -1,10 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
+import 'package:watch_next/services/imdb_import_service.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
+import 'package:file_picker/file_picker.dart';
 
 class WatchlistPage extends StatefulWidget {
   const WatchlistPage({super.key});
@@ -16,8 +19,10 @@ class WatchlistPage extends StatefulWidget {
 class _WatchlistPageState extends State<WatchlistPage> {
   final WatchlistService _watchlistService = WatchlistService();
   final HttpService _httpService = HttpService();
+  final ImdbImportService _importService = ImdbImportService();
   List<int> _userServiceIds = [];
   bool _isRefreshing = false;
+  bool _isImporting = false;
   List<WatchlistItem> _currentItems = [];
   bool _showOnlyAvailable = false;
   String _mediaTypeFilter = 'all'; // 'all', 'movies', 'tv'
@@ -213,6 +218,27 @@ class _WatchlistPageState extends State<WatchlistPage> {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
+                onTap: _isImporting ? null : _importFromImdb,
+                child: const Icon(
+                  Icons.upload_file,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey[850],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
                 onTap: _isRefreshing ? null : _refreshAllAvailability,
                 child: _isRefreshing
                     ? Padding(
@@ -232,6 +258,206 @@ class _WatchlistPageState extends State<WatchlistPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _importFromImdb() async {
+    try {
+      // Pick CSV file
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
+
+      if (result == null) return;
+
+      setState(() {
+        _isImporting = true;
+      });
+
+      // Show progress dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              backgroundColor: Colors.grey[850],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey[700]!, width: 1),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(
+                      color: Colors.orange,
+                      strokeWidth: 4,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'importing_watchlist'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'This may take a few moments...',
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+
+      final file = result.files.single;
+      final (successCount, skippedCount, failedCount) = await _importService.importFromCsv(File(file.path!));
+
+      if (mounted) {
+        Navigator.of(context).pop(); // Close progress dialog
+
+        // Show results
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.grey[850],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey[700]!, width: 1),
+            ),
+            title: Text(
+              'import_complete'.tr(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildResultRow(
+                  Icons.check_circle,
+                  Colors.green,
+                  'Added $successCount items',
+                ),
+                const SizedBox(height: 12),
+                _buildResultRow(
+                  Icons.info,
+                  Colors.orange,
+                  'Skipped $skippedCount (already in watchlist)',
+                ),
+                const SizedBox(height: 12),
+                _buildResultRow(
+                  Icons.error_outline,
+                  Colors.red,
+                  'Failed $failedCount',
+                ),
+              ],
+            ),
+            actions: [
+              Container(
+                width: double.infinity,
+                height: 48,
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.orange, Colors.orange[700]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Center(
+                      child: Text(
+                        'ok'.tr().toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close progress dialog if open
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.grey[850],
+            title: Text(
+              'error_occurred'.tr(),
+              style: const TextStyle(color: Colors.white),
+            ),
+            content: Text(
+              'import_error'.tr(),
+              style: TextStyle(color: Colors.grey[300]),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'ok'.tr(),
+                  style: const TextStyle(color: Colors.orange),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isImporting = false;
+        });
+      }
+    }
+  }
+
+  Widget _buildResultRow(IconData icon, Color color, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.grey[300],
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -688,40 +914,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
                   icon: const Icon(Icons.delete_outline),
                   color: Colors.grey[400],
                   onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        backgroundColor: Colors.grey[850],
-                        title: Text(
-                          'remove_from_watchlist'.tr(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        content: Text(
-                          'remove_watchlist_confirm'.tr(),
-                          style: TextStyle(color: Colors.grey[300]),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text(
-                              'cancel'.tr(),
-                              style: TextStyle(color: Colors.grey[400]),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text(
-                              'remove'.tr(),
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (confirm == true) {
-                      await _watchlistService.removeFromWatchlist(item.mediaId);
-                    }
+                    await _watchlistService.removeFromWatchlist(item.mediaId);
                   },
                 ),
               ],

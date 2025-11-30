@@ -91,6 +91,11 @@
     "movies": "Movies",
     "tv_shows": "TV Shows",
     "available_only": "Available Only",
+    "importing_watchlist": "Importing watchlist...",
+    "import_complete": "Import Complete",
+    "import_results": "Added {success} items\nSkipped {skipped} (already in watchlist)\nFailed {failed}",
+    "import_error": "Failed to import watchlist. Please make sure you're using a valid IMDb CSV export.",
+    "ok": "OK",
 
     "enjoying_watch_next": "Are you enjoying Watch Next?",
     "yes": "Yes",

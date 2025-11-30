@@ -91,6 +91,11 @@
     "movies": "Films",
     "tv_shows": "Séries",
     "available_only": "Disponibles Seulement",
+    "importing_watchlist": "Importation en cours...",
+    "import_complete": "Importation terminée",
+    "import_results": "{success} éléments ajoutés\n{skipped} ignorés (déjà dans la liste)\n{failed} échoués",
+    "import_error": "Échec de l'importation. Veuillez utiliser un fichier CSV IMDb valide.",
+    "ok": "OK",
 
     "enjoying_watch_next": "Appréciez-vous Watch Next?",
     "yes": "Oui",

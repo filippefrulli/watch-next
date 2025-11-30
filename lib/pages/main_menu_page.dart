@@ -90,9 +90,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
               if (!widget.isTab) ...[
                 topBar(),
                 const SizedBox(height: 32),
-              ] else
-                const SizedBox(height: 16),
-              titleSection(),
+                titleSection(),
+              ] else ...[
+                const SizedBox(height: 8),
+                topBar(),
+              ],
               Expanded(
                 flex: 1,
                 child: Container(),
@@ -120,10 +122,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget topBar() {
     if (widget.isTab) {
-      // In tab mode, only show settings button
+      // In tab mode, show title centered with settings button on right
       return Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Placeholder for symmetry (same size as settings button)
+          const SizedBox(width: 48, height: 48),
+          titleSection(),
           settingsButton(),
         ],
       );

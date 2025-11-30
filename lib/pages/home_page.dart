@@ -83,7 +83,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                     ),
                     Tab(
                       icon: Icon(Icons.home_rounded, size: 22),
-                      text: 'Home',
+                      text: 'Discover',
                     ),
                     Tab(
                       icon: Icon(Icons.search, size: 22),

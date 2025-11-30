@@ -6,6 +6,7 @@ import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/imdb_import_service.dart';
+import 'package:watch_next/services/letterboxd_import_service.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -20,6 +21,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
   final WatchlistService _watchlistService = WatchlistService();
   final HttpService _httpService = HttpService();
   final ImdbImportService _importService = ImdbImportService();
+  final LetterboxdImportService _letterboxdImportService = LetterboxdImportService();
   List<int> _userServiceIds = [];
   bool _isRefreshing = false;
   bool _isImporting = false;
@@ -274,14 +276,6 @@ class _WatchlistPageState extends State<WatchlistPage> {
             const SizedBox(height: 12),
             _buildImportSourceOption(
               context,
-              'Trakt.tv',
-              'trakt',
-              Icons.tv,
-              Colors.red,
-            ),
-            const SizedBox(height: 12),
-            _buildImportSourceOption(
-              context,
               'Letterboxd',
               'letterboxd',
               Icons.local_movies,
@@ -293,8 +287,198 @@ class _WatchlistPageState extends State<WatchlistPage> {
     );
 
     if (source != null) {
-      _importFromSource(source);
+      _showImportInstructionsDialog(source);
     }
+  }
+
+  void _showImportInstructionsDialog(String source) {
+    final instructions = _getImportInstructions(source);
+    final sourceInfo = _getSourceInfo(source);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[850],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey[700]!, width: 1),
+        ),
+        title: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: sourceInfo['color'].withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                sourceInfo['icon'],
+                color: sourceInfo['color'],
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              sourceInfo['name'],
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (int i = 0; i < instructions.length; i++) ...[
+              _buildInstructionStep(i + 1, instructions[i], sourceInfo['color']),
+              if (i < instructions.length - 1) const SizedBox(height: 16),
+            ],
+          ],
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 48,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[700]!, width: 1),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Center(
+                        child: Text(
+                          'cancel'.tr(),
+                          style: TextStyle(
+                            color: Colors.grey[300],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 48,
+                  margin: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.orange, Colors.orange[700]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _importFromSource(source);
+                      },
+                      child: Center(
+                        child: Text(
+                          'select_file'.tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<String> _getImportInstructions(String source) {
+    switch (source) {
+      case 'imdb':
+        return [
+          'imdb_step_1'.tr(),
+          'imdb_step_2'.tr(),
+          'imdb_step_3'.tr(),
+        ];
+      case 'letterboxd':
+        return [
+          'letterboxd_step_1'.tr(),
+          'letterboxd_step_2'.tr(),
+          'letterboxd_step_3'.tr(),
+        ];
+      default:
+        return [];
+    }
+  }
+
+  Map<String, dynamic> _getSourceInfo(String source) {
+    switch (source) {
+      case 'imdb':
+        return {'name': 'IMDb', 'icon': Icons.movie, 'color': Colors.amber};
+      case 'letterboxd':
+        return {'name': 'Letterboxd', 'icon': Icons.local_movies, 'color': Colors.green};
+      default:
+        return {'name': '', 'icon': Icons.help, 'color': Colors.grey};
+    }
+  }
+
+  Widget _buildInstructionStep(int stepNumber, String instruction, Color color) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              '$stepNumber',
+              style: TextStyle(
+                color: color,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              instruction,
+              style: TextStyle(
+                color: Colors.grey[300],
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildImportSourceOption(
@@ -356,9 +540,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
   }
 
   Future<void> _importFromSource(String source) async {
-    // For now, all sources use the same CSV import logic
-    // In the future, you can add specific handling for each source
-    await _importFromImdb();
+    switch (source) {
+      case 'imdb':
+        await _importFromImdb();
+        break;
+      case 'letterboxd':
+        await _importFromLetterboxd();
+        break;
+    }
   }
 
   Future<void> _importFromImdb() async {
@@ -520,6 +709,188 @@ class _WatchlistPageState extends State<WatchlistPage> {
             ),
             content: Text(
               'import_error'.tr(),
+              style: TextStyle(color: Colors.grey[300]),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'ok'.tr(),
+                  style: const TextStyle(color: Colors.orange),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isImporting = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _importFromLetterboxd() async {
+    try {
+      // Pick CSV file
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
+
+      if (result == null) return;
+
+      setState(() {
+        _isImporting = true;
+      });
+
+      // Show progress dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              backgroundColor: Colors.grey[850],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey[700]!, width: 1),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(
+                      color: Colors.orange,
+                      strokeWidth: 4,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'importing_watchlist'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'This may take a few moments...',
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+
+      final file = result.files.single;
+      final (successCount, skippedCount, failedCount) = await _letterboxdImportService.importFromCsv(File(file.path!));
+
+      if (mounted) {
+        Navigator.of(context).pop(); // Close progress dialog
+
+        // Show results
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.grey[850],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey[700]!, width: 1),
+            ),
+            title: Text(
+              'import_complete'.tr(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildResultRow(
+                  Icons.check_circle,
+                  Colors.green,
+                  'Added $successCount items',
+                ),
+                const SizedBox(height: 12),
+                _buildResultRow(
+                  Icons.info,
+                  Colors.orange,
+                  'Skipped $skippedCount (already in watchlist)',
+                ),
+                const SizedBox(height: 12),
+                _buildResultRow(
+                  Icons.error_outline,
+                  Colors.red,
+                  'Failed $failedCount',
+                ),
+              ],
+            ),
+            actions: [
+              Container(
+                width: double.infinity,
+                height: 48,
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.orange, Colors.orange[700]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Center(
+                      child: Text(
+                        'ok'.tr().toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close progress dialog if open
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.grey[850],
+            title: Text(
+              'error_occurred'.tr(),
+              style: const TextStyle(color: Colors.white),
+            ),
+            content: Text(
+              'letterboxd_import_error'.tr(),
               style: TextStyle(color: Colors.grey[300]),
             ),
             actions: [

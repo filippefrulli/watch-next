@@ -145,6 +145,7 @@ class _LanguagePageState extends State<LanguagePage> {
           child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
             itemCount: languages.length,
             separatorBuilder: (context, index) => Divider(
               height: 1,

@@ -86,7 +86,11 @@
     "remove": "Entfernen",
     "add_to_watchlist": "Zur Merkliste hinzufügen",
     "added_to_watchlist": "Zur Merkliste hinzugefügt",
-    "removed_from_watchlist": "Von Merkliste entfernt",
+    "removed_from_watchlist": "Von der Merkliste entfernt",
+    "all": "Alle",
+    "movies": "Filme",
+    "tv_shows": "Serien",
+    "available_only": "Nur Verfügbare",
 
     "enjoying_watch_next": "Gefällt dir Watch Next?",
     "yes": "Ja",

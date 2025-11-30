@@ -87,6 +87,10 @@
     "add_to_watchlist": "Add to watchlist",
     "added_to_watchlist": "Added to watchlist",
     "removed_from_watchlist": "Removed from watchlist",
+    "all": "All",
+    "movies": "Movies",
+    "tv_shows": "TV Shows",
+    "available_only": "Available Only",
 
     "enjoying_watch_next": "Are you enjoying Watch Next?",
     "yes": "Yes",

@@ -87,6 +87,10 @@
     "add_to_watchlist": "Ajouter à la liste",
     "added_to_watchlist": "Ajouté à la liste",
     "removed_from_watchlist": "Retiré de la liste",
+    "all": "Tous",
+    "movies": "Films",
+    "tv_shows": "Séries",
+    "available_only": "Disponibles Seulement",
 
     "enjoying_watch_next": "Appréciez-vous Watch Next?",
     "yes": "Oui",

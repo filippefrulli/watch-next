@@ -19,6 +19,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
   List<int> _userServiceIds = [];
   bool _isRefreshing = false;
   List<WatchlistItem> _currentItems = [];
+  bool _showOnlyAvailable = false;
+  String _mediaTypeFilter = 'all'; // 'all', 'movies', 'tv'
 
   @override
   void initState() {
@@ -82,6 +84,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         child: Column(
           children: [
             _buildHeader(),
+            _buildFilters(),
             Expanded(
               child: StreamBuilder<List<WatchlistItem>>(
                 stream: _watchlistService.getWatchlist(),
@@ -103,22 +106,44 @@ class _WatchlistPageState extends State<WatchlistPage> {
                     );
                   }
 
-                  final items = snapshot.data ?? [];
+                  final allItems = snapshot.data ?? [];
+
+                  // Apply filters
+                  final filteredItems = allItems.where((item) {
+                    // Filter by availability
+                    if (_showOnlyAvailable && !item.isAvailable(_userServiceIds)) {
+                      return false;
+                    }
+
+                    // Filter by media type
+                    if (_mediaTypeFilter == 'movies' && !item.isMovie) {
+                      return false;
+                    }
+                    if (_mediaTypeFilter == 'tv' && item.isMovie) {
+                      return false;
+                    }
+
+                    return true;
+                  }).toList();
 
                   // Store current items for refresh
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mounted) {
-                      _currentItems = items;
+                      _currentItems = allItems;
                     }
                   });
 
-                  if (items.isEmpty) {
+                  if (allItems.isEmpty) {
                     return _buildEmptyState();
+                  }
+
+                  if (filteredItems.isEmpty) {
+                    return _buildNoResultsState();
                   }
 
                   return RefreshIndicator(
                     onRefresh: () async {
-                      for (var item in items) {
+                      for (var item in allItems) {
                         await _refreshAvailability(item);
                       }
                     },
@@ -126,9 +151,9 @@ class _WatchlistPageState extends State<WatchlistPage> {
                     color: Colors.white,
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: items.length,
+                      itemCount: filteredItems.length,
                       itemBuilder: (context, index) {
-                        return _buildWatchlistItem(items[index]);
+                        return _buildWatchlistItem(filteredItems[index]);
                       },
                     ),
                   );
@@ -239,6 +264,289 @@ class _WatchlistPageState extends State<WatchlistPage> {
             textAlign: TextAlign.center,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNoResultsState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.filter_list_off,
+            size: 80,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No items match your filters',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try adjusting your filters',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilters() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // Media type dropdown
+              Expanded(
+                flex: 2,
+                child: Material(
+                  color: Colors.grey[850],
+                  borderRadius: BorderRadius.circular(12),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => _showMediaTypeMenu(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey[700]!,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getMediaTypeIcon(),
+                            size: 18,
+                            color: Colors.grey[300],
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _getMediaTypeLabel(),
+                              style: TextStyle(
+                                color: Colors.grey[300],
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.grey[400],
+                            size: 24,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Availability filter
+              Expanded(
+                flex: 2,
+                child: _buildFilterChip(
+                  label: 'available_only'.tr(),
+                  isSelected: _showOnlyAvailable,
+                  icon: Icons.check_circle,
+                  onTap: () {
+                    setState(() {
+                      _showOnlyAvailable = !_showOnlyAvailable;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  IconData _getMediaTypeIcon() {
+    switch (_mediaTypeFilter) {
+      case 'movies':
+        return Icons.movie;
+      case 'tv':
+        return Icons.tv;
+      default:
+        return Icons.video_library;
+    }
+  }
+
+  String _getMediaTypeLabel() {
+    switch (_mediaTypeFilter) {
+      case 'movies':
+        return 'movies'.tr();
+      case 'tv':
+        return 'tv_shows'.tr();
+      default:
+        return 'all'.tr();
+    }
+  }
+
+  void _showMediaTypeMenu(BuildContext context) {
+    showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(16, 200, 16, 0),
+      color: Colors.grey[850],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey[700]!, width: 1),
+      ),
+      items: [
+        PopupMenuItem<String>(
+          value: 'all',
+          child: Row(
+            children: [
+              Icon(
+                Icons.video_library,
+                size: 18,
+                color: _mediaTypeFilter == 'all' ? Colors.orange : Colors.grey[400],
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'all'.tr(),
+                style: TextStyle(
+                  color: _mediaTypeFilter == 'all' ? Colors.orange : Colors.grey[300],
+                  fontWeight: _mediaTypeFilter == 'all' ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+              const Spacer(),
+              if (_mediaTypeFilter == 'all')
+                const Icon(
+                  Icons.check,
+                  size: 18,
+                  color: Colors.orange,
+                ),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'movies',
+          child: Row(
+            children: [
+              Icon(
+                Icons.movie,
+                size: 18,
+                color: _mediaTypeFilter == 'movies' ? Colors.orange : Colors.grey[400],
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'movies'.tr(),
+                style: TextStyle(
+                  color: _mediaTypeFilter == 'movies' ? Colors.orange : Colors.grey[300],
+                  fontWeight: _mediaTypeFilter == 'movies' ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+              const Spacer(),
+              if (_mediaTypeFilter == 'movies')
+                const Icon(
+                  Icons.check,
+                  size: 18,
+                  color: Colors.orange,
+                ),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'tv',
+          child: Row(
+            children: [
+              Icon(
+                Icons.tv,
+                size: 18,
+                color: _mediaTypeFilter == 'tv' ? Colors.orange : Colors.grey[400],
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'tv_shows'.tr(),
+                style: TextStyle(
+                  color: _mediaTypeFilter == 'tv' ? Colors.orange : Colors.grey[300],
+                  fontWeight: _mediaTypeFilter == 'tv' ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+              const Spacer(),
+              if (_mediaTypeFilter == 'tv')
+                const Icon(
+                  Icons.check,
+                  size: 18,
+                  color: Colors.orange,
+                ),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          _mediaTypeFilter = value;
+        });
+      }
+    });
+  }
+
+  Widget _buildFilterChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+    IconData? icon,
+  }) {
+    return Material(
+      color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.grey[850],
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? Colors.orange : Colors.grey[700]!,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: 16,
+                  color: isSelected ? Colors.orange : Colors.grey[400],
+                ),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.orange : Colors.grey[300],
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

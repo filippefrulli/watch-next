@@ -23,7 +23,7 @@ class WatchlistItemCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: Colors.grey[850],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
@@ -43,16 +43,26 @@ class WatchlistItemCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildPoster(),
+                _buildPoster(context),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildInfo(isAvailable),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  color: Colors.grey[400],
-                  onPressed: onRemove,
+                Padding(
+                  padding: const EdgeInsets.only(top: 0),
+                  child: SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(Icons.delete_outline, size: 20),
+                      color: Colors.grey[400],
+                      onPressed: onRemove,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -62,7 +72,7 @@ class WatchlistItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPoster() {
+  Widget _buildPoster(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: item.posterPath != null
@@ -74,7 +84,7 @@ class WatchlistItemCard extends StatelessWidget {
               placeholder: (context, url) => Container(
                 width: 60,
                 height: 90,
-                color: Colors.grey[800],
+                color: Theme.of(context).colorScheme.tertiary,
                 child: const Center(
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
@@ -85,7 +95,7 @@ class WatchlistItemCard extends StatelessWidget {
               errorWidget: (context, url, error) => Container(
                 width: 60,
                 height: 90,
-                color: Colors.grey[800],
+                color: Theme.of(context).colorScheme.tertiary,
                 child: const Icon(
                   Icons.movie,
                   color: Colors.white,
@@ -95,7 +105,7 @@ class WatchlistItemCard extends StatelessWidget {
           : Container(
               width: 60,
               height: 90,
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.tertiary,
               child: const Icon(
                 Icons.movie,
                 color: Colors.white,

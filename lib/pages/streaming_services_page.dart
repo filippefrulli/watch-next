@@ -40,7 +40,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: body(),
     );
   }
@@ -129,10 +129,10 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.grey[900],
+                color: Theme.of(context).colorScheme.tertiary,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.grey[800]!,
+                  color: Theme.of(context).colorScheme.outline,
                   width: 1,
                 ),
               ),
@@ -244,7 +244,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
           width: 3,
           color: isSelected ? Colors.orange : Colors.grey[700]!,
         ),
-        color: Colors.grey[850],
+        color: Theme.of(context).colorScheme.tertiary,
         boxShadow: isSelected
             ? [
                 BoxShadow(
@@ -264,7 +264,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                 fit: BoxFit.cover,
                 imageUrl: "https://image.tmdb.org/t/p/original//$logo",
                 placeholder: (context, url) => Container(
-                  color: Colors.grey[800],
+                  color: Theme.of(context).colorScheme.outline,
                   child: Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
@@ -273,7 +273,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                   ),
                 ),
                 errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[800],
+                  color: Theme.of(context).colorScheme.tertiary,
                   child: Icon(
                     Icons.broken_image,
                     color: Colors.grey[600],

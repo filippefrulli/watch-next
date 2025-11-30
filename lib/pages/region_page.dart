@@ -24,7 +24,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: DelayedDisplay(
         delay: const Duration(milliseconds: 200),
         child: Column(
@@ -54,10 +54,10 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.grey[800]!,
+            color: Theme.of(context).colorScheme.outline,
             width: 1,
           ),
         ),
@@ -69,7 +69,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
             separatorBuilder: (context, index) => Divider(
               height: 1,
               thickness: 1,
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.outline,
               indent: 72,
             ),
             itemBuilder: (context, index) {
@@ -106,7 +106,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.orange : Colors.grey[800],
+                  color: isSelected ? Colors.orange : Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(

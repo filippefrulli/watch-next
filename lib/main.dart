@@ -79,6 +79,8 @@ class MyApp extends StatelessWidget {
           colorScheme: theme.colorScheme.copyWith(
             primary: const Color.fromRGBO(11, 14, 23, 1),
             secondary: Colors.orange,
+            tertiary: const Color.fromARGB(255, 35, 42, 47),
+            outline: Colors.grey[800],
             brightness: Brightness.dark,
           ),
           splashColor: Colors.transparent,

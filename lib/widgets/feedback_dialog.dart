@@ -23,7 +23,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Theme.of(context).colorScheme.tertiary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -164,9 +164,11 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
         const SizedBox(height: 20),
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey[850],
+            color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[800]!),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
           child: TextField(
             controller: _feedbackController,
@@ -212,7 +214,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: onPressed == null ? Colors.grey[800] : color,
+        color: onPressed == null ? Theme.of(context).colorScheme.tertiary : color,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(

@@ -22,12 +22,12 @@ class MoviePosterWidget extends StatelessWidget {
             imageUrl: "https://image.tmdb.org/t/p/original//$poster",
             placeholder: (context, url) => Container(
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(11, 14, 23, 1),
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(25),
               ),
             ),
             errorWidget: (context, url, error) => Container(
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.tertiary,
             ),
           ),
         ),

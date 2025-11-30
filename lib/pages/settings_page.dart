@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: pageBody(),
     );
   }
@@ -43,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.grey[850],
+                    color: Theme.of(context).colorScheme.tertiary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Material(
@@ -245,10 +245,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _settingsCard({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey[800]!,
+          color: Theme.of(context).colorScheme.outline,
           width: 1,
         ),
       ),
@@ -315,7 +315,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Divider(
       height: 1,
       thickness: 1,
-      color: Colors.grey[800],
+      color: Theme.of(context).colorScheme.outline,
       indent: 72,
     );
   }

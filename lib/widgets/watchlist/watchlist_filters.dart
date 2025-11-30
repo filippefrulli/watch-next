@@ -31,6 +31,7 @@ class WatchlistFilters extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: _buildFilterChip(
+                  context: context,
                   label: 'available_only'.tr(),
                   isSelected: showOnlyAvailable,
                   icon: Icons.check_circle,
@@ -47,7 +48,7 @@ class WatchlistFilters extends StatelessWidget {
 
   Widget _buildMediaTypeDropdown(BuildContext context) {
     return Material(
-      color: Colors.grey[850],
+      color: Theme.of(context).colorScheme.tertiary,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -117,7 +118,7 @@ class WatchlistFilters extends StatelessWidget {
     showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(16, 200, 16, 0),
-      color: Colors.grey[850],
+      color: Theme.of(context).colorScheme.tertiary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.grey[700]!, width: 1),
@@ -167,13 +168,14 @@ class WatchlistFilters extends StatelessWidget {
   }
 
   Widget _buildFilterChip({
+    required BuildContext context,
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
     IconData? icon,
   }) {
     return Material(
-      color: isSelected ? Colors.orange.withOpacity(0.2) : Colors.grey[850],
+      color: isSelected ? Colors.orange.withOpacity(0.2) : Theme.of(context).colorScheme.tertiary,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),

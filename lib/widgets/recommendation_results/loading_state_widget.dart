@@ -31,7 +31,7 @@ class LoadingStateWidget extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.grey[800]!,
+                color: Theme.of(context).colorScheme.outline,
                 width: 2,
               ),
             ),

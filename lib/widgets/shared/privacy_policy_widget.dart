@@ -16,11 +16,11 @@ class PrivacyPolicy extends StatelessWidget {
         },
         child: Icon(
           Icons.chevron_left,
-          color: Colors.grey[900],
+          color: Colors.black,
           size: 32,
         ),
       ),
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),

@@ -23,9 +23,9 @@ class StreamingInfoWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -96,7 +96,7 @@ class StreamingInfoWidget extends StatelessWidget {
           fit: BoxFit.fill,
           imageUrl: "https://image.tmdb.org/t/p/original//${item.logoPath}",
           placeholder: (context, url) => Container(
-            color: const Color.fromRGBO(11, 14, 23, 1),
+            color: Theme.of(context).colorScheme.primary,
           ),
           errorWidget: (context, url, error) => Container(
             color: Colors.grey,

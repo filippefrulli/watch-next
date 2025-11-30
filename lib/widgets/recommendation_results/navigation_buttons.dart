@@ -27,10 +27,10 @@ class NavigationButtons extends StatelessWidget {
         // Previous button
         Container(
           decoration: BoxDecoration(
-            color: currentIndex == 0 ? Colors.grey[850] : Colors.grey[900],
+            color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: currentIndex == 0 ? Colors.grey[800]! : Colors.orange.withValues(alpha: 0.3),
+              color: currentIndex == 0 ? Theme.of(context).colorScheme.outline : Colors.orange.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -53,10 +53,12 @@ class NavigationButtons extends StatelessWidget {
         // Next button
         Container(
           decoration: BoxDecoration(
-            color: currentIndex == totalCount - 1 ? Colors.grey[850] : Colors.grey[900],
+            color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: currentIndex == totalCount - 1 ? Colors.grey[800]! : Colors.orange.withValues(alpha: 0.3),
+              color: currentIndex == totalCount - 1
+                  ? Theme.of(context).colorScheme.outline
+                  : Colors.orange.withValues(alpha: 0.3),
               width: 1,
             ),
           ),

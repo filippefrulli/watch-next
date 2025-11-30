@@ -95,7 +95,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
             msg: 'removed_from_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             textColor: Colors.white,
           );
         }
@@ -113,7 +113,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
             msg: 'added_to_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             textColor: Colors.white,
           );
         }
@@ -137,7 +137,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: SlidingUpPanel(
         controller: pc,
         margin: const EdgeInsets.all(8.0),
@@ -160,7 +160,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         maxHeight: MediaQuery.of(context).size.height * 0.90,
         backdropEnabled: true,
         backdropOpacity: 0.8,
-        color: const Color.fromRGBO(11, 14, 23, 1),
+        color: Theme.of(context).colorScheme.primary,
         body: pageBody(),
       ),
     );

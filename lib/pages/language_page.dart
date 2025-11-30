@@ -36,7 +36,7 @@ class _LanguagePageState extends State<LanguagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: body(),
     );
   }
@@ -133,10 +133,10 @@ class _LanguagePageState extends State<LanguagePage> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.grey[800]!,
+            color: Theme.of(context).colorScheme.outline,
             width: 1,
           ),
         ),
@@ -150,7 +150,7 @@ class _LanguagePageState extends State<LanguagePage> {
             separatorBuilder: (context, index) => Divider(
               height: 1,
               thickness: 1,
-              color: Colors.grey[800],
+              color: Theme.of(context).colorScheme.outline,
               indent: 72,
             ),
             itemBuilder: (context, index) {
@@ -185,13 +185,9 @@ class _LanguagePageState extends State<LanguagePage> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Row(
             children: [
-              Container(
+              SizedBox(
                 width: 48,
                 height: 48,
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.orange : Colors.grey[800],
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: Center(
                   child: Text(
                     languageFlags[index],

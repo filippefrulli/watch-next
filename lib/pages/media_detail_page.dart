@@ -87,9 +87,9 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -195,7 +195,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
         width: 250,
         height: 375,
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Icon(
@@ -215,7 +215,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
         placeholder: (context, url) => Container(
           width: 250,
           height: 375,
-          color: Colors.grey[800],
+          color: Theme.of(context).colorScheme.tertiary,
           child: Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
@@ -225,7 +225,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
         errorWidget: (context, url, error) => Container(
           width: 250,
           height: 375,
-          color: Colors.grey[800],
+          color: Theme.of(context).colorScheme.tertiary,
           child: Icon(
             Icons.error_outline,
             color: Colors.grey[600],
@@ -247,7 +247,6 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
-            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
@@ -255,10 +254,10 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.grey[900],
+              color: Theme.of(context).colorScheme.tertiary,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.grey[800]!,
+                color: Theme.of(context).colorScheme.outline,
                 width: 1,
               ),
             ),
@@ -287,10 +286,12 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           if (_streamingProviders.isNotEmpty) ...[
             _buildSectionHeader('stream'.tr(), Icons.play_circle_outline, Colors.green),
             const SizedBox(height: 12),
-            ..._streamingProviders.map((provider) {
-              final isSubscribed = _userServiceIds.contains(provider.providerId);
-              return _buildProviderCard(provider, isSubscribed);
-            }).toList(),
+            ..._streamingProviders.map(
+              (provider) {
+                final isSubscribed = _userServiceIds.contains(provider.providerId);
+                return _buildProviderCard(provider, isSubscribed);
+              },
+            ),
             const SizedBox(height: 24),
           ],
 
@@ -298,9 +299,11 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           if (_rentProviders.isNotEmpty) ...[
             _buildSectionHeader('rent'.tr(), Icons.schedule, Colors.orange),
             const SizedBox(height: 12),
-            ..._rentProviders.map((provider) {
-              return _buildProviderCard(provider, false, showCheckmark: false);
-            }).toList(),
+            ..._rentProviders.map(
+              (provider) {
+                return _buildProviderCard(provider, false, showCheckmark: false);
+              },
+            ),
             const SizedBox(height: 24),
           ],
 
@@ -308,9 +311,11 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           if (_buyProviders.isNotEmpty) ...[
             _buildSectionHeader('buy'.tr(), Icons.shopping_cart_outlined, Colors.blue),
             const SizedBox(height: 12),
-            ..._buyProviders.map((provider) {
-              return _buildProviderCard(provider, false, showCheckmark: false);
-            }).toList(),
+            ..._buyProviders.map(
+              (provider) {
+                return _buildProviderCard(provider, false, showCheckmark: false);
+              },
+            ),
           ],
         ],
       ],
@@ -331,7 +336,6 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
-            fontWeight: FontWeight.w600,
           ),
         ),
       ],
@@ -343,10 +347,10 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isSubscribed ? Colors.green : Colors.grey[800]!,
+          color: isSubscribed ? Colors.green : Theme.of(context).colorScheme.outline,
           width: isSubscribed ? 2 : 1,
         ),
       ),
@@ -364,12 +368,12 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
                     placeholder: (context, url) => Container(
                       width: 48,
                       height: 48,
-                      color: Colors.grey[800],
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                     errorWidget: (context, url, error) => Container(
                       width: 48,
                       height: 48,
-                      color: Colors.grey[800],
+                      color: Theme.of(context).colorScheme.tertiary,
                       child: Icon(
                         Icons.tv,
                         color: Colors.grey[600],
@@ -380,7 +384,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
                 : Container(
                     width: 48,
                     height: 48,
-                    color: Colors.grey[800],
+                    color: Theme.of(context).colorScheme.tertiary,
                     child: Icon(
                       Icons.tv,
                       color: Colors.grey[600],
@@ -396,7 +400,6 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ),

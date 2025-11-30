@@ -28,7 +28,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
@@ -51,10 +51,10 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
             bottom: 0,
             child: Container(
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(11, 14, 23, 1),
+                color: Theme.of(context).colorScheme.primary,
                 border: Border(
                   top: BorderSide(
-                    color: Colors.grey[800]!,
+                    color: Theme.of(context).colorScheme.outline,
                     width: 1,
                   ),
                 ),

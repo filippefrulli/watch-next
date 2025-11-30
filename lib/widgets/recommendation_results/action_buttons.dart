@@ -41,9 +41,12 @@ class ActionButtons extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[800]!, width: 1),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+          width: 1,
+        ),
       ),
       child: TextButton(
         onPressed: () {
@@ -87,10 +90,10 @@ class ActionButtons extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: isInWatchlist ? Colors.orange.withOpacity(0.2) : Colors.grey[900],
+        color: isInWatchlist ? Colors.orange.withOpacity(0.2) : Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isInWatchlist ? Colors.orange : Colors.grey[800]!,
+          color: isInWatchlist ? Colors.orange : Theme.of(context).colorScheme.outline,
           width: 1,
         ),
       ),

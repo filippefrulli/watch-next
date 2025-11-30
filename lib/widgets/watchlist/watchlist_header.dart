@@ -22,19 +22,20 @@ class WatchlistHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          _buildImportButton(),
+          _buildImportButton(context),
           const SizedBox(width: 12),
-          _buildRefreshButton(),
+          _buildRefreshButton(context),
         ],
       ),
     );
   }
 
-  Widget _buildImportButton() {
+  Widget _buildImportButton(BuildContext context) {
     return Container(
       height: 40,
+      width: 60,
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
@@ -42,39 +43,22 @@ class WatchlistHeader extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: isImporting ? null : onImportTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.arrow_upward_outlined,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'import'.tr(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+          child: Icon(
+            Icons.arrow_upward_outlined,
+            color: Colors.white,
+            size: 20,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildRefreshButton() {
+  Widget _buildRefreshButton(BuildContext context) {
     return Container(
-      width: 40,
+      width: 60,
       height: 40,
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(

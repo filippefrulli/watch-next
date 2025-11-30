@@ -12,7 +12,7 @@ class ImportSourceDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.grey[850],
+      backgroundColor: Theme.of(context).colorScheme.tertiary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: Colors.grey[700]!, width: 1),
@@ -56,7 +56,7 @@ class ImportSourceDialog extends StatelessWidget {
     Color color,
   ) {
     return Material(
-      color: Colors.grey[800],
+      color: Theme.of(context).colorScheme.tertiary,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),

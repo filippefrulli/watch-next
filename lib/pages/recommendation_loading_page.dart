@@ -85,7 +85,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -99,7 +99,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Colors.grey[800]!,
+                        color: Theme.of(context).colorScheme.outline,
                         width: 2,
                       ),
                     ),
@@ -398,29 +398,29 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       request: const AdRequest(),
       nativeTemplateStyle: NativeTemplateStyle(
         templateType: TemplateType.medium,
-        mainBackgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        mainBackgroundColor: Theme.of(context).colorScheme.primary,
         cornerRadius: 15.0,
         callToActionTextStyle: NativeTemplateTextStyle(
-          textColor: Colors.grey[900],
+          textColor: Colors.black,
           backgroundColor: Colors.orange,
           style: NativeTemplateFontStyle.monospace,
           size: 16.0,
         ),
         primaryTextStyle: NativeTemplateTextStyle(
           textColor: Colors.orange,
-          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           style: NativeTemplateFontStyle.italic,
           size: 16.0,
         ),
         secondaryTextStyle: NativeTemplateTextStyle(
           textColor: Colors.grey[200],
-          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           style: NativeTemplateFontStyle.bold,
           size: 16.0,
         ),
         tertiaryTextStyle: NativeTemplateTextStyle(
           textColor: Colors.grey[200],
-          backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           style: NativeTemplateFontStyle.normal,
           size: 16.0,
         ),

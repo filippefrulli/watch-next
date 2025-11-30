@@ -65,7 +65,7 @@ class TrailerListWidget extends StatelessWidget {
                       width: 200,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: Colors.grey[850],
+                        color: Theme.of(context).colorScheme.tertiary,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +79,7 @@ class TrailerListWidget extends StatelessWidget {
                                     top: Radius.circular(12),
                                   ),
                                   border: Border.all(
-                                    color: Colors.grey[800]!,
+                                    color: Theme.of(context).colorScheme.outline,
                                     width: 1,
                                   ),
                                 ),

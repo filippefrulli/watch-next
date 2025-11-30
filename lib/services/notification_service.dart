@@ -142,7 +142,7 @@ class NotificationService {
     final shouldRequest = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Theme.of(context).colorScheme.tertiary,
         title: const Text(
           'Enable Notifications?',
           style: TextStyle(color: Colors.white),

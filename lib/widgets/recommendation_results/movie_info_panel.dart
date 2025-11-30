@@ -71,7 +71,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
             msg: 'removed_from_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             textColor: Colors.white,
           );
         }
@@ -89,7 +89,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
             msg: 'added_to_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             textColor: Colors.white,
           );
         }
@@ -108,8 +108,8 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color.fromRGBO(11, 14, 23, 1),
-              Colors.grey[900]!.withValues(alpha: 0.95),
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.95),
             ],
           ),
         ),
@@ -169,7 +169,9 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: _isInWatchlist ? Colors.orange.withOpacity(0.2) : Colors.grey[850],
+                                color: _isInWatchlist
+                                    ? Colors.orange.withOpacity(0.2)
+                                    : Theme.of(context).colorScheme.tertiary,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: _isInWatchlist ? Colors.orange : Colors.grey[700]!,
@@ -221,12 +223,15 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                             ),
                       ),
                       const SizedBox(height: 16),
-                      Container(height: 1, color: Colors.grey[800]),
+                      Container(
+                        height: 1,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
-                          color: Colors.grey[850],
+                          color: Theme.of(context).colorScheme.tertiary,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.orange.withValues(alpha: 0.3), width: 1),
                         ),
@@ -258,7 +263,10 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Container(height: 1, color: Colors.grey[800]),
+                      Container(
+                        height: 1,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                       const SizedBox(height: 8),
                       TrailerListWidget(
                         trailerList: widget.trailerList,

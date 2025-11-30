@@ -73,7 +73,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
         child: Column(
           children: [
@@ -82,10 +82,10 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
               padding: const EdgeInsets.all(16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[900],
+                  color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: Colors.grey[800]!,
+                    color: Theme.of(context).colorScheme.outline,
                     width: 1,
                   ),
                 ),
@@ -310,7 +310,7 @@ class _SearchResultCardState extends State<_SearchResultCard> {
             msg: 'removed_from_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             textColor: Colors.white,
           );
         }
@@ -328,7 +328,7 @@ class _SearchResultCardState extends State<_SearchResultCard> {
             msg: 'added_to_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             textColor: Colors.white,
           );
         }
@@ -345,10 +345,10 @@ class _SearchResultCardState extends State<_SearchResultCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey[800]!,
+          color: Theme.of(context).colorScheme.outline,
           width: 1,
         ),
       ),
@@ -520,7 +520,7 @@ class _SearchResultCardState extends State<_SearchResultCard> {
     return Container(
       width: 60,
       height: 90,
-      color: Colors.grey[800],
+      color: Theme.of(context).colorScheme.tertiary,
       child: Icon(
         Icons.movie_outlined,
         color: Colors.grey[600],

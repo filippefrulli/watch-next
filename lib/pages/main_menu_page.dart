@@ -9,9 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
-import 'package:watch_next/pages/search_media_page.dart';
 import 'package:watch_next/pages/settings_page.dart';
-import 'package:watch_next/pages/watchlist_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
@@ -60,7 +58,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         resizeToAvoidBottomInset: true,
         body: body(),
       ),
@@ -130,10 +128,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.grey[800]!,
+          color: Theme.of(context).colorScheme.outline,
           width: 1,
         ),
       ),
@@ -170,7 +168,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         child: IconButton(
           icon: Icon(
             Icons.help_outline_rounded,
-            color: Colors.grey[900],
+            color: Colors.black,
             size: 26,
           ),
           onPressed: () {
@@ -190,10 +188,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
   Widget switchWidget() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey[800]!,
+          color: Theme.of(context).colorScheme.outline,
           width: 1,
         ),
       ),
@@ -266,10 +264,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey[800]!,
+          color: Theme.of(context).colorScheme.outline,
           width: 1,
         ),
       ),
@@ -297,18 +295,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   height: 1.4,
                 ),
                 filled: true,
-                fillColor: Colors.grey[850],
+                fillColor: Theme.of(context).colorScheme.tertiary,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.orange,
-                    width: 2,
-                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -337,7 +328,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 end: Alignment.bottomRight,
               )
             : null,
-        color: enableLoading ? Colors.orange.withValues(alpha: 0.7) : (isLongEnough ? null : Colors.grey[800]),
+        color: enableLoading
+            ? Colors.orange.withValues(alpha: 0.7)
+            : (isLongEnough ? null : Theme.of(context).colorScheme.tertiary),
         borderRadius: BorderRadius.circular(12),
         boxShadow: isLongEnough && !enableLoading
             ? [
@@ -572,7 +565,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   ),
                 ],
               ),
-              backgroundColor: const Color.fromRGBO(220, 38, 38, 1),
+              backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -597,10 +590,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
             maxHeight: MediaQuery.of(context).size.height * 0.7,
           ),
           decoration: BoxDecoration(
-            color: const Color.fromRGBO(11, 14, 23, 1),
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Colors.grey[800]!,
+              color: Theme.of(context).colorScheme.outline,
               width: 1,
             ),
           ),
@@ -611,7 +604,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.grey[900],
+                  color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
@@ -624,8 +617,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         "need_inspiration".tr(),
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -665,10 +657,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
             maxHeight: MediaQuery.of(context).size.height * 0.7,
           ),
           decoration: BoxDecoration(
-            color: const Color.fromRGBO(11, 14, 23, 1),
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Colors.grey[800]!,
+              color: Theme.of(context).colorScheme.outline,
               width: 1,
             ),
           ),
@@ -679,7 +671,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.grey[900],
+                  color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
@@ -692,8 +684,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         "need_inspiration".tr(),
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -728,10 +719,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.grey[800]!,
+          color: Theme.of(context).colorScheme.outline,
           width: 1,
         ),
       ),

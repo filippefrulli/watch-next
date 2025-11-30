@@ -91,7 +91,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
         child: Column(
           children: [
@@ -179,7 +179,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
               await _refreshAvailability(item);
             }
           },
-          backgroundColor: Colors.grey[850],
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
           color: Colors.white,
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -272,7 +272,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             title: Text(
               'error_occurred'.tr(),
               style: const TextStyle(color: Colors.white),
@@ -345,7 +345,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: Colors.grey[850],
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
             title: Text(
               'error_occurred'.tr(),
               style: const TextStyle(color: Colors.white),

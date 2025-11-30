@@ -16,7 +16,7 @@ class ErrorStateWidget extends StatelessWidget {
         margin: const EdgeInsets.all(24),
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.red.withValues(alpha: 0.3), width: 2),
         ),

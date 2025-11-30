@@ -10,9 +10,7 @@ import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:file_picker/file_picker.dart';
 
 class WatchlistPage extends StatefulWidget {
-  final bool isTab;
-
-  const WatchlistPage({super.key, this.isTab = false});
+  const WatchlistPage({super.key});
 
   @override
   State<WatchlistPage> createState() => _WatchlistPageState();
@@ -90,66 +88,80 @@ class _WatchlistPageState extends State<WatchlistPage> {
       body: SafeArea(
         child: Column(
           children: [
-            if (!widget.isTab)
-              _buildHeader()
-            else
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[850],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: _isImporting ? null : _importFromImdb,
-                          child: const Icon(
-                            Icons.upload_file,
-                            color: Colors.white,
-                            size: 20,
+                        onTap: _isImporting ? null : _showImportSourceDialog,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.arrow_upward_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'import'.tr(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[850],
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: _isRefreshing ? null : _refreshAllAvailability,
-                          child: _isRefreshing
-                              ? Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.refresh,
+                        onTap: _isRefreshing ? null : _refreshAllAvailability,
+                        child: _isRefreshing
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: CircularProgressIndicator(
                                   color: Colors.white,
-                                  size: 20,
+                                  strokeWidth: 2,
                                 ),
-                        ),
+                              )
+                            : const Icon(
+                                Icons.refresh,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 16),
             _buildFilters(),
             Expanded(
               child: StreamBuilder<List<WatchlistItem>>(
@@ -232,94 +244,121 @@ class _WatchlistPageState extends State<WatchlistPage> {
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey[850],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () => Navigator.pop(context),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
+  Future<void> _showImportSourceDialog() async {
+    final source = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[850],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey[700]!, width: 1),
+        ),
+        title: Text(
+          'import_from'.tr(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              'watchlist'.tr(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildImportSourceOption(
+              context,
+              'IMDb',
+              'imdb',
+              Icons.movie,
+              Colors.amber,
             ),
-          ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey[850],
-              borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 12),
+            _buildImportSourceOption(
+              context,
+              'Trakt.tv',
+              'trakt',
+              Icons.tv,
+              Colors.red,
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: _isImporting ? null : _importFromImdb,
-                child: const Icon(
-                  Icons.upload_file,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
+            const SizedBox(height: 12),
+            _buildImportSourceOption(
+              context,
+              'Letterboxd',
+              'letterboxd',
+              Icons.local_movies,
+              Colors.green,
             ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey[850],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: _isRefreshing ? null : _refreshAllAvailability,
-                child: _isRefreshing
-                    ? Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Icon(
-                        Icons.refresh,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+
+    if (source != null) {
+      _importFromSource(source);
+    }
+  }
+
+  Widget _buildImportSourceOption(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Material(
+      color: Colors.grey[800],
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => Navigator.of(context).pop(value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.grey[700]!,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey[400],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _importFromSource(String source) async {
+    // For now, all sources use the same CSV import logic
+    // In the future, you can add specific handling for each source
+    await _importFromImdb();
   }
 
   Future<void> _importFromImdb() async {
@@ -529,7 +568,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         children: [
           Icon(
             Icons.bookmark_border,
-            size: 80,
+            size: 40,
             color: Colors.grey[600],
           ),
           const SizedBox(height: 16),
@@ -540,15 +579,6 @@ class _WatchlistPageState extends State<WatchlistPage> {
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'watchlist_empty_hint'.tr(),
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

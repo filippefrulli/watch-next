@@ -74,7 +74,6 @@
 
     "watchlist": "Watchlist",
     "watchlist_empty": "Your watchlist is empty",
-    "watchlist_empty_hint": "Add movies and TV shows to track their availability",
     "error_loading_watchlist": "Error loading watchlist",
     "available": "Available",
     "not_available": "Not available",
@@ -91,6 +90,8 @@
     "movies": "Movies",
     "tv_shows": "TV Shows",
     "available_only": "Available Only",
+    "import": "Import",
+    "import_from": "Import from",
     "importing_watchlist": "Importing watchlist...",
     "import_complete": "Import Complete",
     "import_results": "Added {success} items\nSkipped {skipped} (already in watchlist)\nFailed {failed}",

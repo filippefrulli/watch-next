@@ -74,7 +74,6 @@
 
     "watchlist": "Merkliste",
     "watchlist_empty": "Deine Merkliste ist leer",
-    "watchlist_empty_hint": "Füge Filme und Serien hinzu, um ihre Verfügbarkeit zu verfolgen",
     "error_loading_watchlist": "Fehler beim Laden der Merkliste",
     "available": "Verfügbar",
     "not_available": "Nicht verfügbar",
@@ -91,6 +90,8 @@
     "movies": "Filme",
     "tv_shows": "Serien",
     "available_only": "Nur Verfügbare",
+    "import": "Importieren",
+    "import_from": "Importieren von",
     "importing_watchlist": "Merkliste wird importiert...",
     "import_complete": "Import abgeschlossen",
     "import_results": "{success} Elemente hinzugefügt\n{skipped} übersprungen (bereits vorhanden)\n{failed} fehlgeschlagen",

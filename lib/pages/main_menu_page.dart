@@ -18,9 +18,7 @@ import 'package:watch_next/widgets/feedback_dialog.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
-  final bool isTab;
-
-  const MainMenuPage({super.key, this.isTab = false});
+  const MainMenuPage({super.key});
 
   @override
   State<MainMenuPage> createState() => _MainMenuPageState();
@@ -74,7 +72,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final tabBarHeight = widget.isTab ? 70 : 0;
+    final tabBarHeight = 70;
 
     // Calculate available height accounting for keyboard
     final availableHeight = screenHeight - topPadding - bottomPadding - tabBarHeight - bottomInset;
@@ -87,14 +85,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
-              if (!widget.isTab) ...[
-                topBar(),
-                const SizedBox(height: 32),
-                titleSection(),
-              ] else ...[
-                const SizedBox(height: 8),
-                topBar(),
-              ],
+              const SizedBox(height: 8),
+              topBar(),
               Expanded(
                 flex: 1,
                 child: Container(),
@@ -121,89 +113,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget topBar() {
-    if (widget.isTab) {
-      // In tab mode, show title centered with settings button on right
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Placeholder for symmetry (same size as settings button)
-          const SizedBox(width: 48, height: 48),
-          titleSection(),
-          settingsButton(),
-        ],
-      );
-    }
-
-    // Standalone mode - show all navigation buttons
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Placeholder for symmetry
+        // Placeholder for symmetry (same size as settings button)
         const SizedBox(width: 48, height: 48),
-        Expanded(
-          child: Container(),
-        ),
-        searchButton(),
-        const SizedBox(width: 12),
-        watchlistButton(),
-        const SizedBox(width: 12),
+        titleSection(),
         settingsButton(),
       ],
-    );
-  }
-
-  Widget searchButton() {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.orange,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () {
-            FirebaseAnalytics.instance.logEvent(
-              name: 'opened_search',
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SearchMediaPage(),
-              ),
-            );
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.search,
-                color: Colors.white,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'search'.tr(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -233,43 +151,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
           },
           child: Icon(
             Icons.settings_rounded,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget watchlistButton() {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: Colors.grey[850],
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.grey[800]!,
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () {
-            FirebaseAnalytics.instance.logEvent(
-              name: 'opened_watchlist',
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const WatchlistPage(),
-              ),
-            );
-          },
-          child: Icon(
-            Icons.bookmark_border,
             color: Colors.white,
             size: 24,
           ),

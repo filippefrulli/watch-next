@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/main_menu_page.dart';
+import 'package:watch_next/pages/home_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 
@@ -213,7 +213,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                   } else if (mounted && !seen) {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => const MainMenuPage(),
+                        builder: (context) => const TabNavigationPage(),
                       ),
                     );
                   }

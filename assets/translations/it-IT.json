@@ -74,7 +74,6 @@
 
     "watchlist": "Lista preferiti",
     "watchlist_empty": "La tua lista è vuota",
-    "watchlist_empty_hint": "Aggiungi film e serie per seguire la loro disponibilità",
     "error_loading_watchlist": "Errore nel caricamento della lista",
     "available": "Disponibile",
     "not_available": "Non disponibile",
@@ -91,6 +90,8 @@
     "movies": "Film",
     "tv_shows": "Serie TV",
     "available_only": "Solo Disponibili",
+    "import": "Importa",
+    "import_from": "Importa da",
     "importing_watchlist": "Importazione in corso...",
     "import_complete": "Importazione completata",
     "import_results": "{success} elementi aggiunti\n{skipped} saltati (già nella lista)\n{failed} falliti",

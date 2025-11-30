@@ -74,7 +74,6 @@
 
     "watchlist": "Lista de seguimiento",
     "watchlist_empty": "Tu lista de seguimiento está vacía",
-    "watchlist_empty_hint": "Añade películas y series para seguir su disponibilidad",
     "error_loading_watchlist": "Error al cargar la lista de seguimiento",
     "available": "Disponible",
     "not_available": "No disponible",
@@ -91,6 +90,8 @@
     "movies": "Películas",
     "tv_shows": "Series",
     "available_only": "Solo Disponibles",
+    "import": "Importar",
+    "import_from": "Importar desde",
     "importing_watchlist": "Importando lista...",
     "import_complete": "Importación completada",
     "import_results": "{success} elementos añadidos\n{skipped} omitidos (ya en la lista)\n{failed} fallidos",

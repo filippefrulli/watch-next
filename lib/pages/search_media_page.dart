@@ -9,9 +9,7 @@ import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
 
 class SearchMediaPage extends StatefulWidget {
-  final bool isTab;
-
-  const SearchMediaPage({super.key, this.isTab = false});
+  const SearchMediaPage({super.key});
 
   @override
   State<SearchMediaPage> createState() => _SearchMediaPageState();
@@ -76,24 +74,6 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      appBar: widget.isTab
-          ? null
-          : AppBar(
-              backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-              elevation: 0,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context),
-              ),
-              title: Text(
-                'search_media'.tr(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
       body: SafeArea(
         child: Column(
           children: [
@@ -224,7 +204,7 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
               Icon(
                 Icons.movie_outlined,
                 color: Colors.grey[700],
-                size: 64,
+                size: 40,
               ),
               const SizedBox(height: 16),
               Text(
@@ -233,18 +213,8 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
                 style: TextStyle(
                   color: Colors.grey[400],
                   fontSize: 18,
-                  fontWeight: FontWeight.w600,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'search_media_start_typing'.tr(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
-              ),
+              )
             ],
           ),
         ),

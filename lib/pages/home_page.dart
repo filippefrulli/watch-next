@@ -38,9 +38,9 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
             child: TabBarView(
               controller: _tabController,
               children: const [
-                WatchlistPage(isTab: true),
-                MainMenuPage(isTab: true),
-                SearchMediaPage(isTab: true),
+                WatchlistPage(),
+                MainMenuPage(),
+                SearchMediaPage(),
               ],
             ),
           ),

@@ -9,7 +9,9 @@ import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
 
 class SearchMediaPage extends StatefulWidget {
-  const SearchMediaPage({super.key});
+  final bool isTab;
+
+  const SearchMediaPage({super.key, this.isTab = false});
 
   @override
   State<SearchMediaPage> createState() => _SearchMediaPageState();
@@ -74,87 +76,91 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'search_media'.tr(),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[900],
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: Colors.grey[800]!,
-                  width: 1,
-                ),
+      appBar: widget.isTab
+          ? null
+          : AppBar(
+              backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
               ),
-              child: TextField(
-                controller: _searchController,
-                autofocus: true,
+              title: Text(
+                'search_media'.tr(),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-                decoration: InputDecoration(
-                  hintText: 'search_for_media'.tr(),
-                  hintStyle: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16,
-                  ),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(Icons.clear, color: Colors.grey[600]),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {
-                              _searchResults = [];
-                              _errorMessage = '';
-                            });
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {});
-                  // Debounce search - wait for user to stop typing
-                  Future.delayed(const Duration(milliseconds: 500), () {
-                    if (_searchController.text == value) {
-                      _performSearch(value);
-                    }
-                  });
-                },
-                onSubmitted: _performSearch,
               ),
             ),
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: Colors.grey[800]!,
+                    width: 1,
+                  ),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'search_for_media'.tr(),
+                    hintStyle: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 16,
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.clear, color: Colors.grey[600]),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                _searchResults = [];
+                                _errorMessage = '';
+                              });
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                    // Debounce search - wait for user to stop typing
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (_searchController.text == value) {
+                        _performSearch(value);
+                      }
+                    });
+                  },
+                  onSubmitted: _performSearch,
+                ),
+              ),
+            ),
 
-          // Results area
-          Expanded(
-            child: _buildResultsArea(),
-          ),
-        ],
+            // Results area
+            Expanded(
+              child: _buildResultsArea(),
+            ),
+          ],
+        ),
       ),
     );
   }

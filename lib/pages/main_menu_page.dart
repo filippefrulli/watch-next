@@ -18,7 +18,9 @@ import 'package:watch_next/widgets/feedback_dialog.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
-  const MainMenuPage({super.key});
+  final bool isTab;
+
+  const MainMenuPage({super.key, this.isTab = false});
 
   @override
   State<MainMenuPage> createState() => _MainMenuPageState();
@@ -57,41 +59,58 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
-      body: body(),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+        resizeToAvoidBottomInset: true,
+        body: body(),
+      ),
     );
   }
 
   Widget body() {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final tabBarHeight = widget.isTab ? 70 : 0;
+
+    // Calculate available height accounting for keyboard
+    final availableHeight = screenHeight - topPadding - bottomPadding - tabBarHeight - bottomInset;
+
     return SafeArea(
+      bottom: false,
       child: SizedBox(
-        height: MediaQuery.of(context).size.height,
+        height: availableHeight,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
-              topBar(),
-              const SizedBox(height: 32),
+              if (!widget.isTab) ...[
+                topBar(),
+                const SizedBox(height: 32),
+              ] else
+                const SizedBox(height: 16),
               titleSection(),
               Expanded(
+                flex: 1,
                 child: Container(),
               ),
               description(),
               const SizedBox(height: 32),
               switchWidget(),
               Expanded(
+                flex: 1,
                 child: Container(),
               ),
               examplesWidget(),
-              const SizedBox(
-                height: 16,
-              ),
+              const SizedBox(height: 16),
               Align(
                 alignment: Alignment.topLeft,
                 child: promptInput(),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -100,6 +119,17 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget topBar() {
+    if (widget.isTab) {
+      // In tab mode, only show settings button
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          settingsButton(),
+        ],
+      );
+    }
+
+    // Standalone mode - show all navigation buttons
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

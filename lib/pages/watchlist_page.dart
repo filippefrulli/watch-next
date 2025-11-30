@@ -10,7 +10,9 @@ import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:file_picker/file_picker.dart';
 
 class WatchlistPage extends StatefulWidget {
-  const WatchlistPage({super.key});
+  final bool isTab;
+
+  const WatchlistPage({super.key, this.isTab = false});
 
   @override
   State<WatchlistPage> createState() => _WatchlistPageState();
@@ -88,7 +90,66 @@ class _WatchlistPageState extends State<WatchlistPage> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            if (!widget.isTab)
+              _buildHeader()
+            else
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[850],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: _isImporting ? null : _importFromImdb,
+                          child: const Icon(
+                            Icons.upload_file,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[850],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: _isRefreshing ? null : _refreshAllAvailability,
+                          child: _isRefreshing
+                              ? Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.refresh,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             _buildFilters(),
             Expanded(
               child: StreamBuilder<List<WatchlistItem>>(

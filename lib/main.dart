@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
 import 'package:watch_next/pages/language_page.dart';
 import 'package:watch_next/services/notification_service.dart';
-import 'pages/main_menu_page.dart';
+import 'pages/home_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 void main() async {
@@ -69,9 +69,6 @@ class MyApp extends StatelessWidget {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         debugShowCheckedModeBanner: false,
-        routes: {
-          '/main': (BuildContext context) => const MainMenuPage(),
-        },
         builder: (context, child) {
           return ScrollConfiguration(
             behavior: MyBehavior(),
@@ -225,7 +222,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
       onPopInvoked: (didPop) {},
       child: const Scaffold(
         backgroundColor: Color.fromRGBO(11, 14, 23, 1),
-        body: MainMenuPage(),
+        resizeToAvoidBottomInset: false,
+        body: TabNavigationPage(),
       ),
     );
   }

@@ -42,13 +42,6 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
     });
 
     try {
-      FirebaseAnalytics.instance.logEvent(
-        name: 'media_search',
-        parameters: <String, Object>{
-          'query': query,
-        },
-      );
-
       final results = await HttpService().multiSearch(query);
 
       setState(() {
@@ -60,13 +53,6 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
         _isSearching = false;
         _errorMessage = 'search_error'.tr();
       });
-
-      FirebaseAnalytics.instance.logEvent(
-        name: 'search_error',
-        parameters: <String, Object>{
-          'error': e.toString(),
-        },
-      );
     }
   }
 
@@ -327,6 +313,13 @@ class _SearchResultCardState extends State<_SearchResultCard> {
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
+          FirebaseAnalytics.instance.logEvent(
+            name: 'watchlist_added',
+            parameters: <String, Object>{
+              'source': 'search',
+              'type': widget.result.isMovie ? 'movie' : 'show',
+            },
+          );
           Fluttertoast.showToast(
             msg: 'added_to_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
@@ -364,11 +357,9 @@ class _SearchResultCardState extends State<_SearchResultCard> {
                 borderRadius: BorderRadius.circular(12),
                 onTap: () async {
                   FirebaseAnalytics.instance.logEvent(
-                    name: 'search_result_tapped',
+                    name: 'search_result_clicked',
                     parameters: <String, Object>{
-                      'id': result.id,
-                      'title': result.displayTitle,
-                      'media_type': result.mediaType,
+                      'type': result.isMovie ? 'movie' : 'show',
                     },
                   );
 

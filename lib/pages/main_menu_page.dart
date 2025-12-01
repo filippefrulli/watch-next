@@ -172,12 +172,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
             size: 26,
           ),
           onPressed: () {
-            FirebaseAnalytics.instance.logEvent(
-              name: 'opened_examples',
-              parameters: <String, Object>{
-                "type": typeIsMovie == 0 ? "movie" : "show",
-              },
-            );
             typeIsMovie == 0 ? showExamples() : showExamplesShows();
           },
         ),

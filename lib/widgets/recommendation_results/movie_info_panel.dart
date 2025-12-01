@@ -1,5 +1,6 @@
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watch_next/objects/trailer.dart';
@@ -85,6 +86,13 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
+          FirebaseAnalytics.instance.logEvent(
+            name: 'watchlist_added',
+            parameters: <String, Object>{
+              'source': 'recommendation_info',
+              'type': widget.isMovie ? 'movie' : 'show',
+            },
+          );
           Fluttertoast.showToast(
             msg: 'added_to_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,

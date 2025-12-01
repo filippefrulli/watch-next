@@ -16,6 +16,7 @@ import 'package:watch_next/widgets/recommendation_results/recommendation_header.
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class RecommendationResultsPage extends StatefulWidget {
   final List<WatchObject> watchObjects;
@@ -109,6 +110,13 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
+          FirebaseAnalytics.instance.logEvent(
+            name: 'watchlist_added',
+            parameters: <String, Object>{
+              'source': 'recommendation',
+              'type': widget.type == 0 ? 'movie' : 'show',
+            },
+          );
           Fluttertoast.showToast(
             msg: 'added_to_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,

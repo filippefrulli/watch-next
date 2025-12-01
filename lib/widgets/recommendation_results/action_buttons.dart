@@ -49,15 +49,7 @@ class ActionButtons extends StatelessWidget {
         ),
       ),
       child: TextButton(
-        onPressed: () {
-          FirebaseAnalytics.instance.logEvent(
-            name: 'opened_info',
-            parameters: <String, Object>{
-              "type": mediaType == 0 ? "movie" : "show",
-            },
-          );
-          onInfoPressed();
-        },
+        onPressed: onInfoPressed,
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(

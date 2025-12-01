@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:watch_next/services/watchlist_service.dart';
@@ -282,6 +283,16 @@ class _WatchlistPageState extends State<WatchlistPage> {
       if (mounted) {
         Navigator.of(context).pop();
 
+        if (successCount > 0) {
+          FirebaseAnalytics.instance.logEvent(
+            name: 'watchlist_imported',
+            parameters: <String, Object>{
+              'source': 'imdb',
+              'count': successCount,
+            },
+          );
+        }
+
         showDialog(
           context: context,
           builder: (context) => ImportResultsDialog(
@@ -354,6 +365,16 @@ class _WatchlistPageState extends State<WatchlistPage> {
 
       if (mounted) {
         Navigator.of(context).pop();
+
+        if (successCount > 0) {
+          FirebaseAnalytics.instance.logEvent(
+            name: 'watchlist_imported',
+            parameters: <String, Object>{
+              'source': 'letterboxd',
+              'count': successCount,
+            },
+          );
+        }
 
         showDialog(
           context: context,

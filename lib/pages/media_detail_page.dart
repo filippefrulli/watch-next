@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
@@ -45,15 +44,6 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
     });
 
     try {
-      FirebaseAnalytics.instance.logEvent(
-        name: 'viewed_media_detail',
-        parameters: <String, Object>{
-          'media_id': widget.mediaId,
-          'title': widget.title,
-          'is_movie': widget.isMovie ? 'true' : 'false',
-        },
-      );
-
       // Load user's streaming service IDs
       _userServiceIds = await DatabaseService.getStreamingServicesIds();
 
@@ -74,13 +64,6 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
         _isLoading = false;
         _errorMessage = 'failed_load_streaming'.tr();
       });
-
-      FirebaseAnalytics.instance.logEvent(
-        name: 'media_detail_error',
-        parameters: <String, Object>{
-          'error': e.toString(),
-        },
-      );
     }
   }
 

@@ -101,6 +101,7 @@
     "letterboxd_step_3": "Wähle die heruntergeladene CSV-Datei aus",
     "letterboxd_import_error": "Import fehlgeschlagen. Bitte verwenden Sie einen gültigen Letterboxd CSV-Export.",
     "importing_watchlist": "Merkliste wird importiert...",
+    "import_please_wait": "Dies kann einen Moment dauern...",
     "import_complete": "Import abgeschlossen",
     "import_results": "{success} Elemente hinzugefügt\n{skipped} übersprungen (bereits vorhanden)\n{failed} fehlgeschlagen",
     "import_error": "Import fehlgeschlagen. Bitte verwenden Sie einen gültigen IMDb CSV-Export.",

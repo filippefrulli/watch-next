@@ -232,7 +232,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
 }
 
 class MyBehavior extends ScrollBehavior {
-  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
+  @override
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
     return child;
   }
 }

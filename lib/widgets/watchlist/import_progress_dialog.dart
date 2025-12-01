@@ -36,7 +36,7 @@ class ImportProgressDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'This may take a few moments...',
+              'import_please_wait'.tr(),
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 12,

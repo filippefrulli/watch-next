@@ -39,6 +39,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
   void initState() {
     super.initState();
     _loadUserServices();
+    _checkAndRefreshIfStale();
   }
 
   Future<void> _loadUserServices() async {
@@ -46,6 +47,28 @@ class _WatchlistPageState extends State<WatchlistPage> {
     setState(() {
       _userServiceIds = services;
     });
+  }
+
+  /// Check if availability cache is stale and refresh in background if needed
+  Future<void> _checkAndRefreshIfStale() async {
+    final isStale = await _watchlistService.isAvailabilityCacheStale();
+    if (isStale && mounted) {
+      // Wait a bit for the stream to provide items, then refresh in background
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted && _currentItems.isNotEmpty && !_isRefreshing) {
+          _refreshAllAvailabilityInBackground();
+        }
+      });
+    }
+  }
+
+  /// Refresh all availability in background without showing loading indicator
+  Future<void> _refreshAllAvailabilityInBackground() async {
+    for (var item in _currentItems) {
+      await _refreshAvailability(item);
+    }
+    // Update the last refresh timestamp after successful refresh
+    await _watchlistService.updateLastRefreshTimestamp();
   }
 
   Future<void> _refreshAllAvailability() async {
@@ -58,6 +81,9 @@ class _WatchlistPageState extends State<WatchlistPage> {
     for (var item in _currentItems) {
       await _refreshAvailability(item);
     }
+
+    // Update the last refresh timestamp after manual refresh
+    await _watchlistService.updateLastRefreshTimestamp();
 
     if (mounted) {
       setState(() {

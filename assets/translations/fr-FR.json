@@ -101,6 +101,7 @@
     "letterboxd_step_3": "Sélectionnez le fichier CSV téléchargé",
     "letterboxd_import_error": "Échec de l'importation. Veuillez utiliser un fichier CSV Letterboxd valide.",
     "importing_watchlist": "Importation en cours...",
+    "import_please_wait": "Cela peut prendre quelques instants...",
     "import_complete": "Importation terminée",
     "import_results": "{success} éléments ajoutés\n{skipped} ignorés (déjà dans la liste)\n{failed} échoués",
     "import_error": "Échec de l'importation. Veuillez utiliser un fichier CSV IMDb valide.",

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/services/notification_service.dart';
+import 'package:watch_next/services/http_service.dart';
 
 class WatchlistItem {
   final int mediaId;
@@ -81,6 +82,11 @@ class WatchlistItem {
 
 class WatchlistService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final HttpService _httpService = HttpService();
+
+  // Cache duration: 24 hours
+  static const Duration _cacheDuration = Duration(hours: 24);
+  static const String _lastRefreshKey = 'watchlist_last_availability_refresh';
 
   /// Get or create a unique device ID for this user
   Future<String> _getUserId() async {
@@ -103,6 +109,7 @@ class WatchlistService {
     required bool isMovie,
     String? posterPath,
     BuildContext? context,
+    bool fetchAvailability = true,
   }) async {
     final userId = await _getUserId();
 
@@ -121,6 +128,12 @@ class WatchlistService {
         .collection('watchlist')
         .doc(mediaId.toString())
         .set(item.toFirestore());
+
+    // Fetch availability in background after adding
+    if (fetchAvailability) {
+      // Don't await - let it run in background
+      fetchAndUpdateAvailability(mediaId, isMovie);
+    }
 
     // Request notification permission after first watchlist item
     if (context != null) {
@@ -185,5 +198,45 @@ class WatchlistService {
       'availability': availability,
       'lastChecked': Timestamp.now(),
     });
+  }
+
+  /// Fetch and update availability for a single item
+  Future<void> fetchAndUpdateAvailability(int mediaId, bool isMovie) async {
+    try {
+      final providers = await _httpService.getCategorizedWatchProviders(
+        mediaId,
+        isMovie,
+      );
+
+      final availabilityMap = {
+        'streaming': providers.streaming.map((s) => s.providerId).whereType<int>().toList(),
+        'rent': providers.rent.map((s) => s.providerId).whereType<int>().toList(),
+        'buy': providers.buy.map((s) => s.providerId).whereType<int>().toList(),
+      };
+
+      await updateAvailability(
+        mediaId: mediaId,
+        availability: availabilityMap,
+      );
+    } catch (e) {
+      // Silently fail - availability will be fetched on next refresh
+    }
+  }
+
+  /// Check if availability cache is stale (older than 24 hours)
+  Future<bool> isAvailabilityCacheStale() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastRefresh = prefs.getInt(_lastRefreshKey);
+
+    if (lastRefresh == null) return true;
+
+    final lastRefreshDate = DateTime.fromMillisecondsSinceEpoch(lastRefresh);
+    return DateTime.now().difference(lastRefreshDate) > _cacheDuration;
+  }
+
+  /// Update the last refresh timestamp
+  Future<void> updateLastRefreshTimestamp() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_lastRefreshKey, DateTime.now().millisecondsSinceEpoch);
   }
 }

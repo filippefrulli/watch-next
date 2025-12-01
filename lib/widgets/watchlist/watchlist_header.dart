@@ -66,11 +66,14 @@ class WatchlistHeader extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           onTap: isRefreshing ? null : onRefreshTap,
           child: isRefreshing
-              ? const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
+              ? const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
                   ),
                 )
               : const Icon(

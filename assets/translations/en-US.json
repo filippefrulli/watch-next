@@ -101,6 +101,7 @@
     "letterboxd_step_3": "Select the downloaded CSV file",
     "letterboxd_import_error": "Failed to import watchlist. Please make sure you're using a valid Letterboxd CSV export.",
     "importing_watchlist": "Importing watchlist...",
+    "import_please_wait": "This may take a few moments...",
     "import_complete": "Import Complete",
     "import_results": "Added {success} items\nSkipped {skipped} (already in watchlist)\nFailed {failed}",
     "import_error": "Failed to import watchlist. Please make sure you're using a valid IMDb CSV export.",

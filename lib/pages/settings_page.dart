@@ -153,11 +153,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           icon: Icons.share_rounded,
                           onTap: () {
                             if (Platform.isAndroid) {
-                              Share.share(
-                                  'Check out my app: https://play.google.com/store/apps/details?id=com.filippefrulli.watch_next');
+                              SharePlus.instance.share(ShareParams(
+                                  text:
+                                      'Check out my app: https://play.google.com/store/apps/details?id=com.filippefrulli.watch_next'));
                             } else if (Platform.isIOS) {
-                              Share.share(
-                                  'Check out my app: https://apps.apple.com/de/app/watch-next-ai-movie-assistant/id6450368827?l=en');
+                              SharePlus.instance.share(ShareParams(
+                                  text:
+                                      'Check out my app: https://apps.apple.com/de/app/watch-next-ai-movie-assistant/id6450368827?l=en'));
                             }
                           },
                         ),
@@ -279,7 +281,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.15),
+                  color: Colors.orange.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(

@@ -301,6 +301,9 @@ class _SearchResultCardState extends State<_SearchResultCard> {
   }
 
   Future<void> _toggleWatchlist() async {
+    // Capture theme color before async gap
+    final toastColor = Theme.of(context).colorScheme.tertiary;
+
     try {
       if (_isInWatchlist) {
         await _watchlistService.removeFromWatchlist(widget.result.id);
@@ -310,7 +313,7 @@ class _SearchResultCardState extends State<_SearchResultCard> {
             msg: 'removed_from_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
+            backgroundColor: toastColor,
             textColor: Colors.white,
           );
         }
@@ -328,13 +331,13 @@ class _SearchResultCardState extends State<_SearchResultCard> {
             msg: 'added_to_watchlist'.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
+            backgroundColor: toastColor,
             textColor: Colors.white,
           );
         }
       }
     } catch (e) {
-      print('Error toggling watchlist: $e');
+      // Handle errors if necessary
     }
   }
 
@@ -372,6 +375,8 @@ class _SearchResultCardState extends State<_SearchResultCard> {
                   // Increment successful query counter for feedback system
                   await FeedbackService.incrementSuccessfulQuery();
 
+                  if (!mounted || !context.mounted) return;
+
                   // Navigate to detail page and check for feedback dialog when returning
                   await Navigator.push(
                     context,
@@ -386,20 +391,18 @@ class _SearchResultCardState extends State<_SearchResultCard> {
                   );
 
                   // After returning from detail page, check if we should show feedback dialog
-                  if (mounted) {
-                    final shouldShow = await FeedbackService.shouldShowFeedbackDialog();
-                    if (shouldShow && mounted) {
-                      // Show dialog after user returns to search screen
-                      Future.delayed(const Duration(milliseconds: 300), () {
-                        if (mounted) {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (_) => const FeedbackDialog(),
-                          );
-                        }
-                      });
-                    }
+                  final shouldShow = await FeedbackService.shouldShowFeedbackDialog();
+                  if (shouldShow && mounted) {
+                    // Show dialog after user returns to search screen
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      if (mounted && context.mounted) {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const FeedbackDialog(),
+                        );
+                      }
+                    });
                   }
                 },
                 child: Padding(

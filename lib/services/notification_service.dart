@@ -130,6 +130,9 @@ class NotificationService {
 
   /// Manually request permission (for showing dialog first)
   static Future<bool> requestPermissionWithDialog(BuildContext context) async {
+    // Capture theme color before any async gaps
+    final dialogColor = Theme.of(context).colorScheme.tertiary;
+
     final prefs = await SharedPreferences.getInstance();
     final hasRequested = prefs.getBool(_permissionRequestedKey) ?? false;
 
@@ -138,11 +141,14 @@ class NotificationService {
       return await hasPermission();
     }
 
+    // Check if context is still valid after async gap
+    if (!context.mounted) return false;
+
     // Show dialog explaining why we need permission
     final shouldRequest = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.tertiary,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: dialogColor,
         title: const Text(
           'Enable Notifications?',
           style: TextStyle(color: Colors.white),
@@ -153,11 +159,11 @@ class NotificationService {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text('Not Now', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text('Enable', style: TextStyle(color: Colors.orange)),
           ),
         ],

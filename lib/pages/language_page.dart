@@ -87,7 +87,7 @@ class _LanguagePageState extends State<LanguagePage> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.orange.withOpacity(0.3),
+                color: Colors.orange.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -166,7 +166,7 @@ class _LanguagePageState extends State<LanguagePage> {
     bool isSelected = selected == index;
 
     return Material(
-      color: isSelected ? Colors.orange.withOpacity(0.1) : Colors.transparent,
+      color: isSelected ? Colors.orange.withValues(alpha: 0.1) : Colors.transparent,
       child: InkWell(
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -495,6 +495,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           // Increment successful query counter for feedback system
           await FeedbackService.incrementSuccessfulQuery();
 
+          if (!mounted) return;
           // Navigate to recommendation page and check for feedback dialog when returning
           await Navigator.of(context).push(
             MaterialPageRoute(

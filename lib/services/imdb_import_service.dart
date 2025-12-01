@@ -101,7 +101,6 @@ class ImdbImportService {
 
           successCount++;
         } catch (e) {
-          print('Error importing $title: $e');
           failedCount++;
         }
 
@@ -111,7 +110,6 @@ class ImdbImportService {
 
       return (successCount, skippedCount, failedCount);
     } catch (e) {
-      print('Error reading CSV: $e');
       rethrow;
     }
   }

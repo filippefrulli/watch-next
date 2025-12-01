@@ -1,7 +1,6 @@
 class WatchProviders {
   int? id;
-  // ignore: prefer_typing_uninitialized_variables
-  var results;
+  Map<String, dynamic>? results;
 
   WatchProviders({this.id, this.results});
 }

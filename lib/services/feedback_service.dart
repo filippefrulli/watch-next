@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -6,6 +7,9 @@ class FeedbackService {
   static const String _successfulQueriesKey = 'successful_queries_count';
   static const String _hasShownFeedbackDialogKey = 'has_shown_feedback_dialog';
   static const int _queriesBeforePrompt = 3;
+
+  static const String _appStoreId = '6450368827'; // Apple App Store ID
+  static const String _googlePlayId = 'com.filippefrulli.watchnext'; // Google Play package name
 
   /// Increment the successful query counter
   static Future<void> incrementSuccessfulQuery() async {
@@ -39,9 +43,11 @@ class FeedbackService {
       await inAppReview.requestReview();
     } else {
       // Fallback to opening store listing if in-app review not available
-      await inAppReview.openStoreListing(
-        appStoreId: 'YOUR_APP_STORE_ID', // TODO: Replace with actual App Store ID
-      );
+      if (Platform.isIOS) {
+        await inAppReview.openStoreListing(appStoreId: _appStoreId);
+      } else {
+        await inAppReview.openStoreListing(appStoreId: _googlePlayId);
+      }
     }
   }
 
@@ -58,7 +64,6 @@ class FeedbackService {
 
       return true;
     } catch (e) {
-      print('Error submitting feedback: $e');
       return false;
     }
   }

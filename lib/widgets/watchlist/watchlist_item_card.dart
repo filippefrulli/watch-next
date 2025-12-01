@@ -149,7 +149,7 @@ class WatchlistItemCard extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: isAvailable ? Colors.green.withOpacity(0.2) : Colors.grey.withOpacity(0.2),
+        color: isAvailable ? Colors.green.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isAvailable ? Colors.green : Colors.grey[600]!,

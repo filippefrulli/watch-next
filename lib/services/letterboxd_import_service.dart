@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/http_service.dart';
-import 'package:watch_next/objects/search_results.dart';
 
 class LetterboxdImportService {
   final WatchlistService _watchlistService = WatchlistService();
@@ -58,11 +57,9 @@ class LetterboxdImportService {
           String? resultTitle;
           String? posterPath;
 
-          if (result is Results) {
-            mediaId = result.id;
-            resultTitle = result.title ?? result.originalTitle;
-            posterPath = result.posterPath;
-          }
+          mediaId = result.id;
+          resultTitle = result.title ?? result.originalTitle;
+          posterPath = result.posterPath;
 
           if (mediaId == null) {
             failedCount++;
@@ -86,7 +83,6 @@ class LetterboxdImportService {
 
           successCount++;
         } catch (e) {
-          print('Error importing $title: $e');
           failedCount++;
         }
 
@@ -96,7 +92,6 @@ class LetterboxdImportService {
 
       return (successCount, skippedCount, failedCount);
     } catch (e) {
-      print('Error reading CSV: $e');
       rethrow;
     }
   }

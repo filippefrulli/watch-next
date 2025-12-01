@@ -119,7 +119,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         }
       }
     } catch (e) {
-      print('Error toggling watchlist: $e');
+      // Handle errors if necessary
     }
   }
 

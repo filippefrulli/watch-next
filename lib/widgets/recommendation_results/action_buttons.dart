@@ -90,7 +90,7 @@ class ActionButtons extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: isInWatchlist ? Colors.orange.withOpacity(0.2) : Theme.of(context).colorScheme.tertiary,
+        color: isInWatchlist ? Colors.orange.withValues(alpha: 0.2) : Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isInWatchlist ? Colors.orange : Theme.of(context).colorScheme.outline,

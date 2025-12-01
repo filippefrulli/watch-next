@@ -175,7 +175,7 @@ class WatchlistFilters extends StatelessWidget {
     IconData? icon,
   }) {
     return Material(
-      color: isSelected ? Colors.orange.withOpacity(0.2) : Theme.of(context).colorScheme.tertiary,
+      color: isSelected ? Colors.orange.withValues(alpha: 0.2) : Theme.of(context).colorScheme.tertiary,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),

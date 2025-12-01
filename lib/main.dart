@@ -221,7 +221,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: [SystemUiOverlay.top]);
 
     return PopScope(
-      onPopInvoked: (didPop) {},
+      onPopInvokedWithResult: (didPop, result) {},
       child: const Scaffold(
         backgroundColor: Color.fromRGBO(11, 14, 23, 1),
         resizeToAvoidBottomInset: false,

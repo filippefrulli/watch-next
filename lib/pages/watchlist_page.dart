@@ -84,7 +84,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         availability: availabilityMap,
       );
     } catch (e) {
-      print('Error refreshing availability: $e');
+      // Handle errors if necessary
     }
   }
 

@@ -175,8 +175,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
 
       String queryContent = widget.type == 0
-          ? 'prompt_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_2'.tr() + ' ' + doNotRecomment
-          : 'prompt_series_1'.tr() + ' ' + widget.requestString + '. ' + 'prompt_series_2'.tr() + ' ' + doNotRecomment;
+          ? '${'prompt_1'.tr()} ${widget.requestString}. ${'prompt_2'.tr()} $doNotRecomment'
+          : '${'prompt_series_1'.tr()} ${widget.requestString}. ${'prompt_series_2'.tr()} $doNotRecomment';
 
       // Direct HTTP request to Gemini API
       final url =

@@ -95,7 +95,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         }
       }
     } catch (e) {
-      print('Error toggling watchlist: $e');
+      // Handle errors if necessary
     }
   }
 
@@ -170,7 +170,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                               ),
                               decoration: BoxDecoration(
                                 color: _isInWatchlist
-                                    ? Colors.orange.withOpacity(0.2)
+                                    ? Colors.orange.withValues(alpha: 0.2)
                                     : Theme.of(context).colorScheme.tertiary,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(

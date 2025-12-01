@@ -87,7 +87,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.error_outline, size: 48, color: Colors.red),
@@ -193,7 +193,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.orange.withOpacity(0.3),
+                  color: Colors.orange.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -248,7 +248,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
         boxShadow: isSelected
             ? [
                 BoxShadow(
-                  color: Colors.orange.withOpacity(0.3),
+                  color: Colors.orange.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -294,7 +294,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 4,
                     ),
                   ],

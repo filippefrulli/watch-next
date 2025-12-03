@@ -88,7 +88,7 @@
     "all": "Tous",
     "movies": "Films",
     "tv_shows": "Séries",
-    "available_only": "Disponibles Seulement",
+    "available_only": "Disponibles",
     "import": "Importer",
     "import_from": "Importer depuis",
     "select_file": "Sélectionner le fichier",
@@ -135,5 +135,7 @@
     "prompt_2": "Rappel: Fais très attention aux critères liés au temps. Si l'utilisateur demande des films \"avant 1990\", chaque film doit être d'avant 1990. Respecte toutes les exigences spécifiques de l'utilisateur. Format de sortie: titre y:année,, titre y:année,, (pas de numérotation, pas d'explications, juste la liste).",
 
     "prompt_series_1": "Tu es un expert en recommandations de séries TV avec une connaissance approfondie de la télévision de toutes les décennies et de tous les genres. Ta tâche est d'analyser les critères de l'utilisateur et de renvoyer exactement 30 titres de séries TV uniques.\n\nFORMAT DE SORTIE: Renvoie les titres dans ce format exact: \"titre y:date de première diffusion\",, (avec des doubles virgules séparant chaque entrée, sur une ligne, pas de numérotation, pas de listes).\n\nEXEMPLE: Game of Thrones y:2011,, Stranger Things y:2016,, Les Soprano y:1999\n\nCONTRAINTES TEMPORELLES: Si l'utilisateur spécifie N'IMPORTE QUEL critère lié au temps (plages d'années, décennies, termes comme \"classiques\", \"vieilles séries\", \"vintage\", \"avant [année]\", \"après [année]\", \"des années [décennie]\"), tu DOIS strictement respecter cette contrainte. Renvoie UNIQUEMENT des séries de la période spécifiée.\n\nDISPONIBILITÉ EN STREAMING: Priorise les séries TV largement disponibles sur les services de streaming.\n\nTITRES SIMILAIRES: Si un nom de série spécifique est donné, renvoie cette série plus 29 similaires.\n\nCRITÈRES DE L'UTILISATEUR:",
-    "prompt_series_2": "Rappel: Fais très attention aux critères liés au temps. Si l'utilisateur demande des séries \"avant 1990\", chaque série doit être d'avant 1990. Respecte toutes les exigences spécifiques de l'utilisateur. Format de sortie: titre y:année,, titre y:année,, (pas de numérotation, pas d'explications, juste la liste)."
+    "prompt_series_2": "Rappel: Fais très attention aux critères liés au temps. Si l'utilisateur demande des séries \"avant 1990\", chaque série doit être d'avant 1990. Respecte toutes les exigences spécifiques de l'utilisateur. Format de sortie: titre y:année,, titre y:année,, (pas de numérotation, pas d'explications, juste la liste).",
+
+    "no_filter_results": "Aucun élément ne correspond à vos filtres"
 }

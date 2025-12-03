@@ -88,7 +88,7 @@
     "all": "All",
     "movies": "Movies",
     "tv_shows": "TV Shows",
-    "available_only": "Available Only",
+    "available_only": "Available",
     "import": "Import",
     "import_from": "Import from",
     "select_file": "Select File",
@@ -135,5 +135,7 @@
     "prompt_2": "Remember: Pay close attention to time-related criteria. If the user asks for movies \"before 1990\", every single movie must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).",
 
     "prompt_series_1": "You are a TV show recommendation expert with extensive knowledge of television across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique TV show titles.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:first air date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old shows\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY shows from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize TV shows that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific show name, return that show plus 29 similar ones.\n\nUSER CRITERIA:",
-    "prompt_series_2": "Remember: Pay close attention to time-related criteria. If the user asks for shows \"before 1990\", every single show must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list)."
+    "prompt_series_2": "Remember: Pay close attention to time-related criteria. If the user asks for shows \"before 1990\", every single show must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).",
+
+    "no_filter_results": "No items match your filters"
 }

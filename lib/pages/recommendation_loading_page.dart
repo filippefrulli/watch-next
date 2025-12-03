@@ -38,12 +38,21 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
   bool fetchingMovieInfo = false;
   bool filtering = false;
   String itemsToNotRecommend = '';
+  bool _adLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    loadAd();
     _loadRecommendations();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_adLoaded) {
+      _adLoaded = true;
+      loadAd();
+    }
   }
 
   @override

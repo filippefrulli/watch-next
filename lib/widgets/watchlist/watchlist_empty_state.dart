@@ -46,21 +46,12 @@ class WatchlistNoResultsState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No items match your filters',
+            'no_filter_results'.tr(),
             style: TextStyle(
               color: Colors.grey[400],
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try adjusting your filters',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

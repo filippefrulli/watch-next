@@ -88,7 +88,7 @@
     "all": "Todos",
     "movies": "Filmes",
     "tv_shows": "Séries",
-    "available_only": "Apenas Disponíveis",
+    "available_only": "Disponíveis",
     "import": "Importar",
     "import_from": "Importar de",
     "select_file": "Selecionar Arquivo",
@@ -135,5 +135,7 @@
     "prompt_2": "Lembre-se: Preste muita atenção aos critérios relacionados ao tempo. Se o usuário pedir filmes \"antes de 1990\", cada filme deve ser de antes de 1990. Atenda a todos os requisitos específicos do usuário. Formato de saída: título y:ano,, título y:ano,, (sem numeração, sem explicações, apenas a lista).",
 
     "prompt_series_1": "Você é um especialista em recomendação de séries com amplo conhecimento de televisão de todas as décadas e gêneros. Sua tarefa é analisar os critérios do usuário e retornar exatamente 30 títulos de séries únicos.\n\nFORMATO DE SAÍDA: Retorne títulos neste formato exato: \"título y:data de estreia\",, (com vírgulas duplas separando cada entrada, em uma linha, sem numeração, sem listas).\n\nEXEMPLO: Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\nRESTRIÇÕES DE TEMPO: Se o usuário especificar QUALQUER critério relacionado ao tempo (intervalos de anos, décadas, termos como \"clássicos\", \"séries antigas\", \"vintage\", \"antes de [ano]\", \"depois de [ano]\", \"dos anos [década]\"), você DEVE respeitar estritamente essa restrição. Retorne APENAS séries desse período especificado.\n\nDISPONIBILIDADE EM STREAMING: Priorize séries amplamente disponíveis em serviços de streaming.\n\nTÍTULOS SIMILARES: Se for dado um nome de série específico, retorne essa série mais 29 similares.\n\nCRITÉRIOS DO USUÁRIO:",
-    "prompt_series_2": "Lembre-se: Preste muita atenção aos critérios relacionados ao tempo. Se o usuário pedir séries \"antes de 1990\", cada série deve ser de antes de 1990. Atenda a todos os requisitos específicos do usuário. Formato de saída: título y:ano,, título y:ano,, (sem numeração, sem explicações, apenas a lista)."
+    "prompt_series_2": "Lembre-se: Preste muita atenção aos critérios relacionados ao tempo. Se o usuário pedir séries \"antes de 1990\", cada série deve ser de antes de 1990. Atenda a todos os requisitos específicos do usuário. Formato de saída: título y:ano,, título y:ano,, (sem numeração, sem explicações, apenas a lista).",
+
+    "no_filter_results": "Nenhum item corresponde aos seus filtros"
 }

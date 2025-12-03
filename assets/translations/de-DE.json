@@ -88,7 +88,7 @@
     "all": "Alle",
     "movies": "Filme",
     "tv_shows": "Serien",
-    "available_only": "Nur Verfügbare",
+    "available_only": "Verfügbare",
     "import": "Importieren",
     "import_from": "Importieren von",
     "select_file": "Datei auswählen",
@@ -135,5 +135,7 @@
     "prompt_2": "Denke daran: Achte genau auf zeitbezogene Kriterien. Wenn der Benutzer nach Filmen \"vor 1990\" fragt, muss jeder einzelne Film von vor 1990 sein. Erfülle alle spezifischen Anforderungen des Benutzers. Ausgabeformat: Titel y:Jahr,, Titel y:Jahr,, (keine Nummerierung, keine Erklärungen, nur die Liste).",
 
     "prompt_series_1": "Du bist ein TV-Serien-Empfehlungsexperte mit umfassendem Wissen über Fernsehen aus allen Jahrzehnten und Genres. Deine Aufgabe ist es, die Kriterien des Benutzers zu analysieren und genau 30 einzigartige TV-Serien-Titel zurückzugeben.\n\nAUSGABEFORMAT: Gib Titel in diesem exakten Format zurück: \"Titel y:Erstausstrahlungsdatum\",, (mit doppelten Kommas zwischen jedem Eintrag, in einer Zeile, keine Nummerierung, keine Listen).\n\nBEISPIEL: Game of Thrones y:2011,, Stranger Things y:2016,, Die Sopranos y:1999\n\nZEITBESCHRÄNKUNGEN: Wenn der Benutzer IRGENDWELCHE zeitbezogenen Kriterien angibt (Jahresbereiche, Jahrzehnte, Begriffe wie \"Klassiker\", \"alte Serien\", \"Vintage\", \"vor [Jahr]\", \"nach [Jahr]\", \"aus den [Jahrzehnt]\"), MUSST du diese Beschränkung strikt einhalten. Gib NUR Serien aus dem angegebenen Zeitraum zurück.\n\nSTREAMING-VERFÜGBARKEIT: Priorisiere TV-Serien, die weit verbreitet auf Streaming-Diensten verfügbar sind.\n\nÄHNLICHE TITEL: Wenn ein bestimmter Serienname angegeben wird, gib diese Serie plus 29 ähnliche zurück.\n\nBENUTZERKRITERIEN:",
-    "prompt_series_2": "Denke daran: Achte genau auf zeitbezogene Kriterien. Wenn der Benutzer nach Serien \"vor 1990\" fragt, muss jede einzelne Serie von vor 1990 sein. Erfülle alle spezifischen Anforderungen des Benutzers. Ausgabeformat: Titel y:Jahr,, Titel y:Jahr,, (keine Nummerierung, keine Erklärungen, nur die Liste)."
+    "prompt_series_2": "Denke daran: Achte genau auf zeitbezogene Kriterien. Wenn der Benutzer nach Serien \"vor 1990\" fragt, muss jede einzelne Serie von vor 1990 sein. Erfülle alle spezifischen Anforderungen des Benutzers. Ausgabeformat: Titel y:Jahr,, Titel y:Jahr,, (keine Nummerierung, keine Erklärungen, nur die Liste).",
+
+    "no_filter_results": "Keine Einträge entsprechen deinen Filtern"
 }

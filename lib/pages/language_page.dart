@@ -45,31 +45,39 @@ class _LanguagePageState extends State<LanguagePage> {
   }
 
   Widget body() {
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 60),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              Text(
-                'Select your language',
-                maxLines: 1,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displayLarge,
+    return SafeArea(
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        Text(
+                          'Select your language',
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  _languages(),
+                  const SizedBox(height: 24),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-        const SizedBox(height: 40),
-        _languages(),
-        Expanded(
-          child: Container(),
-        ),
-        _next(),
-        const SizedBox(height: 32),
-      ],
+          _next(),
+          const SizedBox(height: 32),
+        ],
+      ),
     );
   }
 

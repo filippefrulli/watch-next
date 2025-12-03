@@ -6,7 +6,7 @@ import 'package:in_app_review/in_app_review.dart';
 class FeedbackService {
   static const String _successfulQueriesKey = 'successful_queries_count';
   static const String _hasShownFeedbackDialogKey = 'has_shown_feedback_dialog';
-  static const int _queriesBeforePrompt = 3;
+  static const int _queriesBeforePrompt = 7;
 
   static const String _appStoreId = '6450368827'; // Apple App Store ID
   static const String _googlePlayId = 'com.filippefrulli.watch_next'; // Google Play package name

@@ -9,7 +9,7 @@ class FeedbackService {
   static const int _queriesBeforePrompt = 3;
 
   static const String _appStoreId = '6450368827'; // Apple App Store ID
-  static const String _googlePlayId = 'com.filippefrulli.watchnext'; // Google Play package name
+  static const String _googlePlayId = 'com.filippefrulli.watch_next'; // Google Play package name
 
   /// Increment the successful query counter
   static Future<void> incrementSuccessfulQuery() async {

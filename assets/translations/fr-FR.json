@@ -80,7 +80,6 @@
     "last_checked": "Dernière vérification {time}",
     "just_now": "à l'instant",
     "remove_from_watchlist": "Retirer de la liste",
-    "remove_watchlist_confirm": "Êtes-vous sûr de vouloir retirer ceci de votre liste ?",
     "cancel": "Annuler",
     "remove": "Retirer",
     "add_to_watchlist": "Ajouter à la liste",
@@ -103,7 +102,9 @@
     "importing_watchlist": "Importation en cours...",
     "import_please_wait": "Cela peut prendre quelques instants...",
     "import_complete": "Importation terminée",
-    "import_results": "{success} éléments ajoutés\n{skipped} ignorés (déjà dans la liste)\n{failed} échoués",
+    "import_added_items": "{count} éléments ajoutés",
+    "import_skipped_items": "{count} ignorés (déjà dans la liste)",
+    "import_failed_items": "{count} échoués",
     "import_error": "Échec de l'importation. Veuillez utiliser un fichier CSV IMDb valide.",
     "ok": "OK",
 
@@ -121,6 +122,9 @@
     "sending": "Envoi en cours...",
     "feedback_sent": "Merci pour vos commentaires!",
     "feedback_error": "Échec de l'envoi des commentaires. Veuillez réessayer.",
+    "send_feedback": "Envoyer des commentaires",
+    "feedback_settings_title": "Envoyez-nous vos commentaires",
+    "feedback_settings_message": "Vous avez une suggestion, une plainte ou vous voulez simplement dire bonjour? Nous serions ravis de vous entendre!",
 
     "select_streaming": "Sélectionne tes services de streaming",
 

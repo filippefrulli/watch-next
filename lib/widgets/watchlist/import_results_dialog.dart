@@ -36,19 +36,19 @@ class ImportResultsDialog extends StatelessWidget {
           _buildResultRow(
             Icons.check_circle,
             Colors.green,
-            'Added $successCount items',
+            'import_added_items'.tr(namedArgs: {'count': successCount.toString()}),
           ),
           const SizedBox(height: 12),
           _buildResultRow(
             Icons.info,
             Colors.orange,
-            'Skipped $skippedCount (already in watchlist)',
+            'import_skipped_items'.tr(namedArgs: {'count': skippedCount.toString()}),
           ),
           const SizedBox(height: 12),
           _buildResultRow(
             Icons.error_outline,
             Colors.red,
-            'Failed $failedCount',
+            'import_failed_items'.tr(namedArgs: {'count': failedCount.toString()}),
           ),
         ],
       ),

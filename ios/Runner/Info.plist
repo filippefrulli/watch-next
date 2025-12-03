@@ -21,6 +21,10 @@
 		<string>ar</string>
 		<string>es</string>
 		<string>fr</string>
+		<string>de</string>
+		<string>pt</string>
+		<string>ja</string>
+		<string>hi</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>watch_next</string>

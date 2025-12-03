@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/pages/language_page.dart';
 import 'package:watch_next/pages/region_page.dart';
 import 'package:watch_next/pages/streaming_services_page.dart';
+import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/widgets/shared/divider.dart';
 import 'package:watch_next/widgets/shared/privacy_policy_widget.dart';
 
@@ -161,6 +163,14 @@ class _SettingsPageState extends State<SettingsPage> {
                                   text:
                                       'Check out my app: https://apps.apple.com/de/app/watch-next-ai-movie-assistant/id6450368827?l=en'));
                             }
+                          },
+                        ),
+                        _divider(),
+                        _settingsTile(
+                          title: "send_feedback".tr(),
+                          icon: Icons.feedback_rounded,
+                          onTap: () {
+                            _showFeedbackDialog();
                           },
                         ),
                       ],
@@ -319,6 +329,141 @@ class _SettingsPageState extends State<SettingsPage> {
       thickness: 1,
       color: Theme.of(context).colorScheme.outline,
       indent: 72,
+    );
+  }
+
+  void _showFeedbackDialog() {
+    final TextEditingController feedbackController = TextEditingController();
+    bool isSubmitting = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'feedback_settings_title'.tr(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'feedback_settings_message'.tr(),
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                  child: TextField(
+                    controller: feedbackController,
+                    maxLines: 5,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: 'feedback_hint'.tr(),
+                      hintStyle: TextStyle(color: Colors.grey[600]),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(16),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[700],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => Navigator.pop(dialogContext),
+                            child: Center(
+                              child: Text(
+                                'cancel'.tr(),
+                                style: Theme.of(context).textTheme.displayMedium,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: isSubmitting ? Colors.orange.withValues(alpha: 0.7) : Colors.orange,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: isSubmitting
+                                ? null
+                                : () async {
+                                    if (feedbackController.text.trim().isEmpty) return;
+
+                                    setDialogState(() => isSubmitting = true);
+
+                                    final success = await FeedbackService.submitFeedback(
+                                      feedbackController.text,
+                                    );
+
+                                    if (!dialogContext.mounted) return;
+                                    Navigator.pop(dialogContext);
+
+                                    Fluttertoast.showToast(
+                                      msg: success ? 'feedback_sent'.tr() : 'feedback_error'.tr(),
+                                      toastLength: Toast.LENGTH_LONG,
+                                      gravity: ToastGravity.BOTTOM,
+                                      backgroundColor: success ? Colors.green : Colors.red,
+                                      textColor: Colors.white,
+                                    );
+                                  },
+                            child: Center(
+                              child: Text(
+                                isSubmitting ? 'sending'.tr() : 'send'.tr(),
+                                style: Theme.of(context).textTheme.displayMedium,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -18,13 +18,16 @@ class _LanguagePageState extends State<LanguagePage> {
     'Italiano',
     'Français',
     'Español',
+    'Português',
+    '日本語',
+    'हिन्दी',
   ];
 
-  static List<String> lang = ['en', 'de', 'it', 'fr', 'es'];
+  static List<String> lang = ['en', 'de', 'it', 'fr', 'es', 'pt', 'ja', 'hi'];
 
-  static List<String> regions = ['US', 'DE', 'IT', 'FR', 'ES'];
+  static List<String> regions = ['US', 'DE', 'IT', 'FR', 'ES', 'BR', 'JP', 'IN'];
 
-  static List<String> languageFlags = ['🇺🇸', '🇩🇪', '🇮🇹', '🇫🇷', '🇪🇸'];
+  static List<String> languageFlags = ['🇺🇸', '🇩🇪', '🇮🇹', '🇫🇷', '🇪🇸', '🇧🇷', '🇯🇵', '🇮🇳'];
 
   int selected = 21;
 

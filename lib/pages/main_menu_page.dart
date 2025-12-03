@@ -597,7 +597,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: const BorderRadius.only(
@@ -612,7 +612,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         "need_inspiration".tr(),
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 16,
                         ),
                       ),
                     ),
@@ -622,7 +622,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               // Content
               Flexible(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -712,7 +712,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   Widget _exampleItem(String text, IconData icon) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(14),
@@ -733,7 +733,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             child: Icon(
               icon,
               color: Colors.orange,
-              size: 18,
+              size: 14,
             ),
           ),
           const SizedBox(width: 12),

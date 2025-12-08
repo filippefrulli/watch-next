@@ -80,9 +80,9 @@ class MyApp extends StatelessWidget {
         },
         theme: ThemeData(
           colorScheme: theme.colorScheme.copyWith(
-            primary: const Color.fromRGBO(11, 14, 23, 1),
+            primary: const Color.fromARGB(255, 14, 14, 14),
             secondary: Colors.orange,
-            tertiary: const Color.fromARGB(255, 35, 42, 47),
+            tertiary: const Color.fromARGB(255, 30, 31, 31),
             outline: Colors.grey[800],
             brightness: Brightness.dark,
           ),

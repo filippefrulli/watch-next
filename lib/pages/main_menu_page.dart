@@ -2,17 +2,18 @@ import 'dart:async';
 import 'dart:io';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:toggle_switch/toggle_switch.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
-import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
+import 'package:watch_next/widgets/main_menu/examples_dialog.dart';
+import 'package:watch_next/widgets/main_menu/main_menu_top_bar.dart';
+import 'package:watch_next/widgets/main_menu/media_type_switch.dart';
+import 'package:watch_next/widgets/main_menu/prompt_input_widget.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
@@ -23,34 +24,37 @@ class MainMenuPage extends StatefulWidget {
 }
 
 class _MainMenuPageState extends State<MainMenuPage> {
-  int currentIndex = -1;
-
   late final OpenAIClient openAI;
-
   final _controller = TextEditingController();
+  final GlobalKey textFieldKey = GlobalKey();
 
   bool isLongEnough = false;
   bool isValidQuery = false;
   bool enableLoading = false;
-
-  GlobalKey textFieldKey = GlobalKey();
-  GlobalKey goButtonKey = GlobalKey();
-
   bool noInternet = false;
-  int typeIsMovie = 0; //0 = movie , 1 = show
+  int typeIsMovie = 0;
 
   @override
   void initState() {
     super.initState();
     openAI = OpenAIClient(apiKey: openApiKey);
-    _controller.addListener(checkLength);
-    _controller.text = '';
+    _controller.addListener(_checkLength);
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _checkLength() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          isLongEnough = _controller.text.length >= 5;
+        });
+      }
+    });
   }
 
   @override
@@ -60,19 +64,18 @@ class _MainMenuPageState extends State<MainMenuPage> {
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.primary,
         resizeToAvoidBottomInset: true,
-        body: body(),
+        body: _buildBody(),
       ),
     );
   }
 
-  Widget body() {
+  Widget _buildBody() {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final screenHeight = MediaQuery.of(context).size.height;
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final tabBarHeight = 70;
+    const tabBarHeight = 70;
 
-    // Calculate available height accounting for keyboard
     final availableHeight = screenHeight - topPadding - bottomPadding - tabBarHeight - bottomInset;
 
     return SafeArea(
@@ -84,23 +87,23 @@ class _MainMenuPageState extends State<MainMenuPage> {
           child: Column(
             children: [
               const SizedBox(height: 8),
-              topBar(),
-              Expanded(
-                flex: 1,
-                child: Container(),
-              ),
-              description(),
+              const MainMenuTopBar(),
+              const Spacer(),
+              _buildDescription(),
               const SizedBox(height: 32),
-              switchWidget(),
-              Expanded(
-                flex: 1,
-                child: Container(),
+              MediaTypeSwitch(
+                currentIndex: typeIsMovie,
+                onToggle: (index) => setState(() => typeIsMovie = index),
               ),
-              examplesWidget(),
+              const Spacer(),
+              ExamplesButton(isMovie: typeIsMovie == 0),
               const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.topLeft,
-                child: promptInput(),
+              PromptInputWidget(
+                controller: _controller,
+                textFieldKey: textFieldKey,
+                isLongEnough: isLongEnough,
+                enableLoading: enableLoading,
+                onGoPressed: _onGoPressed,
               ),
               const SizedBox(height: 16),
             ],
@@ -110,275 +113,30 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
-  Widget topBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Placeholder for symmetry (same size as settings button)
-        const SizedBox(width: 48, height: 48),
-        titleSection(),
-        settingsButton(),
-      ],
-    );
-  }
-
-  Widget settingsButton() {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SettingsPage(),
-              ),
-            );
-          },
-          child: Icon(
-            Icons.settings_rounded,
-            color: Colors.white,
-            size: 24,
+  Widget _buildDescription() {
+    return Text(
+      "find_something".tr(),
+      textAlign: TextAlign.center,
+      style: Theme.of(context).textTheme.displayMedium?.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            height: 1.4,
           ),
-        ),
-      ),
     );
   }
 
-  Widget examplesWidget() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: IconButton(
-          icon: Icon(
-            Icons.help_outline_rounded,
-            color: Colors.black,
-            size: 26,
-          ),
-          onPressed: () {
-            typeIsMovie == 0 ? showExamples() : showExamplesShows();
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget switchWidget() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-          width: 1,
-        ),
-      ),
-      padding: const EdgeInsets.all(4),
-      child: ToggleSwitch(
-        minWidth: 140.0,
-        minHeight: 48.0,
-        initialLabelIndex: typeIsMovie,
-        cornerRadius: 12.0,
-        animate: true,
-        animationDuration: 300,
-        activeFgColor: Colors.white,
-        inactiveBgColor: Colors.transparent,
-        inactiveFgColor: Colors.grey[400],
-        totalSwitches: 2,
-        labels: ['movie'.tr(), 'tv_show'.tr()],
-        customTextStyles: [
-          TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ],
-        activeBgColors: [
-          [Colors.orange],
-          [Colors.orange],
-        ],
-        onToggle: (index) {
-          setState(() {
-            typeIsMovie = index!;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget description() {
-    return Column(
-      children: [
-        Text(
-          "find_something".tr(),
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                height: 1.4,
-              ),
-        ),
-      ],
-    );
-  }
-
-  Widget titleSection() {
-    return Column(
-      children: [
-        DelayedDisplay(
-          fadingDuration: const Duration(milliseconds: 1000),
-          child: Text(
-            "hey_there".tr(),
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget promptInput() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: TextField(
-              key: textFieldKey,
-              autofocus: false,
-              showCursor: true,
-              maxLines: 4,
-              minLines: 1,
-              controller: _controller,
-              cursorColor: Colors.orange,
-              style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                    fontSize: 15,
-                    height: 1.4,
-                  ),
-              decoration: InputDecoration(
-                hintText: "hint".tr(),
-                hintStyle: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                  height: 1.4,
-                ),
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.tertiary,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          goButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget goButton() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      height: 48,
-      width: 48,
-      decoration: BoxDecoration(
-        gradient: isLongEnough && !enableLoading
-            ? LinearGradient(
-                colors: [Colors.orange, Colors.orange[700]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        color: enableLoading
-            ? Colors.orange.withValues(alpha: 0.7)
-            : (isLongEnough ? null : Theme.of(context).colorScheme.tertiary),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: isLongEnough && !enableLoading
-            ? [
-                BoxShadow(
-                  color: Colors.orange.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : [],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          key: goButtonKey,
-          borderRadius: BorderRadius.circular(12),
-          onTap: isLongEnough && !enableLoading ? goButtonPressed : null,
-          child: Center(
-            child: enableLoading
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 24,
-                    color: isLongEnough ? Colors.white : Colors.grey[600],
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void checkLength() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_controller.text.length >= 5 && mounted) {
-        setState(() {
-          isLongEnough = true;
-        });
+  Future<void> _checkConnection() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() => noInternet = false);
       }
-      if (_controller.text.length < 5 && mounted) {
-        setState(() {
-          isLongEnough = false;
-        });
-      }
-    });
+    } on SocketException catch (_) {
+      setState(() => noInternet = true);
+    }
   }
 
-  Future<void> validateQuery() async {
+  Future<void> _validateQuery() async {
     try {
       final response = await openAI.createChatCompletion(
         request: CreateChatCompletionRequest(
@@ -395,19 +153,13 @@ class _MainMenuPageState extends State<MainMenuPage> {
         ),
       );
 
-      if (response.choices.first.message.content == "YES" && mounted) {
+      if (mounted) {
         setState(() {
-          isValidQuery = true;
-          enableLoading = false;
-        });
-      } else {
-        setState(() {
-          isValidQuery = false;
+          isValidQuery = response.choices.first.message.content == "YES";
           enableLoading = false;
         });
       }
     } catch (e) {
-      // Log error to Firebase Analytics
       FirebaseAnalytics.instance.logEvent(
         name: 'api_error',
         parameters: <String, Object>{
@@ -417,11 +169,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
       );
 
       if (mounted) {
-        setState(() {
-          enableLoading = false;
-        });
-
-        // Show user-friendly error message
+        setState(() => enableLoading = false);
         showToastWidget(
           ToastWidget(
             title: "error_occurred".tr(),
@@ -433,24 +181,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
   }
 
-  Future<void> checkConnection() async {
-    try {
-      final result = await InternetAddress.lookup('example.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        setState(() {
-          noInternet = false;
-        });
-      }
-    } on SocketException catch (_) {
-      setState(() {
-        noInternet = true;
-      });
-    }
-  }
-
-  void goButtonPressed() async {
+  Future<void> _onGoPressed() async {
     FocusScope.of(context).unfocus();
-    await checkConnection();
+    await _checkConnection();
+
     if (noInternet) {
       showToastWidget(
         ToastWidget(
@@ -459,295 +193,114 @@ class _MainMenuPageState extends State<MainMenuPage> {
         ),
         duration: const Duration(seconds: 4),
       );
+      return;
+    }
+
+    if (!isLongEnough || !mounted) return;
+
+    setState(() {
+      enableLoading = true;
+      isValidQuery = false;
+    });
+
+    await _validateQuery();
+    if (!mounted) return;
+
+    if (isValidQuery) {
+      await _handleValidQuery();
     } else {
-      if (isLongEnough && mounted) {
-        setState(() {
-          enableLoading = true;
-          isValidQuery = false; // Reset state before validation
-        });
-        await validateQuery();
+      _handleInvalidQuery();
+    }
+  }
 
-        // Only proceed if still mounted and validation completed
-        if (!mounted) return;
+  Future<void> _handleValidQuery() async {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'valid_prompt',
+      parameters: <String, Object>{
+        "type": typeIsMovie == 0 ? "movie" : "show",
+      },
+    );
 
-        if (isValidQuery) {
-          // Log valid query with actual query text
-          FirebaseAnalytics.instance.logEvent(
-            name: 'valid_prompt',
-            parameters: <String, Object>{
-              "type": typeIsMovie == 0 ? "movie" : "show",
-            },
-          );
+    FirebaseFirestore.instance.collection('good_queries').add({
+      'type': typeIsMovie == 0 ? "movie" : "show",
+      'timestamp': FieldValue.serverTimestamp(),
+      'query': _controller.text,
+    });
 
-          // Log valid query to Firestore
-          FirebaseFirestore.instance.collection('good_queries').add({
-            'type': typeIsMovie == 0 ? "movie" : "show",
-            'timestamp': FieldValue.serverTimestamp(),
-            'query': _controller.text,
-          });
+    await FeedbackService.incrementSuccessfulQuery();
 
-          // Increment successful query counter for feedback system
-          await FeedbackService.incrementSuccessfulQuery();
+    if (!mounted) return;
 
-          if (!mounted) return;
-          // Navigate to recommendation page and check for feedback dialog when returning
-          await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => RecommendationLoadingPage(requestString: _controller.text, type: typeIsMovie),
-            ),
-          );
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RecommendationLoadingPage(
+          requestString: _controller.text,
+          type: typeIsMovie,
+        ),
+      ),
+    );
 
-          // After returning from recommendation page, check if we should show feedback dialog
+    if (mounted) {
+      final shouldShow = await FeedbackService.shouldShowFeedbackDialog();
+      if (shouldShow && mounted) {
+        Future.delayed(const Duration(milliseconds: 300), () {
           if (mounted) {
-            final shouldShow = await FeedbackService.shouldShowFeedbackDialog();
-            if (shouldShow && mounted) {
-              // Show dialog after user returns to main screen
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (mounted) {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (_) => const FeedbackDialog(),
-                  );
-                }
-              });
-            }
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => const FeedbackDialog(),
+            );
           }
-        } else {
-          // Log invalid query with actual query text
-          FirebaseAnalytics.instance.logEvent(
-            name: 'invalid_prompt',
-            parameters: <String, Object>{
-              "type": typeIsMovie == 0 ? "movie" : "show",
-            },
-          );
-
-          // Log invalid query to Firestore
-          FirebaseFirestore.instance.collection('invalid_queries').add({
-            'type': typeIsMovie == 0 ? "movie" : "show",
-            'timestamp': FieldValue.serverTimestamp(),
-            'query': _controller.text,
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      "invalid_query".tr(),
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        height: 1.4,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  InkWell(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              duration: const Duration(seconds: 8),
-            ),
-          );
-        }
+        });
       }
     }
   }
 
-  void showExamples() {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.7,
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-              width: 1,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "need_inspiration".tr(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Content
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _exampleItem("example_1".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_2".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_3".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_4".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_5".tr(), Icons.auto_awesome_rounded),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+  void _handleInvalidQuery() {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'invalid_prompt',
+      parameters: <String, Object>{
+        "type": typeIsMovie == 0 ? "movie" : "show",
+      },
     );
-  }
 
-  void showExamplesShows() {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.7,
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-              width: 1,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "need_inspiration".tr(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Content
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _exampleItem("example_show_1".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_show_2".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_show_3".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_show_4".tr(), Icons.auto_awesome_rounded),
-                      _exampleItem("example_show_5".tr(), Icons.auto_awesome_rounded),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+    FirebaseFirestore.instance.collection('invalid_queries').add({
+      'type': typeIsMovie == 0 ? "movie" : "show",
+      'timestamp': FieldValue.serverTimestamp(),
+      'query': _controller.text,
+    });
 
-  Widget _exampleItem(String text, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              icon,
-              color: Colors.orange,
-              size: 14,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                height: 1.4,
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Expanded(
+              child: Text(
+                "invalid_query".tr(),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  height: 1.4,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            InkWell(
+              onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                child: const Icon(Icons.close, color: Colors.white, size: 20),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        duration: const Duration(seconds: 8),
       ),
     );
   }

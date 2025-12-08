@@ -31,16 +31,15 @@ class WatchlistHeader extends StatelessWidget {
 
   Widget _buildImportButton(BuildContext context) {
     return Container(
-      height: 40,
-      width: 60,
+      height: 50,
+      width: 50,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
           onTap: isImporting ? null : onImportTap,
           child: Icon(
             Icons.arrow_upward_outlined,
@@ -54,8 +53,8 @@ class WatchlistHeader extends StatelessWidget {
 
   Widget _buildRefreshButton(BuildContext context) {
     return Container(
-      width: 60,
-      height: 40,
+      width: 50,
+      height: 50,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(12),

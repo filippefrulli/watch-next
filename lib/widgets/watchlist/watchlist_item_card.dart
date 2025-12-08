@@ -22,49 +22,59 @@ class WatchlistItemCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: Material(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MediaDetailPage(
-                  mediaId: item.mediaId,
-                  title: item.title,
-                  isMovie: item.isMovie,
-                  posterPath: item.posterPath,
-                ),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildPoster(context),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildInfo(isAvailable),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 0),
-                  child: SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      icon: const Icon(Icons.delete_outline, size: 20),
-                      color: Colors.grey[400],
-                      onPressed: onRemove,
-                    ),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
+            width: 1,
+          ),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MediaDetailPage(
+                    mediaId: item.mediaId,
+                    title: item.title,
+                    isMovie: item.isMovie,
+                    posterPath: item.posterPath,
                   ),
                 ),
-              ],
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildPoster(context),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildInfo(isAvailable),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 0),
+                    child: SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: const Icon(Icons.delete_outline, size: 20),
+                        color: Colors.grey[400],
+                        onPressed: onRemove,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

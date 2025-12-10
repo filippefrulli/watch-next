@@ -22,6 +22,28 @@
     "example_show_4": "A show with less than 5 seasons",
     "example_show_5": "A show that is reality television",
 
+    "query_settings": "Query Settings",
+    "release_period": "Release Period",
+    "reviews": "Reviews",
+    "any": "Any",
+    "recent": "Recent",
+    "classic": "Classic",
+    "positive": "Positive",
+    "great": "Great",
+    "popularity": "Popularity",
+    "very_popular": "Very popular",
+    "hidden_gem": "Hidden gem",
+    "duration": "Duration",
+    "duration_normal": "Normal (<2hrs)",
+    "duration_long": "Long (>2hrs)",
+    "completion_status": "Completion",
+    "finished": "Finished",
+    "ongoing": "Ongoing",
+    "season_count": "Seasons",
+    "seasons_short": "Up to 3",
+    "seasons_long": "4 or more",
+    "reset": "Reset",
+
     "here_recommendation": "We recommend",
     "watch_it_on": "Available on:",
     "accept": "Accept",
@@ -131,10 +153,10 @@
     "validation_prompt": "Your job is to validate wether a given sentence or word is a request to recommend a movie, criteria from which you can recommend a movie or a movie name. Examples of correct prompts are: \"romantic and funny, ideal for a first date\", \"starring Tom Cruise and directed by Steven Spielberg\", \"about artificial intelligence, with good reviews\", \"action and adventure\", \"funny\", \"Moana\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",
     "validation_prompt_series": "Your job is to validate wether a given sentence is a request to recommend a tv show, criteria from which you can recommend a tv show or a tv show name. Examples of correct prompts are: \"that has less than 5 seasons\", \"about sports\", \"with episodes shorter than 30 minutes\", \"funny\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",
 
-    "prompt_1": "You are a movie recommendation expert with extensive knowledge of cinema across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique movie titles.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:release date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: star wars y:1977,, Jurassic Park y:1993,, The Godfather y:1972\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old movies\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY movies from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize movies that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific movie name, return that movie plus 29 similar ones.\n\nUSER CRITERIA:",
+    "prompt_1": "You are a movie recommendation expert with extensive knowledge of cinema across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique movie titles.\n\nIMPORTANT: The user's request may be in ANY language (English, Spanish, German, French, Italian, Portuguese, Japanese, Hindi, etc.). Understand and process it regardless of the language used.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:release date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: star wars y:1977,, Jurassic Park y:1993,, The Godfather y:1972\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old movies\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY movies from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize movies that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific movie name, return that movie plus 29 similar ones.\n\nUSER CRITERIA:",
     "prompt_2": "Remember: Pay close attention to time-related criteria. If the user asks for movies \"before 1990\", every single movie must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).",
-
-    "prompt_series_1": "You are a TV show recommendation expert with extensive knowledge of television across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique TV show titles.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:first air date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old shows\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY shows from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize TV shows that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific show name, return that show plus 29 similar ones.\n\nUSER CRITERIA:",
+    
+    "prompt_series_1": "You are a TV show recommendation expert with extensive knowledge of television across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique TV show titles.\n\nIMPORTANT: The user's request may be in ANY language (English, Spanish, German, French, Italian, Portuguese, Japanese, Hindi, etc.). Understand and process it regardless of the language used.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:first air date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old shows\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY shows from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize TV shows that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific show name, return that show plus 29 similar ones.\n\nUSER CRITERIA:",
     "prompt_series_2": "Remember: Pay close attention to time-related criteria. If the user asks for shows \"before 1990\", every single show must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).",
 
     "no_filter_results": "No items match your filters"

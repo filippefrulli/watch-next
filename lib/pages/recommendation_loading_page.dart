@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
 
 class RecommendationLoadingPage extends StatefulWidget {
@@ -181,11 +182,11 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           )},';
         }
       }
-      String doNotRecomment = itemsToNotRecommend.isNotEmpty ? 'do_not_recommend'.tr() + itemsToNotRecommend : '';
+      String doNotRecommend = itemsToNotRecommend.isNotEmpty ? doNotRecommendPrefix + itemsToNotRecommend : '';
 
       String queryContent = widget.type == 0
-          ? '${'prompt_1'.tr()} ${widget.requestString}. ${'prompt_2'.tr()} $doNotRecomment'
-          : '${'prompt_series_1'.tr()} ${widget.requestString}. ${'prompt_series_2'.tr()} $doNotRecomment';
+          ? '$moviePrompt1 ${widget.requestString}. $moviePrompt2 $doNotRecommend'
+          : '$seriesPrompt1 ${widget.requestString}. $seriesPrompt2 $doNotRecommend';
 
       // Direct HTTP request to Gemini API
       final url =

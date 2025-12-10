@@ -9,11 +9,13 @@ import 'package:oktoast/oktoast.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
 import 'package:watch_next/widgets/main_menu/examples_dialog.dart';
 import 'package:watch_next/widgets/main_menu/main_menu_top_bar.dart';
 import 'package:watch_next/widgets/main_menu/media_type_switch.dart';
 import 'package:watch_next/widgets/main_menu/prompt_input_widget.dart';
+import 'package:watch_next/widgets/main_menu/query_settings_panel.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
 
 class MainMenuPage extends StatefulWidget {
@@ -33,12 +35,21 @@ class _MainMenuPageState extends State<MainMenuPage> {
   bool enableLoading = false;
   bool noInternet = false;
   int typeIsMovie = 0;
+  QuerySettings _querySettings = const QuerySettings();
 
   @override
   void initState() {
     super.initState();
     openAI = OpenAIClient(apiKey: openApiKey);
     _controller.addListener(_checkLength);
+    _loadQuerySettings();
+  }
+
+  Future<void> _loadQuerySettings() async {
+    final settings = await QuerySettingsService.load();
+    if (mounted) {
+      setState(() => _querySettings = settings);
+    }
   }
 
   @override
@@ -96,7 +107,20 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 onToggle: (index) => setState(() => typeIsMovie = index),
               ),
               const Spacer(),
-              ExamplesButton(isMovie: typeIsMovie == 0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  QuerySettingsButton(
+                    settings: _querySettings,
+                    onSettingsChanged: (settings) {
+                      setState(() => _querySettings = settings);
+                    },
+                    isMovie: typeIsMovie == 0,
+                  ),
+                  const SizedBox(width: 12),
+                  ExamplesButton(isMovie: typeIsMovie == 0),
+                ],
+              ),
               const SizedBox(height: 16),
               PromptInputWidget(
                 controller: _controller,
@@ -143,7 +167,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           model: ChatCompletionModel.modelId('gpt-5-mini'),
           messages: [
             ChatCompletionMessage.system(
-              content: typeIsMovie == 0 ? 'validation_prompt'.tr() : 'validation_prompt_series'.tr(),
+              content: typeIsMovie == 0 ? validationPromptMovie : validationPromptSeries,
             ),
             ChatCompletionMessage.user(
               content: ChatCompletionUserMessageContent.string(_controller.text),
@@ -231,10 +255,13 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
     if (!mounted) return;
 
+    // Build the full query with settings suffix
+    final fullQuery = _controller.text + _querySettings.toPromptSuffix(isMovie: typeIsMovie == 0);
+
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => RecommendationLoadingPage(
-          requestString: _controller.text,
+          requestString: fullQuery,
           type: typeIsMovie,
         ),
       ),

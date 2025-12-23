@@ -2,7 +2,6 @@ import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
@@ -68,13 +67,6 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         await _watchlistService.removeFromWatchlist(widget.mediaId);
         if (mounted) {
           setState(() => _isInWatchlist = false);
-          Fluttertoast.showToast(
-            msg: 'removed_from_watchlist'.tr(),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
-            textColor: Colors.white,
-          );
         }
       } else {
         await _watchlistService.addToWatchlist(
@@ -92,13 +84,6 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
               'source': 'recommendation_info',
               'type': widget.isMovie ? 'movie' : 'show',
             },
-          );
-          Fluttertoast.showToast(
-            msg: 'added_to_watchlist'.tr(),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
-            textColor: Colors.white,
           );
         }
       }

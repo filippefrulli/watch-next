@@ -1,10 +1,13 @@
 /// System prompts for AI recommendations
 /// These are kept in English only - the LLM is instructed to handle multilingual user input
+library;
 
-const String moviePrompt1 = '''
+String moviePrompt1(String country) => '''
 You are a movie recommendation expert with extensive knowledge of cinema across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique movie titles.
 
 IMPORTANT: The user's request may be in ANY language (English, Spanish, German, French, Italian, Portuguese, Japanese, Hindi, etc.). Understand and process it regardless of the language used.
+
+REGIONAL PREFERENCE: The user is located in $country. Include movies from $country or that are popular/relevant in $country when appropriate, alongside international recommendations. Prioritize a good mix.
 
 OUTPUT FORMAT: Return titles in this exact format: "title y:release date",, (with double commas separating each entry, on one line, no numbering, no lists).
 
@@ -21,10 +24,12 @@ USER CRITERIA:''';
 const String moviePrompt2 = '''
 Remember: Pay close attention to time-related criteria. If the user asks for movies "before 1990", every single movie must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).''';
 
-const String seriesPrompt1 = '''
+String seriesPrompt1(String country) => '''
 You are a TV show recommendation expert with extensive knowledge of television across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique TV show titles.
 
 IMPORTANT: The user's request may be in ANY language (English, Spanish, German, French, Italian, Portuguese, Japanese, Hindi, etc.). Understand and process it regardless of the language used.
+
+REGIONAL PREFERENCE: The user is located in $country. Include TV shows from $country or that are popular/relevant in $country when appropriate, alongside international recommendations. Prioritize a good mix.
 
 OUTPUT FORMAT: Return titles in this exact format: "title y:first air date",, (with double commas separating each entry, on one line, no numbering, no lists).
 

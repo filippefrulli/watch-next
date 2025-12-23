@@ -13,7 +13,6 @@ class RecommendationContent extends StatelessWidget {
   final int mediaType;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
-  final VoidCallback onAccept;
   final VoidCallback onInfoPressed;
   final VoidCallback onReloadPressed;
   final VoidCallback? onWatchlistPressed;
@@ -29,7 +28,6 @@ class RecommendationContent extends StatelessWidget {
     required this.mediaType,
     required this.onPrevious,
     required this.onNext,
-    required this.onAccept,
     required this.onInfoPressed,
     required this.onReloadPressed,
     this.onWatchlistPressed,
@@ -56,7 +54,6 @@ class RecommendationContent extends StatelessWidget {
             const SizedBox(width: 16),
             ActionButtons(
               showReloadButton: currentIndex == totalCount - 1,
-              onInfoPressed: onInfoPressed,
               onReloadPressed: onReloadPressed,
               onWatchlistPressed: onWatchlistPressed,
               isInWatchlist: isInWatchlist,
@@ -70,7 +67,7 @@ class RecommendationContent extends StatelessWidget {
           totalCount: totalCount,
           onPrevious: onPrevious,
           onNext: onNext,
-          onAccept: onAccept,
+          onInfoPressed: onInfoPressed,
         ),
         const SizedBox(height: 12),
       ],

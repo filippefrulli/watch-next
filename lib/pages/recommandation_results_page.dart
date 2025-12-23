@@ -3,8 +3,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/objects/movie_credits.dart';
@@ -15,7 +13,6 @@ import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 class RecommendationResultsPage extends StatefulWidget {
@@ -92,13 +89,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         await _watchlistService.removeFromWatchlist(selectedWatchObject.id!);
         if (mounted) {
           setState(() => _isInWatchlist = false);
-          Fluttertoast.showToast(
-            msg: 'removed_from_watchlist'.tr(),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
-            textColor: Colors.white,
-          );
         }
       } else {
         await _watchlistService.addToWatchlist(
@@ -116,13 +106,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               'source': 'recommendation',
               'type': widget.type == 0 ? 'movie' : 'show',
             },
-          );
-          Fluttertoast.showToast(
-            msg: 'added_to_watchlist'.tr(),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
-            textColor: Colors.white,
           );
         }
       }
@@ -183,6 +166,9 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
             currentIndex: index,
             totalCount: length,
             isLoading: false,
+            onClose: () {
+              Navigator.of(context).pop();
+            },
           ),
           const SizedBox(height: 8),
           Expanded(
@@ -214,13 +200,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                 });
                 _checkIfInWatchlist();
                 _preloadNextPoster();
-              },
-              onAccept: () async {
-                final prefs = await SharedPreferences.getInstance();
-                prefs.setInt('accepted_movie', selectedWatchObject.id!);
-                if (!mounted) return;
-                // Only pop once since loading page used pushReplacement
-                Navigator.of(context).pop();
               },
               onInfoPressed: () async {
                 movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);

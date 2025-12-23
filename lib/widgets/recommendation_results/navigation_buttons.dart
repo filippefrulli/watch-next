@@ -7,7 +7,7 @@ class NavigationButtons extends StatelessWidget {
   final int totalCount;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
-  final VoidCallback onAccept;
+  final VoidCallback onInfoPressed;
 
   const NavigationButtons({
     super.key,
@@ -15,7 +15,7 @@ class NavigationButtons extends StatelessWidget {
     required this.totalCount,
     required this.onPrevious,
     required this.onNext,
-    required this.onAccept,
+    required this.onInfoPressed,
   });
 
   @override
@@ -29,10 +29,6 @@ class NavigationButtons extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: currentIndex == 0 ? Theme.of(context).colorScheme.outline : Colors.orange.withValues(alpha: 0.3),
-              width: 1,
-            ),
           ),
           child: IconButton(
             onPressed: () {
@@ -48,19 +44,13 @@ class NavigationButtons extends StatelessWidget {
           ),
         ),
         Expanded(child: Container()),
-        _buildAcceptButton(context),
+        _buildInfoButton(context),
         Expanded(child: Container()),
         // Next button
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: currentIndex == totalCount - 1
-                  ? Theme.of(context).colorScheme.outline
-                  : Colors.orange.withValues(alpha: 0.3),
-              width: 1,
-            ),
           ),
           child: IconButton(
             onPressed: () {
@@ -80,41 +70,38 @@ class NavigationButtons extends StatelessWidget {
     );
   }
 
-  Widget _buildAcceptButton(BuildContext context) {
+  Widget _buildInfoButton(BuildContext context) {
     return Center(
       child: DelayedDisplay(
         delay: const Duration(milliseconds: 100),
         child: Container(
           height: 56,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
-            gradient: const LinearGradient(
-              colors: [Colors.orange, Color(0xFFFF8C00)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.orange.withValues(alpha: 0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(16),
           ),
           child: TextButton(
-            onPressed: onAccept,
+            onPressed: onInfoPressed,
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: Text(
-              "accept".tr(),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.keyboard_arrow_up_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  "open_info".tr(),
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
+              ],
             ),
           ),
         ),

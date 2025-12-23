@@ -7,6 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/utils/prompts.dart';
@@ -184,13 +186,22 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       }
       String doNotRecommend = itemsToNotRecommend.isNotEmpty ? doNotRecommendPrefix + itemsToNotRecommend : '';
 
+      // Get user's country for regional recommendations
+      final prefs = await SharedPreferences.getInstance();
+      final regionCode = prefs.getString('region') ?? 'US';
+      final region = availableRegions.firstWhere(
+        (r) => r.iso == regionCode,
+        orElse: () => Region(iso: 'US', englishName: 'United States', foreignName: 'United States'),
+      );
+      final countryName = region.englishName ?? 'United States';
+
       String queryContent = widget.type == 0
-          ? '$moviePrompt1 ${widget.requestString}. $moviePrompt2 $doNotRecommend'
-          : '$seriesPrompt1 ${widget.requestString}. $seriesPrompt2 $doNotRecommend';
+          ? '${moviePrompt1(countryName)} ${widget.requestString}. $moviePrompt2 $doNotRecommend'
+          : '${seriesPrompt1(countryName)} ${widget.requestString}. $seriesPrompt2 $doNotRecommend';
 
       // Direct HTTP request to Gemini API
       final url =
-          Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent');
+          Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent');
 
       final response = await http.post(
         url,
@@ -207,7 +218,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             }
           ],
           'generationConfig': {
-            'temperature': 1.0,
+            'thinkingConfig': {'thinkingLevel': 'low'}
           }
         }),
       );

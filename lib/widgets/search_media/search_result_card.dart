@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/http_service.dart';
@@ -38,20 +37,11 @@ class _SearchResultCardState extends State<SearchResultCard> {
   }
 
   Future<void> _toggleWatchlist() async {
-    final toastColor = Theme.of(context).colorScheme.tertiary;
-
     try {
       if (_isInWatchlist) {
         await _watchlistService.removeFromWatchlist(widget.result.id);
         if (mounted) {
           setState(() => _isInWatchlist = false);
-          Fluttertoast.showToast(
-            msg: 'removed_from_watchlist'.tr(),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: toastColor,
-            textColor: Colors.white,
-          );
         }
       } else {
         await _watchlistService.addToWatchlist(
@@ -69,13 +59,6 @@ class _SearchResultCardState extends State<SearchResultCard> {
               'source': 'search',
               'type': widget.result.isMovie ? 'movie' : 'show',
             },
-          );
-          Fluttertoast.showToast(
-            msg: 'added_to_watchlist'.tr(),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: toastColor,
-            textColor: Colors.white,
           );
         }
       }

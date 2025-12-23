@@ -47,6 +47,8 @@
     "here_recommendation": "Ti consigliamo",
     "watch_it_on": "Lo trovi su:",
     "accept": "Accetta",
+    "open_info": "Apri Info",
+    "load_more": "Più risultati",
     "generating": "Sto generando i consigli",
     "fetching": "Sto raccogliendo informazioni",
     "filtering": "Sto filtrando i risultati",
@@ -94,7 +96,7 @@
     "information": "Informazioni",
     "search": "Cerca",
 
-    "watchlist": "Lista preferiti",
+    "watchlist": "Watchlist",
     "watchlist_empty": "La tua lista è vuota",
     "error_loading_watchlist": "Errore nel caricamento della lista",
     "available": "Disponibile",

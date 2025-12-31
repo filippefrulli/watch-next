@@ -105,11 +105,11 @@ class NotificationService {
     const androidDetails = AndroidNotificationDetails(
       'weekly_reminder',
       'Weekly Reminder',
-      channelDescription: 'Weekly reminder',
+      channelDescription: 'Weekly reminder to pick something to watch',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
       icon: '@mipmap/launcher_icon',
-      color: Color(0xFFFF9800), // Orange color
+      color: Colors.orange,
       colorized: true,
     );
 
@@ -184,11 +184,11 @@ class NotificationService {
     const androidDetails = AndroidNotificationDetails(
       'weekly_reminder',
       'Weekly Reminder',
-      channelDescription: 'Weekly reminder to check your watchlist',
+      channelDescription: 'Weekly reminder to pick something to watch',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
       icon: '@mipmap/launcher_icon',
-      color: Color(0xFFFF9800), // Orange color
+      color: Colors.orange,
       colorized: true,
     );
 

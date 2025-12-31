@@ -8,6 +8,7 @@ import 'package:watch_next/pages/language_page.dart';
 import 'package:watch_next/pages/region_page.dart';
 import 'package:watch_next/pages/streaming_services_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
+import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/widgets/shared/divider.dart';
 import 'package:watch_next/widgets/shared/privacy_policy_widget.dart';
 
@@ -121,6 +122,24 @@ class _SettingsPageState extends State<SettingsPage> {
                                 builder: (context) => const LanguagePage(),
                               ),
                             );
+                          },
+                        ),
+                        _divider(),
+                        // TODO: Remove this test button before release
+                        _settingsTile(
+                          title: "Test Notification",
+                          icon: Icons.notifications_rounded,
+                          onTap: () async {
+                            await NotificationService.testWeeklyReminder();
+                            if (mounted) {
+                              Fluttertoast.showToast(
+                                msg: "Test notification sent!",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                backgroundColor: Theme.of(context).colorScheme.tertiary,
+                                textColor: Colors.white,
+                              );
+                            }
                           },
                         ),
                       ],

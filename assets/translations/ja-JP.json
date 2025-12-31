@@ -59,6 +59,8 @@
     "error_occurred": "エラーが発生しました。再試行してください",
     "invalid_query": "リクエストを処理できませんでした。観たいものについて、より具体的な詳細を入力してください",
     "dismiss": "閉じる",
+    "notification_title": "週末の映画タイム! 🎬",
+    "notification_body": "今週末、何を見るか決めるのにお手伝いが必要ですか?",
     "select_country": "国を選択",
     "done": "確認",
     "new": "新規",

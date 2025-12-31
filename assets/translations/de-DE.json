@@ -59,6 +59,8 @@
     "error_occurred": "Ein Fehler ist aufgetreten. Bitte versuche es erneut",
     "invalid_query": "Wir konnten deine Anfrage nicht verarbeiten. Bitte gib eine spezifischere Anfrage mit klaren Details darüber an, was du sehen möchtest",
     "dismiss": "Schließen",
+    "notification_title": "Zeit für einen Film! 🎬",
+    "notification_body": "Brauchst du Hilfe bei der Auswahl für das Wochenende?",
     "select_country": "Wähle dein Land aus",
     "done": "Bestätigen",
     "new": "Neue",

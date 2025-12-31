@@ -59,6 +59,8 @@
     "error_occurred": "An error occurred. Please try again",
     "invalid_query": "We couldn't process your request. Please provide a more specific query with clear details about what you'd like to watch",
     "dismiss": "Dismiss",
+    "notification_title": "Weekend Watch Time! 🎬",
+    "notification_body": "Need help picking something to watch for the weekend?",
     "select_country": "Select your country",
     "done": "Confirm",
     "new": "New",

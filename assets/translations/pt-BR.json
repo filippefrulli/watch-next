@@ -59,6 +59,8 @@
     "error_occurred": "Ocorreu um erro. Por favor, tente novamente",
     "invalid_query": "Não foi possível processar sua solicitação. Por favor, forneça uma pesquisa mais específica com detalhes claros sobre o que você gostaria de assistir",
     "dismiss": "Dispensar",
+    "notification_title": "Hora de assistir algo! 🎬",
+    "notification_body": "Precisa de ajuda para escolher o que assistir neste fim de semana?",
     "select_country": "Selecione seu país",
     "done": "Confirmar",
     "new": "Novo",

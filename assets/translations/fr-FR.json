@@ -59,6 +59,8 @@
     "error_occurred": "Une erreur s'est produite. Veuillez réessayer",
     "invalid_query": "Nous n'avons pas pu traiter votre demande. Veuillez fournir une requête plus précise avec des détails clairs sur ce que vous aimeriez regarder",
     "dismiss": "Fermer",
+    "notification_title": "C'est l'heure du cinéma! 🎬",
+    "notification_body": "Besoin d'aide pour choisir quoi regarder ce week-end?",
     "select_country": "Sélectionne ton pays",
     "done": "Confirmer",
     "new": "Nouveau",

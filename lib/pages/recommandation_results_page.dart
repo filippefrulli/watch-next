@@ -20,6 +20,8 @@ class RecommendationResultsPage extends StatefulWidget {
   final String requestString;
   final int type;
   final String itemsToNotRecommend;
+  final bool includeRentals;
+  final bool includePurchases;
 
   const RecommendationResultsPage({
     super.key,
@@ -27,6 +29,8 @@ class RecommendationResultsPage extends StatefulWidget {
     required this.requestString,
     required this.type,
     required this.itemsToNotRecommend,
+    this.includeRentals = false,
+    this.includePurchases = false,
   });
 
   @override
@@ -96,7 +100,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
           title: selectedWatchObject.title ?? '',
           isMovie: widget.type == 0,
           posterPath: selectedWatchObject.posterPath,
-          context: context,
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
@@ -180,6 +183,8 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               totalCount: length,
               mediaType: widget.type,
               isInWatchlist: _isInWatchlist,
+              isRentOnly: selectedWatchObject.isRentOnly,
+              isBuyOnly: selectedWatchObject.isBuyOnly,
               onWatchlistPressed: _toggleWatchlist,
               onPrevious: () {
                 setState(() {
@@ -227,6 +232,8 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                     builder: (context) => RecommendationLoadingPage(
                       requestString: widget.requestString,
                       type: widget.type,
+                      includeRentals: widget.includeRentals,
+                      includePurchases: widget.includePurchases,
                     ),
                   ),
                 );
@@ -296,6 +303,8 @@ class WatchObject {
   int? id;
   String? title;
   List<int>? watchProviders;
+  bool isRentOnly;
+  bool isBuyOnly;
 
   WatchObject({
     this.posterPath,
@@ -304,5 +313,7 @@ class WatchObject {
     this.id,
     this.title,
     this.watchProviders,
+    this.isRentOnly = false,
+    this.isBuyOnly = false,
   });
 }

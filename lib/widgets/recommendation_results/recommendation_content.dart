@@ -17,6 +17,8 @@ class RecommendationContent extends StatelessWidget {
   final VoidCallback onReloadPressed;
   final VoidCallback? onWatchlistPressed;
   final bool isInWatchlist;
+  final bool isRentOnly;
+  final bool isBuyOnly;
 
   const RecommendationContent({
     super.key,
@@ -32,6 +34,8 @@ class RecommendationContent extends StatelessWidget {
     required this.onReloadPressed,
     this.onWatchlistPressed,
     this.isInWatchlist = false,
+    this.isRentOnly = false,
+    this.isBuyOnly = false,
   });
 
   @override
@@ -50,6 +54,8 @@ class RecommendationContent extends StatelessWidget {
             StreamingInfoWidget(
               watchProviders: watchProviders,
               servicesList: servicesList,
+              isRentOnly: isRentOnly,
+              isBuyOnly: isBuyOnly,
             ),
             const SizedBox(width: 16),
             ActionButtons(

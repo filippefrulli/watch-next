@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
-import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/services/http_service.dart';
 
 class WatchlistItem {
@@ -108,7 +106,6 @@ class WatchlistService {
     required String title,
     required bool isMovie,
     String? posterPath,
-    BuildContext? context,
     bool fetchAvailability = true,
   }) async {
     final userId = await _getUserId();
@@ -133,24 +130,6 @@ class WatchlistService {
     if (fetchAvailability) {
       // Don't await - let it run in background
       fetchAndUpdateAvailability(mediaId, isMovie);
-    }
-
-    // Request notification permission after first watchlist item
-    if (context != null) {
-      final watchlistSnapshot = await _firestore.collection('users').doc(userId).collection('watchlist').limit(2).get();
-
-      // If this is the first or second item, request permission
-      if (watchlistSnapshot.docs.length <= 2) {
-        final hasPermission = await NotificationService.hasPermission();
-        if (!hasPermission && context.mounted) {
-          // Show permission dialog after a brief delay
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (context.mounted) {
-              NotificationService.requestPermissionWithDialog(context);
-            }
-          });
-        }
-      }
     }
   }
 

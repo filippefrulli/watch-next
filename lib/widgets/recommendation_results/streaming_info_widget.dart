@@ -7,12 +7,27 @@ import 'package:watch_next/objects/streaming_service.dart';
 class StreamingInfoWidget extends StatelessWidget {
   final List<int>? watchProviders;
   final Future<dynamic> servicesList;
+  final bool isRentOnly;
+  final bool isBuyOnly;
 
   const StreamingInfoWidget({
     super.key,
     required this.watchProviders,
     required this.servicesList,
+    this.isRentOnly = false,
+    this.isBuyOnly = false,
   });
+
+  String _getAvailabilityLabel() {
+    if (isRentOnly && isBuyOnly) {
+      return "rent_buy_on".tr();
+    } else if (isRentOnly) {
+      return "rent_on".tr();
+    } else if (isBuyOnly) {
+      return "buy_on".tr();
+    }
+    return "stream_it_on".tr();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +47,7 @@ class StreamingInfoWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "watch_it_on".tr(),
+            _getAvailabilityLabel(),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   fontSize: 12,

@@ -91,6 +91,18 @@ class TrailerListWidget extends StatelessWidget {
                                     imageUrl: thumbnail,
                                     fit: BoxFit.cover,
                                     width: double.infinity,
+                                    placeholder: (context, url) => Container(
+                                      color: Theme.of(context).colorScheme.tertiary,
+                                      child: const Center(
+                                        child: Icon(Icons.movie, color: Colors.grey),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      color: Theme.of(context).colorScheme.tertiary,
+                                      child: const Center(
+                                        child: Icon(Icons.movie, color: Colors.grey),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

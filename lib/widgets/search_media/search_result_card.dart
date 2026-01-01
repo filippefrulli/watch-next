@@ -49,7 +49,6 @@ class _SearchResultCardState extends State<SearchResultCard> {
           title: widget.result.displayTitle,
           isMovie: widget.result.isMovie,
           posterPath: widget.result.posterPath,
-          context: context,
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);

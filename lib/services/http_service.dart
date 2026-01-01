@@ -13,6 +13,27 @@ import '../objects/search_results.dart';
 import '../objects/movie_details.dart';
 import 'database_service.dart';
 
+/// Result containing watch providers and their availability type
+class WatchProvidersResult {
+  final List<int> providerIds;
+  final bool hasStreaming; // Available on a streaming subscription
+  final bool hasRent; // Available for rent
+  final bool hasBuy; // Available to buy
+
+  const WatchProvidersResult({
+    required this.providerIds,
+    this.hasStreaming = false,
+    this.hasRent = false,
+    this.hasBuy = false,
+  });
+
+  /// True if only available for rent (no streaming)
+  bool get isRentOnly => !hasStreaming && hasRent;
+
+  /// True if only available to buy (no streaming, no rent)
+  bool get isBuyOnly => !hasStreaming && !hasRent && hasBuy;
+}
+
 class HttpService {
   final String apiKey = tmdbApiKey;
 
@@ -125,7 +146,11 @@ class HttpService {
     return details;
   }
 
-  Future<List<int>> getWatchProviders(int id) async {
+  Future<WatchProvidersResult> getWatchProviders(
+    int id, {
+    bool includeRentals = false,
+    bool includePurchases = false,
+  }) async {
     try {
       final response = await _client
           .get(
@@ -139,7 +164,7 @@ class HttpService {
 
       if (response.statusCode != 200) {
         log('TMDB API error getting watch providers: ${response.statusCode}');
-        return [];
+        return const WatchProvidersResult(providerIds: []);
       }
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -148,28 +173,63 @@ class HttpService {
       List<String> providers = jsonDecode(response.body)["results"].keys.toList();
 
       List<int> movieProvidersIds = [];
+      bool hasStreaming = false;
+      bool hasRent = false;
+      bool hasBuy = false;
 
       if (providers.contains(region)) {
         List<int> myProvidersIds = await DatabaseService.getStreamingServicesIds();
 
         ProviderRegion provider = ProviderRegion.fromJson(jsonDecode(response.body)["results"][region]);
+
+        // Always check streaming (flatrate) - only from user's selected services
         if (provider.flatrate != null) {
           for (StreamingType item in provider.flatrate!) {
             if (myProvidersIds.contains(item.providerId)) {
               movieProvidersIds.add(item.providerId!);
+              hasStreaming = true;
+            }
+          }
+        }
+
+        // Check rentals if enabled - include any rental provider
+        if (includeRentals && provider.rent != null) {
+          for (StreamingType item in provider.rent!) {
+            if (!movieProvidersIds.contains(item.providerId)) {
+              movieProvidersIds.add(item.providerId!);
+              hasRent = true;
+            }
+          }
+        }
+
+        // Check purchases if enabled - include any purchase provider
+        if (includePurchases && provider.buy != null) {
+          for (StreamingType item in provider.buy!) {
+            if (!movieProvidersIds.contains(item.providerId)) {
+              movieProvidersIds.add(item.providerId!);
+              hasBuy = true;
             }
           }
         }
       }
 
-      return movieProvidersIds;
+      return WatchProvidersResult(
+        providerIds: movieProvidersIds,
+        hasStreaming: hasStreaming,
+        hasRent: hasRent,
+        hasBuy: hasBuy,
+      );
     } catch (e) {
       log('Error getting watch providers: $e');
-      return [];
+      return const WatchProvidersResult(providerIds: []);
     }
   }
 
-  Future<List<int>> getWatchProvidersSeries(int id) async {
+  Future<WatchProvidersResult> getWatchProvidersSeries(
+    int id, {
+    bool includeRentals = false,
+    bool includePurchases = false,
+  }) async {
     try {
       final response = await _client
           .get(
@@ -183,7 +243,7 @@ class HttpService {
 
       if (response.statusCode != 200) {
         log('TMDB API error getting watch providers for series: ${response.statusCode}');
-        return [];
+        return const WatchProvidersResult(providerIds: []);
       }
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -192,24 +252,55 @@ class HttpService {
       List<String> providers = jsonDecode(response.body)["results"].keys.toList();
 
       List<int> movieProvidersIds = [];
+      bool hasStreaming = false;
+      bool hasRent = false;
+      bool hasBuy = false;
 
       if (providers.contains(region)) {
         List<int> myProvidersIds = await DatabaseService.getStreamingServicesIds();
 
         ProviderRegion provider = ProviderRegion.fromJson(jsonDecode(response.body)["results"][region]);
+
+        // Always check streaming (flatrate) - only from user's selected services
         if (provider.flatrate != null) {
           for (StreamingType item in provider.flatrate!) {
             if (myProvidersIds.contains(item.providerId)) {
               movieProvidersIds.add(item.providerId!);
+              hasStreaming = true;
+            }
+          }
+        }
+
+        // Check rentals if enabled - include any rental provider
+        if (includeRentals && provider.rent != null) {
+          for (StreamingType item in provider.rent!) {
+            if (!movieProvidersIds.contains(item.providerId)) {
+              movieProvidersIds.add(item.providerId!);
+              hasRent = true;
+            }
+          }
+        }
+
+        // Check purchases if enabled - include any purchase provider
+        if (includePurchases && provider.buy != null) {
+          for (StreamingType item in provider.buy!) {
+            if (!movieProvidersIds.contains(item.providerId)) {
+              movieProvidersIds.add(item.providerId!);
+              hasBuy = true;
             }
           }
         }
       }
 
-      return movieProvidersIds;
+      return WatchProvidersResult(
+        providerIds: movieProvidersIds,
+        hasStreaming: hasStreaming,
+        hasRent: hasRent,
+        hasBuy: hasBuy,
+      );
     } catch (e) {
       log('Error getting watch providers for series: $e');
-      return [];
+      return const WatchProvidersResult(providerIds: []);
     }
   }
 

@@ -17,11 +17,15 @@ import 'package:watch_next/utils/secrets.dart';
 class RecommendationLoadingPage extends StatefulWidget {
   final String requestString;
   final int type;
+  final bool includeRentals;
+  final bool includePurchases;
 
   const RecommendationLoadingPage({
     super.key,
     required this.requestString,
     required this.type,
+    this.includeRentals = false,
+    this.includePurchases = false,
   });
 
   @override
@@ -79,6 +83,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
               requestString: widget.requestString,
               type: widget.type,
               itemsToNotRecommend: itemsToNotRecommend,
+              includeRentals: widget.includeRentals,
+              includePurchases: widget.includePurchases,
             ),
           ),
         );
@@ -350,19 +356,27 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     // Parallelize HTTP requests using Future.wait
     final futures = watchObjectList.map((watchObject) async {
       if (widget.type == 0) {
-        final value = await HttpService().getWatchProviders(
+        final result = await HttpService().getWatchProviders(
           watchObject.id!,
+          includeRentals: widget.includeRentals,
+          includePurchases: widget.includePurchases,
         );
-        if (value.isNotEmpty) {
-          watchObject.watchProviders = value;
+        if (result.providerIds.isNotEmpty) {
+          watchObject.watchProviders = result.providerIds;
+          watchObject.isRentOnly = result.isRentOnly;
+          watchObject.isBuyOnly = result.isBuyOnly;
           return watchObject;
         }
       } else {
-        final value = await HttpService().getWatchProvidersSeries(
+        final result = await HttpService().getWatchProvidersSeries(
           watchObject.id!,
+          includeRentals: widget.includeRentals,
+          includePurchases: widget.includePurchases,
         );
-        if (value.isNotEmpty) {
-          watchObject.watchProviders = value;
+        if (result.providerIds.isNotEmpty) {
+          watchObject.watchProviders = result.providerIds;
+          watchObject.isRentOnly = result.isRentOnly;
+          watchObject.isBuyOnly = result.isBuyOnly;
           return watchObject;
         }
       }

@@ -25,6 +25,9 @@ class QuerySettings {
   // TV Show-specific
   final CompletionFilter completionFilter;
   final SeasonCountFilter seasonCountFilter;
+  // Availability options
+  final bool includeRentals;
+  final bool includePurchases;
 
   const QuerySettings({
     this.releaseFilter = ReleaseFilter.any,
@@ -33,6 +36,8 @@ class QuerySettings {
     this.durationFilter = DurationFilter.any,
     this.completionFilter = CompletionFilter.any,
     this.seasonCountFilter = SeasonCountFilter.any,
+    this.includeRentals = false,
+    this.includePurchases = false,
   });
 
   QuerySettings copyWith({
@@ -42,6 +47,8 @@ class QuerySettings {
     DurationFilter? durationFilter,
     CompletionFilter? completionFilter,
     SeasonCountFilter? seasonCountFilter,
+    bool? includeRentals,
+    bool? includePurchases,
   }) {
     return QuerySettings(
       releaseFilter: releaseFilter ?? this.releaseFilter,
@@ -50,6 +57,8 @@ class QuerySettings {
       durationFilter: durationFilter ?? this.durationFilter,
       completionFilter: completionFilter ?? this.completionFilter,
       seasonCountFilter: seasonCountFilter ?? this.seasonCountFilter,
+      includeRentals: includeRentals ?? this.includeRentals,
+      includePurchases: includePurchases ?? this.includePurchases,
     );
   }
 
@@ -138,7 +147,9 @@ class QuerySettings {
       popularityFilter != PopularityFilter.any ||
       durationFilter != DurationFilter.any ||
       completionFilter != CompletionFilter.any ||
-      seasonCountFilter != SeasonCountFilter.any;
+      seasonCountFilter != SeasonCountFilter.any ||
+      includeRentals ||
+      includePurchases;
 }
 
 class QuerySettingsService {
@@ -148,6 +159,8 @@ class QuerySettingsService {
   static const String _durationFilterKey = 'query_duration_filter';
   static const String _completionFilterKey = 'query_completion_filter';
   static const String _seasonCountFilterKey = 'query_season_count_filter';
+  static const String _includeRentalsKey = 'query_include_rentals';
+  static const String _includePurchasesKey = 'query_include_purchases';
 
   static Future<QuerySettings> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -157,6 +170,8 @@ class QuerySettingsService {
     final durationIndex = prefs.getInt(_durationFilterKey) ?? 0;
     final completionIndex = prefs.getInt(_completionFilterKey) ?? 0;
     final seasonCountIndex = prefs.getInt(_seasonCountFilterKey) ?? 0;
+    final includeRentals = prefs.getBool(_includeRentalsKey) ?? false;
+    final includePurchases = prefs.getBool(_includePurchasesKey) ?? false;
 
     return QuerySettings(
       releaseFilter: ReleaseFilter.values[releaseIndex],
@@ -165,6 +180,8 @@ class QuerySettingsService {
       durationFilter: DurationFilter.values[durationIndex],
       completionFilter: CompletionFilter.values[completionIndex],
       seasonCountFilter: SeasonCountFilter.values[seasonCountIndex],
+      includeRentals: includeRentals,
+      includePurchases: includePurchases,
     );
   }
 
@@ -176,6 +193,8 @@ class QuerySettingsService {
     await prefs.setInt(_durationFilterKey, settings.durationFilter.index);
     await prefs.setInt(_completionFilterKey, settings.completionFilter.index);
     await prefs.setInt(_seasonCountFilterKey, settings.seasonCountFilter.index);
+    await prefs.setBool(_includeRentalsKey, settings.includeRentals);
+    await prefs.setBool(_includePurchasesKey, settings.includePurchases);
   }
 }
 
@@ -267,6 +286,8 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
                     const SizedBox(height: 24),
                     _buildSeasonCountSection(context),
                   ],
+                  const SizedBox(height: 24),
+                  _buildAvailabilitySection(context),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -591,6 +612,80 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildAvailabilitySection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'availability_options'.tr(),
+          style: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildCheckboxTile(
+          label: 'include_rentals'.tr(),
+          value: _settings.includeRentals,
+          onChanged: (value) => _updateSettings(
+            _settings.copyWith(includeRentals: value),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildCheckboxTile(
+          label: 'include_purchases'.tr(),
+          value: _settings.includePurchases,
+          onChanged: (value) => _updateSettings(
+            _settings.copyWith(includePurchases: value),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCheckboxTile({
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: Row(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: value ? Colors.orange.withValues(alpha: 0.2) : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: value ? Colors.orange : Colors.grey[600]!,
+                width: 2,
+              ),
+            ),
+            child: value
+                ? const Icon(
+                    Icons.check,
+                    size: 16,
+                    color: Colors.orange,
+                  )
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: TextStyle(
+              color: value ? Colors.orange : Colors.white,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

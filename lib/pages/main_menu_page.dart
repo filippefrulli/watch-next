@@ -263,6 +263,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
         builder: (context) => RecommendationLoadingPage(
           requestString: fullQuery,
           type: typeIsMovie,
+          includeRentals: _querySettings.includeRentals,
+          includePurchases: _querySettings.includePurchases,
         ),
       ),
     );

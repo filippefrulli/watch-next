@@ -4,6 +4,7 @@ import 'package:openai_dart/openai_dart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
@@ -245,11 +246,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
       },
     );
 
-    FirebaseFirestore.instance.collection('good_queries').add({
-      'type': typeIsMovie == 0 ? "movie" : "show",
-      'timestamp': FieldValue.serverTimestamp(),
-      'query': _controller.text,
-    });
+    // Skip Firestore writes in debug mode
+    if (!kDebugMode) {
+      FirebaseFirestore.instance.collection('good_queries').add({
+        'type': typeIsMovie == 0 ? "movie" : "show",
+        'timestamp': FieldValue.serverTimestamp(),
+        'query': _controller.text,
+      });
+    }
 
     await FeedbackService.incrementSuccessfulQuery();
 
@@ -293,11 +297,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
       },
     );
 
-    FirebaseFirestore.instance.collection('invalid_queries').add({
-      'type': typeIsMovie == 0 ? "movie" : "show",
-      'timestamp': FieldValue.serverTimestamp(),
-      'query': _controller.text,
-    });
+    // Skip Firestore writes in debug mode
+    if (!kDebugMode) {
+      FirebaseFirestore.instance.collection('invalid_queries').add({
+        'type': typeIsMovie == 0 ? "movie" : "show",
+        'timestamp': FieldValue.serverTimestamp(),
+        'query': _controller.text,
+      });
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

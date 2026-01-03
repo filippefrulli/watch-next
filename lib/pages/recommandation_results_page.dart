@@ -234,6 +234,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                       type: widget.type,
                       includeRentals: widget.includeRentals,
                       includePurchases: widget.includePurchases,
+                      itemsToNotRecommend: widget.itemsToNotRecommend,
                     ),
                   ),
                 );

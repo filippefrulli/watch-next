@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
 
@@ -19,6 +20,7 @@ class RecommendationLoadingPage extends StatefulWidget {
   final int type;
   final bool includeRentals;
   final bool includePurchases;
+  final String itemsToNotRecommend;
 
   const RecommendationLoadingPage({
     super.key,
@@ -26,6 +28,7 @@ class RecommendationLoadingPage extends StatefulWidget {
     required this.type,
     this.includeRentals = false,
     this.includePurchases = false,
+    this.itemsToNotRecommend = '',
   });
 
   @override
@@ -44,12 +47,13 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
   bool askingGpt = false;
   bool fetchingMovieInfo = false;
   bool filtering = false;
-  String itemsToNotRecommend = '';
+  late String itemsToNotRecommend;
   bool _adLoaded = false;
 
   @override
   void initState() {
     super.initState();
+    itemsToNotRecommend = widget.itemsToNotRecommend;
     _loadRecommendations();
   }
 
@@ -180,17 +184,15 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     });
 
     try {
-      List<String> itemsList = itemsToNotRecommend.split(',,');
-      itemsToNotRecommend = '';
-      for (String item in itemsList) {
-        if (item.isNotEmpty) {
-          itemsToNotRecommend += '${item.substring(
-            0,
-            item.indexOf('y:'),
-          )},';
-        }
-      }
-      String doNotRecommend = itemsToNotRecommend.isNotEmpty ? doNotRecommendPrefix + itemsToNotRecommend : '';
+      // Load cached excluded titles for this query
+      final cachedTitles = await QueryCacheService.getExcludedTitles(
+        widget.type,
+        widget.requestString,
+      );
+
+      // Format excluded titles for the prompt
+      final excludedTitlesStr = QueryCacheService.formatExcludedTitlesForPrompt(cachedTitles);
+      String doNotRecommend = excludedTitlesStr.isNotEmpty ? doNotRecommendPrefix + excludedTitlesStr : '';
 
       // Get user's country for regional recommendations
       final prefs = await SharedPreferences.getInstance();
@@ -240,11 +242,19 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
         throw Exception('Empty response from Gemini API');
       }
 
-      itemsToNotRecommend = '';
+      // Parse titles from response and add to cache
+      final newTitles = QueryCacheService.parseTitlesFromResponse(responseContent);
+      await QueryCacheService.addExcludedTitles(
+        widget.type,
+        widget.requestString,
+        newTitles,
+      );
+
+      // Update local state for passing to results page
+      itemsToNotRecommend = responseContent;
 
       setState(() {
         askingGpt = false;
-        itemsToNotRecommend = responseContent;
       });
 
       final parsed = await parseResponse(responseContent);

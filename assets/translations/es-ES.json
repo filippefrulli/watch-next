@@ -158,7 +158,7 @@
     "feedback_settings_title": "Envíanos tus comentarios",
     "feedback_settings_message": "¿Tienes una sugerencia, queja o simplemente quieres saludar? ¡Nos encantaría saber de ti!",
 
-    "select_streaming": "Selecciona tus plataformas de streaming",
+    "select_streaming": "Elige tus plataformas de streaming",
 
     "validation_prompt": "Tu trabajo es validar si una oración determinada es una solicitud para recomendar una película, un criterio a partir del cual puedes recomendar una película o el nombre de una película. Ejemplos de indicaciones correctas son: \"Recomiende una película romántica y divertida, ideal para una primera cita\", \"Recomiende una película protagonizada por Tom Cruise y dirigida por Steven Spielberg\", \"sobre inteligencia artificial, con buenas críticas \", \"acción y aventura\", \"divertido\", \"Moana\". Si el mensaje es válido, devuelva solo el texto YES; de lo contrario, NO. El mensaje es: ",
     "validation_prompt_series": "Tu trabajo es validar si una oración dada es una solicitud para recomendar una series, un criterio a partir del cual puedes recomendar una series, o el nombre de una series. Ejemplos de avisos correctos son: \"que tenga menos de 5 temporadas\", \"sobre deportes\", \"con episodios de menos de 30 minutos\", \"divertida\", \"Lost\". Si el mensaje es válido, devuelva solo el texto YES, de lo contrario, NO. El aviso es: ",

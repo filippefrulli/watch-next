@@ -10,6 +10,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
+import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/utils/prompts.dart';
@@ -194,6 +195,22 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       final excludedTitlesStr = QueryCacheService.formatExcludedTitlesForPrompt(cachedTitles);
       String doNotRecommend = excludedTitlesStr.isNotEmpty ? doNotRecommendPrefix + excludedTitlesStr : '';
 
+      // Check if user has limited streaming services (1-2) and add priority instruction
+      String priorityInstruction = '';
+      final userServiceIds = await DatabaseService.getStreamingServicesIds();
+      if (userServiceIds.length <= 2 && userServiceIds.isNotEmpty) {
+        // Get service names from the available providers
+        final allProviders = await HttpService().getWatchProvidersByLocale();
+        final userServiceNames = allProviders
+            .where((provider) => userServiceIds.contains(provider.providerId))
+            .map((provider) => provider.providerName ?? '')
+            .where((name) => name.isNotEmpty)
+            .toList();
+        if (userServiceNames.isNotEmpty) {
+          priorityInstruction = prioritizeServicesPrefix(userServiceNames);
+        }
+      }
+
       // Get user's country for regional recommendations
       final prefs = await SharedPreferences.getInstance();
       final regionCode = prefs.getString('region') ?? 'US';
@@ -204,8 +221,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       final countryName = region.englishName ?? 'United States';
 
       String queryContent = widget.type == 0
-          ? '${moviePrompt1(countryName)} ${widget.requestString}. $moviePrompt2 $doNotRecommend'
-          : '${seriesPrompt1(countryName)} ${widget.requestString}. $seriesPrompt2 $doNotRecommend';
+          ? '${moviePrompt1(countryName)} ${widget.requestString}. $moviePrompt2 $priorityInstruction$doNotRecommend'
+          : '${seriesPrompt1(countryName)} ${widget.requestString}. $seriesPrompt2 $priorityInstruction$doNotRecommend';
 
       // Direct HTTP request to Gemini API
       final url =

@@ -48,6 +48,12 @@ Remember: Pay close attention to time-related criteria. If the user asks for sho
 
 const String doNotRecommendPrefix = 'Do not recommend any of these titles: ';
 
+/// Prefix for prioritizing specific streaming services when user has limited services
+String prioritizeServicesPrefix(List<String> serviceNames) {
+  final services = serviceNames.join(', ');
+  return 'PRIORITY: The user only has access to $services. Strongly prioritize titles that are available on these platforms or were originally produced by them (e.g., Netflix Originals, Amazon Prime Originals, Disney+ Originals, Apple TV+ Originals, HBO Originals). This is critical to ensure the user can actually watch the recommendations. ';
+}
+
 /// Validation prompts to check if user input is a valid movie/show request
 const String validationPromptMovie = '''
 Your job is to validate whether a given sentence or word is a request to recommend a movie, criteria from which you can recommend a movie, or a movie name.

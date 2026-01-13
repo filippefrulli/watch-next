@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -20,17 +21,41 @@ class NotificationService {
     // Initialize local notifications
     await _initializeLocalNotifications();
 
+    // Request permissions
+    await _requestPermissions();
+
     // Schedule weekly reminder if enabled (default: enabled)
     await _scheduleWeeklyReminderIfEnabled();
+  }
+
+  /// Request notification permissions (required for Android 13+ and iOS)
+  static Future<void> _requestPermissions() async {
+    if (Platform.isAndroid) {
+      final androidPlugin =
+          _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      if (androidPlugin != null) {
+        // Request notification permission (Android 13+)
+        await androidPlugin.requestNotificationsPermission();
+      }
+    } else if (Platform.isIOS) {
+      final iosPlugin = _localNotifications.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      if (iosPlugin != null) {
+        await iosPlugin.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
+    }
   }
 
   /// Initialize local notifications plugin
   static Future<void> _initializeLocalNotifications() async {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
 
     const initSettings = InitializationSettings(
@@ -57,6 +82,17 @@ class NotificationService {
     }
   }
 
+  /// Reschedule notification with proper translations (call after EasyLocalization is available)
+  static Future<void> rescheduleWithTranslations(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final isEnabled = prefs.getBool(_weeklyReminderEnabledKey) ?? true;
+
+    if (isEnabled) {
+      await scheduleWeeklyFridayReminder(context: context);
+      debugPrint('Notification rescheduled with translations');
+    }
+  }
+
   /// Schedule weekly Friday reminder if enabled
   static Future<void> _scheduleWeeklyReminderIfEnabled() async {
     final prefs = await SharedPreferences.getInstance();
@@ -68,13 +104,22 @@ class NotificationService {
   }
 
   /// Schedule a weekly notification for Friday at 6 PM local time
-  static Future<void> scheduleWeeklyFridayReminder() async {
+  static Future<void> scheduleWeeklyFridayReminder({BuildContext? context}) async {
     // Cancel any existing weekly reminder first
     await _localNotifications.cancel(_weeklyReminderId);
 
-    // Get translated strings
-    final title = 'notification_title'.tr();
-    final body = 'notification_body'.tr();
+    // Get translated strings - use fallback if context not available
+    String title;
+    String body;
+
+    if (context != null) {
+      title = 'notification_title'.tr(context: context);
+      body = 'notification_body'.tr(context: context);
+    } else {
+      // Fallback to English when called during initialization
+      title = 'Weekend Watch Time! 🎬';
+      body = "Not sure what to watch? Let's find something perfect for you!";
+    }
 
     const androidDetails = AndroidNotificationDetails(
       'weekly_reminder',
@@ -102,7 +147,7 @@ class NotificationService {
       _weeklyReminderId,
       title,
       body,
-      _nextFriday(18, 0), // Friday at 6 PM
+      _nextFriday(18, 0), // Friday at 6:00 PM
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime, // Repeats weekly!
@@ -132,12 +177,12 @@ class NotificationService {
   }
 
   /// Enable or disable weekly reminder
-  static Future<void> setWeeklyReminderEnabled(bool enabled) async {
+  static Future<void> setWeeklyReminderEnabled(bool enabled, {BuildContext? context}) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_weeklyReminderEnabledKey, enabled);
 
     if (enabled) {
-      await scheduleWeeklyFridayReminder();
+      await scheduleWeeklyFridayReminder(context: context);
     } else {
       await cancelWeeklyReminder();
     }
@@ -150,10 +195,18 @@ class NotificationService {
   }
 
   /// TEST ONLY: Show the weekly reminder notification immediately
-  static Future<void> testWeeklyReminder() async {
-    // Get translated strings
-    final title = 'notification_title'.tr();
-    final body = 'notification_body'.tr();
+  static Future<void> testWeeklyReminder({BuildContext? context}) async {
+    // Get translated strings with fallback
+    String title;
+    String body;
+
+    if (context != null) {
+      title = 'notification_title'.tr(context: context);
+      body = 'notification_body'.tr(context: context);
+    } else {
+      title = 'Weekend Watch Time! 🎬';
+      body = "Not sure what to watch? Let's find something perfect for you!";
+    }
 
     const androidDetails = AndroidNotificationDetails(
       'weekly_reminder',

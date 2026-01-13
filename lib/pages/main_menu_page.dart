@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
+import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
@@ -44,6 +45,16 @@ class _MainMenuPageState extends State<MainMenuPage> {
     openAI = OpenAIClient(apiKey: openApiKey);
     _controller.addListener(_checkLength);
     _loadQuerySettings();
+    // Reschedule notification with proper translations once context is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _rescheduleNotificationWithContext();
+    });
+  }
+
+  Future<void> _rescheduleNotificationWithContext() async {
+    if (mounted) {
+      await NotificationService.rescheduleWithTranslations(context);
+    }
   }
 
   Future<void> _loadQuerySettings() async {

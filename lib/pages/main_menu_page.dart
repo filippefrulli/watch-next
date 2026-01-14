@@ -257,15 +257,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
       },
     );
 
-    // Skip Firestore writes in debug mode
-    if (!kDebugMode) {
-      FirebaseFirestore.instance.collection('good_queries').add({
-        'type': typeIsMovie == 0 ? "movie" : "show",
-        'timestamp': FieldValue.serverTimestamp(),
-        'query': _controller.text,
-      });
-    }
-
     await FeedbackService.incrementSuccessfulQuery();
 
     if (!mounted) return;

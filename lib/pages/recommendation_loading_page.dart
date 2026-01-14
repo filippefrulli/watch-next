@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -80,6 +82,26 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       if (!mounted) return;
 
       if (results.isNotEmpty) {
+        // Get user's streaming service names for logging
+        final userServiceIds = await DatabaseService.getStreamingServicesIds();
+        final allProviders = await HttpService().getWatchProvidersByLocale();
+        final userServiceNames = allProviders
+            .where((provider) => userServiceIds.contains(provider.providerId))
+            .map((provider) => provider.providerName ?? '')
+            .where((name) => name.isNotEmpty)
+            .toList();
+
+        // Save successful query to Firestore with results count
+        if (!kDebugMode) {
+          FirebaseFirestore.instance.collection('good_queries').add({
+            'type': widget.type == 0 ? 'movie' : 'show',
+            'timestamp': FieldValue.serverTimestamp(),
+            'query': widget.requestString,
+            'results_count': results.length,
+            'streaming_services': userServiceNames,
+          });
+        }
+
         // Navigate to results page with the loaded data
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(

@@ -40,7 +40,7 @@ class SeriesResults {
   int? id;
   String? mediaType;
   String? originalLanguage;
-  String? title;
+  String? name;
   String? backdropPath;
   double? popularity;
   int? voteCount;
@@ -57,7 +57,7 @@ class SeriesResults {
       this.id,
       this.mediaType,
       this.originalLanguage,
-      this.title,
+      this.name,
       this.backdropPath,
       this.popularity,
       this.voteCount,
@@ -74,7 +74,7 @@ class SeriesResults {
     id = json['id'];
     mediaType = json['media_type'];
     originalLanguage = json['original_language'];
-    title = json['title'];
+    name = json['name'];
     backdropPath = json['backdrop_path'];
     popularity = json['popularity'];
     voteCount = json['vote_count'];
@@ -93,7 +93,7 @@ class SeriesResults {
     data['id'] = id;
     data['media_type'] = mediaType;
     data['original_language'] = originalLanguage;
-    data['title'] = title;
+    data['name'] = name;
     data['backdrop_path'] = backdropPath;
     data['popularity'] = popularity;
     data['vote_count'] = voteCount;

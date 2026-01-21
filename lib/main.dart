@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -8,7 +9,8 @@ import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
 import 'package:watch_next/pages/language_page.dart';
-import 'pages/main_menu_page.dart';
+import 'package:watch_next/services/notification_service.dart';
+import 'pages/home_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 void main() async {
@@ -18,6 +20,21 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Disable analytics in debug mode
+  if (kDebugMode) {
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
+  }
+
+  // Initialize notification service
+  await NotificationService.initialize();
+
+  // Lock orientation to portrait only
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemStatusBarContrastEnforced: true,
       systemNavigationBarColor: Colors.transparent,
@@ -33,6 +50,9 @@ void main() async {
           Locale('de', 'DE'),
           Locale('fr', 'FR'),
           Locale('es', 'ES'),
+          Locale('pt', 'BR'),
+          Locale('ja', 'JP'),
+          Locale('hi', 'IN'),
         ],
         path: 'assets/translations',
         startLocale: const Locale('en', 'US'),
@@ -45,14 +65,18 @@ void main() async {
 
 final ThemeData theme = ThemeData();
 
+// Global navigator key for handling notifications when app is in background
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 /// This Widget is the main application.
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return OKToast(
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         navigatorObservers: [
           FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
         ],
@@ -60,9 +84,6 @@ class MyApp extends StatelessWidget {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         debugShowCheckedModeBanner: false,
-        routes: {
-          '/main': (BuildContext context) => const MainMenuPage(),
-        },
         builder: (context, child) {
           return ScrollConfiguration(
             behavior: MyBehavior(),
@@ -71,8 +92,10 @@ class MyApp extends StatelessWidget {
         },
         theme: ThemeData(
           colorScheme: theme.colorScheme.copyWith(
-            primary: const Color.fromRGBO(11, 14, 23, 1),
+            primary: const Color.fromARGB(255, 14, 14, 14),
             secondary: Colors.orange,
+            tertiary: const Color.fromARGB(255, 30, 31, 31),
+            outline: Colors.grey[800],
             brightness: Brightness.dark,
           ),
           splashColor: Colors.transparent,
@@ -119,6 +142,11 @@ class MyApp extends StatelessWidget {
               fontWeight: FontWeight.w400,
               letterSpacing: 1.2,
             ),
+            bodyLarge: TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[400],
+              fontWeight: FontWeight.w400,
+            ),
             bodyMedium: const TextStyle(
               fontSize: 20.0,
               color: Colors.orange,
@@ -130,7 +158,7 @@ class MyApp extends StatelessWidget {
               color: Colors.grey[600],
               fontWeight: FontWeight.w400,
             ),
-            bodyLarge: TextStyle(
+            headlineSmall: TextStyle(
               fontSize: 16.0,
               color: Colors.grey[400],
               fontWeight: FontWeight.w400,
@@ -144,7 +172,7 @@ class MyApp extends StatelessWidget {
 }
 
 class Splash extends StatefulWidget {
-  const Splash({Key? key}) : super(key: key);
+  const Splash({super.key});
 
   @override
   SplashState createState() => SplashState();
@@ -183,7 +211,7 @@ class SplashState extends State<Splash> {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   HomePageState createState() => HomePageState();
@@ -205,21 +233,22 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
         systemNavigationBarIconBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.dark));
 
-//Setting SystmeUIMode
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: [SystemUiOverlay.top]);
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {},
       child: const Scaffold(
         backgroundColor: Color.fromRGBO(11, 14, 23, 1),
-        body: MainMenuPage(),
+        resizeToAvoidBottomInset: false,
+        body: TabNavigationPage(),
       ),
     );
   }
 }
 
 class MyBehavior extends ScrollBehavior {
-  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
+  @override
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
     return child;
   }
 }

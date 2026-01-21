@@ -40,31 +40,130 @@ const providersMapIos = {
   530: 'assets/streaming_services/peacock.png',
 };
 
-const String privacyPolicy = '''Privacy Policy
+const String privacyPolicy = '''Privacy Policy for Watch Next
 
-Effective Date: 01.06.2023
+Last Updated: November 12, 2025
 
-Our Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you use our mobile application Watch Next. Please read this Privacy Policy carefully to understand our practices regarding your personal information and how we will treat it. By using our mobile application, you consent to the practices described in this Privacy Policy.
+1. Introduction
 
-Information We Collect:
-We do not collect any personal information or data when you use our mobile application. We are committed to maintaining the privacy of our users and ensuring that no personally identifiable information is collected, stored, or shared.
+This Privacy Policy describes how Watch Next ("we", "our", or "the App") collects, uses, and protects your information when you use our mobile application. By using Watch Next, you agree to the collection and use of information in accordance with this policy.
 
-Use of Information:
-As we do not collect any personal information, we do not use or process any data related to your personal information. Therefore, we do not engage in any activities that involve analyzing, sharing, or selling your personal information.
+2. Information We Collect
 
-Third-Party Services:
-Our mobile application does not integrate or use any third-party services that may collect or process your personal information. We strive to ensure that your privacy is protected throughout your use of our application.
+2.1 User Account Information
+- User ID: A unique identifier generated when you first use the App, stored locally on your device and in our secure database.
 
-Children's Privacy:
-Our mobile application is not intended for use by individuals under the age of 13. We do not knowingly collect personal information from children under 13 years of age. If we discover that a child under 13 has provided us with personal information, we will promptly delete such information from our servers.
+2.2 Watchlist Data
+- Movies and TV shows you add to your watchlist
+- Streaming service preferences you select
+- Availability status of content on your preferred streaming services
+- Timestamps of when content was added or checked
 
-Security:
-We are committed to protecting your personal information and have implemented appropriate technical and organizational measures to safeguard it. However, please note that no method of transmission over the internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your personal information, we cannot guarantee its absolute security.
+2.3 Device Information
+- Firebase Cloud Messaging (FCM) token: A unique device identifier used exclusively to deliver push notifications about content availability changes
+- Device platform (iOS/Android) for notification compatibility
 
-Changes to Our Privacy Policy:
-We reserve the right to modify this Privacy Policy at any time. Any changes will be effective immediately upon posting the updated Privacy Policy on our mobile application. We encourage you to review this Privacy Policy periodically for any changes. Your continued use of our mobile application after any modifications to the Privacy Policy will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.
+2.4 Analytics Data
+We use Firebase Analytics to understand app usage patterns:
+- App opens and session duration
+- Features used within the app
+- General device information (model, OS version)
+- Crash reports and performance data
 
-Contact Us:
-If you have any questions or concerns regarding this Privacy Policy or our practices, please contact us at [Insert Contact Information].
+2.5 Advertising Data
+We use Google Mobile Ads to display advertisements:
+- Ad interaction data (views, clicks)
+- Device advertising ID (can be reset in your device settings)
 
-Please note that this Privacy Policy solely applies to our mobile application and does not cover any third-party websites, services, or applications that may be linked to or accessed from our application. We encourage you to review the privacy policies of any third-party services before providing any personal information.''';
+3. How We Use Your Information
+
+We use the collected information for the following purposes:
+- To maintain and sync your watchlist across sessions
+- To check content availability on your selected streaming services
+- To send you daily notifications when watchlisted content becomes available on your streaming services (only if you opt-in to notifications)
+- To improve app performance and user experience
+- To display relevant advertisements
+- To analyze app usage and fix technical issues
+
+4. Data Storage and Security
+
+4.1 Cloud Storage
+Your watchlist data and user ID are stored in Google Firebase Firestore, a secure cloud database platform. Firebase implements industry-standard security measures including encryption in transit and at rest.
+
+4.2 Local Storage
+Your user ID, streaming service preferences, and notification settings are stored locally on your device using secure local storage.
+
+4.3 Security Measures
+We implement appropriate technical and organizational security measures to protect your information. However, no method of transmission over the internet or electronic storage is 100% secure.
+
+5. Third-Party Services
+
+We use the following third-party services that may collect and process data:
+
+5.1 Firebase Services (Google LLC)
+- Firebase Authentication (user identification)
+- Firebase Firestore (data storage)
+- Firebase Cloud Messaging (push notifications)
+- Firebase Analytics (app usage analytics)
+Privacy Policy: https://firebase.google.com/support/privacy
+
+5.2 The Movie Database (TMDB)
+- Content metadata and availability information
+Privacy Policy: https://www.themoviedb.org/privacy-policy
+
+5.3 Google Mobile Ads
+- Advertisement display and tracking
+Privacy Policy: https://policies.google.com/privacy
+
+6. Push Notifications
+
+If you grant notification permissions:
+- We will send you a maximum of one notification per day
+- Notifications are sent only when content on your watchlist becomes available on your selected streaming services
+- You can disable notifications at any time in your device settings
+- We do not use notifications for marketing purposes
+
+7. Data Retention
+
+- Watchlist data: Retained as long as you use the App
+- FCM tokens: Automatically expire and are refreshed by Firebase; invalid tokens are removed
+- Analytics data: Retained according to Firebase Analytics default retention periods (14 months)
+- You can request deletion of all your data by contacting us
+
+8. Your Rights
+
+You have the right to:
+- Access your personal data stored in our systems
+- Request correction of inaccurate data
+- Request deletion of your data
+- Opt-out of push notifications at any time
+- Reset your advertising ID in your device settings
+
+9. Children's Privacy
+
+Watch Next is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If we discover that a child under 13 has provided us with personal information, we will delete such information immediately.
+
+10. International Data Transfers
+
+Your information may be transferred to and processed in countries other than your country of residence. These countries may have different data protection laws. By using our App, you consent to such transfers.
+
+11. Changes to This Privacy Policy
+
+We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last Updated" date at the top of this policy. Significant changes will be communicated through an in-app notification. Your continued use of the App after changes constitutes acceptance of the updated policy.
+
+12. Contact Information
+
+If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us at:
+
+Email: [Your Contact Email]
+
+13. Legal Compliance
+
+This Privacy Policy complies with applicable data protection laws including:
+- General Data Protection Regulation (GDPR) for users in the European Economic Area
+- California Consumer Privacy Act (CCPA) for users in California
+- Other applicable regional data protection laws
+
+14. Third-Party Links
+
+Our App may contain links to streaming service websites or other third-party services. We are not responsible for the privacy practices of these third parties. We encourage you to read their privacy policies before providing any personal information.''';

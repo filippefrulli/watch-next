@@ -6,7 +6,7 @@ import 'package:watch_next/objects/region.dart';
 import 'streaming_services_page.dart';
 
 class RegionIntroPage extends StatefulWidget {
-  const RegionIntroPage({Key? key}) : super(key: key);
+  const RegionIntroPage({super.key});
 
   @override
   State<RegionIntroPage> createState() => _SecondIntroScreenState();
@@ -24,7 +24,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(11, 14, 23, 1),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: DelayedDisplay(
         delay: const Duration(milliseconds: 200),
         child: Column(
@@ -36,11 +36,11 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
               "select_country".tr(),
               style: Theme.of(context).textTheme.displayLarge,
             ),
-            const SizedBox(height: 16),
-            _regions(),
+            const SizedBox(height: 24),
             Expanded(
-              child: Container(),
+              child: _regions(),
             ),
+            const SizedBox(height: 16),
             nextButton(),
             const SizedBox(height: 32),
           ],
@@ -51,23 +51,27 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
 
   Widget _regions() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: Theme.of(context).colorScheme.tertiary,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.grey[700]!,
+            color: Theme.of(context).colorScheme.outline,
+            width: 1,
           ),
-          borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
-        height: MediaQuery.of(context).size.height * 0.7,
-        child: MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: ListView.builder(
-            padding: const EdgeInsets.only(bottom: 32),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: availableRegions.length,
+            separatorBuilder: (context, index) => Divider(
+              height: 1,
+              thickness: 1,
+              color: Theme.of(context).colorScheme.outline,
+              indent: 72,
+            ),
             itemBuilder: (context, index) {
               return _listTile(availableRegions[index].englishName!, availableRegions[index].iso!, index);
             },
@@ -78,59 +82,120 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
   }
 
   Widget _listTile(String country, String region, int index) {
-    return TextButton(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _text(country, index),
-          const SizedBox(height: 12),
-          Container(height: 1, color: Colors.grey[600]),
-        ],
+    bool isSelected = selected == index;
+
+    return Material(
+      color: isSelected ? Colors.orange.withValues(alpha: 0.1) : Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('region', region);
+          prefs.setInt('region_number', index);
+
+          prefs.setBool('seen', true);
+
+          setState(() {
+            selected = index;
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.orange : Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.location_on_rounded,
+                    color: isSelected ? Colors.white : Colors.grey[600],
+                    size: 24,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  country,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 16,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? Colors.orange : Colors.white,
+                      ),
+                ),
+              ),
+              AnimatedScale(
+                scale: isSelected ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      onPressed: () async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('region', region);
-        prefs.setInt('region_number', index);
-
-        prefs.setBool('seen', true);
-
-        setState(() {
-          selected = index;
-        });
-      },
     );
-  }
-
-  Widget _text(String country, int index) {
-    if (selected == index) {
-      return Text(
-        country,
-        style: Theme.of(context).textTheme.bodyMedium,
-      );
-    } else {
-      return Text(
-        country,
-        style: Theme.of(context).textTheme.displayMedium,
-      );
-    }
   }
 
   Widget nextButton() {
     return selected > -1
         ? DelayedDisplay(
             delay: const Duration(milliseconds: 100),
-            child: TextButton(
-              onPressed: () async {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const StreamingServicesPage(),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.orange, Colors.orange[700]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.orange.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                );
-              },
-              child: Text(
-                "done".tr(),
-                style: Theme.of(context).textTheme.bodyMedium,
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () async {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const StreamingServicesPage(),
+                      ),
+                    );
+                  },
+                  child: Center(
+                    child: Text(
+                      "done".tr().toUpperCase(),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                    ),
+                  ),
+                ),
               ),
             ),
           )

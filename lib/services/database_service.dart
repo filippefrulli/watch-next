@@ -8,7 +8,7 @@ class DatabaseService {
     return await db!.rawQuery('SELECT TOP 50 * FROM already_watched ORDER BY date DESC');
   }
 
-  static insertSeenMovie(int movieId) async {
+  static Future<void> insertSeenMovie(int movieId) async {
     Database? db = await DatabaseHelper.instance.database;
 
     await db!.rawInsert(
@@ -21,7 +21,7 @@ class DatabaseService {
     return await db!.rawQuery('SELECT TOP 50 * FROM not_interested ORDER BY date DESC');
   }
 
-  static insertNotInterested(int movieId) async {
+  static Future<void> insertNotInterested(int movieId) async {
     Database? db = await DatabaseHelper.instance.database;
 
     await db!.rawInsert(
@@ -45,17 +45,17 @@ class DatabaseService {
     return streamingIds;
   }
 
-  static saveStreamingServices(Map<int, String> streamingServices) async {
+  static Future<void> saveStreamingServices(Map<int, String> streamingServices) async {
     Database? db = await DatabaseHelper.instance.database;
     int id;
     String logo;
     db!.rawQuery('DELETE FROM streaming_services');
 
     streamingServices.forEach(
-      (key, value) => {
-        id = key,
-        logo = value,
-        db.rawInsert('INSERT OR REPLACE INTO streaming_services(streaming_id, streaming_logo) VALUES($id, "$logo")')
+      (key, value) {
+        id = key;
+        logo = value;
+        db.rawInsert('INSERT OR REPLACE INTO streaming_services(streaming_id, streaming_logo) VALUES($id, "$logo")');
       },
     );
   }

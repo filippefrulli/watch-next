@@ -169,5 +169,13 @@
     "prompt_series_1": "Eres un experto en recomendaciones de series de TV con un amplio conocimiento de la televisión de todas las décadas y géneros. Tu tarea es analizar los criterios del usuario y devolver exactamente 30 títulos únicos de series de TV.\n\nFORMATO DE SALIDA: Devuelve títulos en este formato exacto: \"título y:fecha de estreno\",, (con comas dobles separando cada entrada, en una línea, sin numeración, sin listas).\n\nEJEMPLO: Game of Thrones y:2011,, Stranger Things y:2016,, Los Soprano y:1999\n\nRESTRICCIONES TEMPORALES: Si el usuario especifica CUALQUIER criterio relacionado con el tiempo (rangos de años, décadas, términos como \"clásicos\", \"series antiguas\", \"vintage\", \"antes de [año]\", \"después de [año]\", \"de los [década]\"), DEBES cumplir estrictamente esa restricción. Devuelve SOLO series del período especificado.\n\nDISPONIBILIDAD EN STREAMING: Prioriza series de TV que estén ampliamente disponibles en servicios de streaming.\n\nTÍTULOS SIMILARES: Si se proporciona un nombre de serie específico, devuelve esa serie más 29 similares.\n\nCRITERIOS DEL USUARIO:",
     "prompt_series_2": "Recuerda: Presta mucha atención a los criterios relacionados con el tiempo. Si el usuario pide series \"antes de 1990\", cada serie debe ser de antes de 1990. Cumple todos los requisitos específicos del usuario. Formato de salida: título y:año,, título y:año,, (sin numeración, sin explicaciones, solo la lista).",
 
-    "no_filter_results": "Ningún elemento coincide con tus filtros"
+    "no_filter_results": "Ningún elemento coincide con tus filtros",
+
+    "playlists": "Listas",
+    "playlists_subtitle": "Colecciones seleccionadas para ti",
+    "error_loading_playlists": "Error al cargar las listas",
+    "no_playlists": "No hay listas disponibles",
+    "titles": "títulos",
+    "no_items": "No hay elementos en esta lista",
+    "rent_buy": "Alquilar/Comprar"
 }

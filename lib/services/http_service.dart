@@ -324,12 +324,6 @@ class HttpService {
       (item) => item.displayPriority! > 100,
     );
 
-    // List<StreamingService> resultList = providers.results!;
-    // if (Platform.isIOS) {
-    //   resultList.removeWhere(
-    //     (item) => item.providerId == 337,
-    //   );
-    // }
     return list;
   }
 

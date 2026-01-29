@@ -15,6 +15,7 @@ import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
+import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
 
@@ -99,6 +100,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             'query': widget.requestString,
             'results_count': results.length,
             'streaming_services': userServiceNames,
+            'identifier': await WatchlistService().getUserId()
           });
         }
 

@@ -10,6 +10,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/notification_service.dart';
+import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
@@ -291,7 +292,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
   }
 
-  void _handleInvalidQuery() {
+  Future<void> _handleInvalidQuery() async {
     FirebaseAnalytics.instance.logEvent(
       name: 'invalid_prompt',
       parameters: <String, Object>{
@@ -305,6 +306,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         'type': typeIsMovie == 0 ? "movie" : "show",
         'timestamp': FieldValue.serverTimestamp(),
         'query': _controller.text,
+        'identifier': await WatchlistService().getUserId()
       });
     }
 

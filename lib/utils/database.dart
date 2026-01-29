@@ -5,18 +5,18 @@ import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDi
 
 class DatabaseHelper {
   static const _databaseName = "movies.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
 
-  static const alreadyWatchedTable = 'already_watched';
-  static const notInterestedTable = 'not_interested';
   static const streamingServicesTable = 'streaming_services';
-
-  static const movieId = 'movie_id';
-
-  static const date = 'date';
-
   static const streamingId = 'streaming_id';
   static const streamingLogo = 'streaming_logo';
+
+  static const watchlistTable = 'watchlist';
+  static const watchlistId = 'id';
+  static const watchlistTitle = 'title';
+  static const watchlistIsMovie = 'is_movie';
+  static const watchlistPosterPath = 'poster_path';
+  static const watchlistDateAdded = 'date_added';
 
   // make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -35,34 +35,54 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
-    return await openDatabase(path, version: _databaseVersion, onCreate: _onCreateMovie, onConfigure: _onConfigure);
+    return await openDatabase(
+      path,
+      version: _databaseVersion,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+      onConfigure: _onConfigure,
+    );
   }
 
   static Future _onConfigure(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
-  // SQL code to create the database table
-  Future _onCreateMovie(Database db, int version) async {
+  // Create tables for a fresh install
+  Future _onCreate(Database db, int version) async {
     await db.execute('''
-          CREATE TABLE $alreadyWatchedTable (
-            $movieId INTEGER PRIMARY KEY,
-            $date TEXT NOT NULL
-          )
-          ''');
+      CREATE TABLE $streamingServicesTable (
+        $streamingId INTEGER PRIMARY KEY,
+        $streamingLogo TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE $watchlistTable (
+        $watchlistId INTEGER PRIMARY KEY,
+        $watchlistTitle TEXT NOT NULL,
+        $watchlistIsMovie INTEGER NOT NULL,
+        $watchlistPosterPath TEXT,
+        $watchlistDateAdded TEXT NOT NULL
+      )
+    ''');
+  }
 
-    await db.execute('''
-          CREATE TABLE $notInterestedTable (
-            $movieId INTEGER PRIMARY KEY,
-            $date TEXT NOT NULL
-          )
-          ''');
-
-    await db.execute('''
-          CREATE TABLE $streamingServicesTable (
-            $streamingId INTEGER PRIMARY KEY,
-            $streamingLogo TEXT NOT NULL
-          )
-          ''');
+  // Migration for upgrades
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Drop old tables if they exist
+      await db.execute('DROP TABLE IF EXISTS already_watched');
+      await db.execute('DROP TABLE IF EXISTS not_interested');
+      // Create new watchlist table
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS $watchlistTable (
+          $watchlistId INTEGER PRIMARY KEY,
+          $watchlistTitle TEXT NOT NULL,
+          $watchlistIsMovie INTEGER NOT NULL,
+          $watchlistPosterPath TEXT,
+          $watchlistDateAdded TEXT NOT NULL
+        )
+      ''');
+    }
   }
 }

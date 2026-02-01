@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
+import 'package:watch_next/services/watchlist_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/objects/streaming_service.dart';
 
 class MediaDetailPage extends StatefulWidget {
@@ -24,7 +27,9 @@ class MediaDetailPage extends StatefulWidget {
 }
 
 class _MediaDetailPageState extends State<MediaDetailPage> {
+  final WatchlistService _watchlistService = WatchlistService();
   bool _isLoading = true;
+  bool _isInWatchlist = false;
   List<StreamingService> _streamingProviders = [];
   List<StreamingService> _rentProviders = [];
   List<StreamingService> _buyProviders = [];
@@ -44,8 +49,9 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
     });
 
     try {
-      // Load user's streaming service IDs
+      // Load user's streaming service IDs and check watchlist status
       _userServiceIds = await DatabaseService.getStreamingServicesIds();
+      final inWatchlist = await _watchlistService.isInWatchlist(widget.mediaId);
 
       // Fetch categorized watch providers
       final categorizedProviders = await HttpService().getCategorizedWatchProviders(
@@ -54,6 +60,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
       );
 
       setState(() {
+        _isInWatchlist = inWatchlist;
         _streamingProviders = categorizedProviders.streaming;
         _rentProviders = categorizedProviders.rent;
         _buyProviders = categorizedProviders.buy;
@@ -64,6 +71,47 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
         _isLoading = false;
         _errorMessage = 'failed_load_streaming'.tr();
       });
+    }
+  }
+
+  Future<void> _toggleWatchlist() async {
+    try {
+      if (_isInWatchlist) {
+        await _watchlistService.removeFromWatchlist(widget.mediaId);
+        if (mounted) {
+          setState(() => _isInWatchlist = false);
+        }
+        UserActionService.logWatchlistRemove(
+          mediaId: widget.mediaId,
+          title: widget.title,
+          type: widget.isMovie ? 'movie' : 'show',
+        );
+      } else {
+        await _watchlistService.addToWatchlist(
+          mediaId: widget.mediaId,
+          title: widget.title,
+          isMovie: widget.isMovie,
+          posterPath: widget.posterPath,
+        );
+        if (mounted) {
+          setState(() => _isInWatchlist = true);
+          FirebaseAnalytics.instance.logEvent(
+            name: 'watchlist_added',
+            parameters: <String, Object>{
+              'source': 'media_detail',
+              'type': widget.isMovie ? 'movie' : 'show',
+            },
+          );
+        }
+        UserActionService.logWatchlistAdd(
+          mediaId: widget.mediaId,
+          title: widget.title,
+          type: widget.isMovie ? 'movie' : 'show',
+          source: 'media_detail',
+        );
+      }
+    } catch (e) {
+      // Handle errors if necessary
     }
   }
 
@@ -163,10 +211,56 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           children: [
             // Poster
             _buildPoster(),
+            const SizedBox(height: 24),
+            // Watchlist button
+            _buildWatchlistButton(),
             const SizedBox(height: 32),
             // Streaming providers section
             _buildStreamingProvidersSection(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWatchlistButton() {
+    return SizedBox(
+      width: 250,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _toggleWatchlist,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: _isInWatchlist ? Colors.orange.withOpacity(0.15) : Theme.of(context).colorScheme.tertiary,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _isInWatchlist ? Colors.orange : Theme.of(context).colorScheme.outline,
+                width: _isInWatchlist ? 2 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+                  color: _isInWatchlist ? Colors.orange : Colors.white,
+                  size: 22,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _isInWatchlist ? 'remove_from_watchlist'.tr() : 'add_to_watchlist'.tr(),
+                  style: TextStyle(
+                    color: _isInWatchlist ? Colors.orange : Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

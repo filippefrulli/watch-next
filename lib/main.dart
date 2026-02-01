@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
 import 'package:watch_next/pages/language_page.dart';
 import 'package:watch_next/services/notification_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'pages/home_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -197,6 +198,8 @@ class SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
+    // Initialize user tracking on app open
+    UserActionService.initializeUser();
     Timer(const Duration(milliseconds: 200), () {
       checkFirstSeen();
     });

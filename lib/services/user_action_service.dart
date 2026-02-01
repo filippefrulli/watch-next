@@ -19,6 +19,34 @@ class UserActionService {
     return userId;
   }
 
+  /// Initialize user document on first app open
+  /// This ensures we have a record of every user, even if they don't perform actions
+  static Future<void> initializeUser() async {
+    if (kDebugMode) return;
+
+    try {
+      final userId = await _getUserId();
+      final userDoc = _firestore.collection('users').doc(userId);
+      final docSnapshot = await userDoc.get();
+
+      if (!docSnapshot.exists) {
+        // First time user - create the document
+        await userDoc.set({
+          'created_at': FieldValue.serverTimestamp(),
+          'first_open': FieldValue.serverTimestamp(),
+          'last_open': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Returning user - update last_open
+        await userDoc.update({
+          'last_open': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (e) {
+      // Silently fail - don't interrupt user experience for analytics
+    }
+  }
+
   /// Log a user action to Firestore
   ///
   /// [actionName] - The name of the action (e.g., 'recommendation_requested')

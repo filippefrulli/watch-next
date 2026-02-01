@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/objects/trailer.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
 
@@ -68,6 +69,12 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         if (mounted) {
           setState(() => _isInWatchlist = false);
         }
+        // Track watchlist remove
+        UserActionService.logWatchlistRemove(
+          mediaId: widget.mediaId,
+          title: widget.title,
+          type: widget.isMovie ? 'movie' : 'show',
+        );
       } else {
         await _watchlistService.addToWatchlist(
           mediaId: widget.mediaId,
@@ -85,6 +92,13 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
             },
           );
         }
+        // Track watchlist add
+        UserActionService.logWatchlistAdd(
+          mediaId: widget.mediaId,
+          title: widget.title,
+          type: widget.isMovie ? 'movie' : 'show',
+          source: 'recommendation_info',
+        );
       }
     } catch (e) {
       // Handle errors if necessary

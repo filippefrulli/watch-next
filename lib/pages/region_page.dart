@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'streaming_services_page.dart';
 
 class RegionIntroPage extends StatefulWidget {
@@ -89,10 +90,17 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
       child: InkWell(
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
+          final previousRegion = prefs.getString('region');
           prefs.setString('region', region);
           prefs.setInt('region_number', index);
 
           prefs.setBool('seen', true);
+
+          // Track region changed
+          UserActionService.logRegionChanged(
+            fromRegion: previousRegion ?? 'none',
+            toRegion: region,
+          );
 
           setState(() {
             selected = index;

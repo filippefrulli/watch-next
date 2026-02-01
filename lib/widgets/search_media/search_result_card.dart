@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
 
@@ -43,6 +44,12 @@ class _SearchResultCardState extends State<SearchResultCard> {
         if (mounted) {
           setState(() => _isInWatchlist = false);
         }
+        // Track watchlist remove
+        UserActionService.logWatchlistRemove(
+          mediaId: widget.result.id,
+          title: widget.result.displayTitle,
+          type: widget.result.isMovie ? 'movie' : 'show',
+        );
       } else {
         await _watchlistService.addToWatchlist(
           mediaId: widget.result.id,
@@ -60,6 +67,13 @@ class _SearchResultCardState extends State<SearchResultCard> {
             },
           );
         }
+        // Track watchlist add
+        UserActionService.logWatchlistAdd(
+          mediaId: widget.result.id,
+          title: widget.result.displayTitle,
+          type: widget.result.isMovie ? 'movie' : 'show',
+          source: 'search',
+        );
       }
     } catch (e) {
       // Handle errors if necessary
@@ -72,6 +86,14 @@ class _SearchResultCardState extends State<SearchResultCard> {
       parameters: <String, Object>{
         'type': widget.result.isMovie ? 'movie' : 'show',
       },
+    );
+
+    // Track search result selected
+    UserActionService.logSearchResultSelected(
+      mediaId: widget.result.id,
+      title: widget.result.displayTitle,
+      type: widget.result.isMovie ? 'movie' : 'show',
+      positionInList: 0, // Position not available in this context
     );
 
     await FeedbackService.incrementSuccessfulQuery();

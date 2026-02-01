@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watch_next/pages/browse_page.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
 import 'package:watch_next/pages/search_media_page.dart';
 import 'package:watch_next/pages/watchlist_page.dart';
@@ -16,7 +17,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: 1);
   }
 
   @override
@@ -40,6 +41,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
               children: const [
                 WatchlistPage(),
                 MainMenuPage(),
+                BrowsePage(),
                 SearchMediaPage(),
               ],
             ),
@@ -84,6 +86,10 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                     Tab(
                       icon: Icon(Icons.home_rounded, size: 22),
                       text: 'Discover',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.explore_outlined, size: 22),
+                      text: 'Browse',
                     ),
                     Tab(
                       icon: Icon(Icons.search, size: 22),

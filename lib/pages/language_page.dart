@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/region_page.dart';
+import 'package:watch_next/services/user_action_service.dart';
 
 class LanguagePage extends StatefulWidget {
   const LanguagePage({super.key});
@@ -182,10 +183,17 @@ class _LanguagePageState extends State<LanguagePage> {
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           if (mounted) {
+            final previousLang = prefs.getString('lang');
             context.setLocale(Locale(lang, region));
 
             prefs.setInt('language_number', index);
             prefs.setString('lang', '$lang-$region');
+
+            // Track language changed
+            UserActionService.logLanguageChanged(
+              fromLanguage: previousLang ?? 'none',
+              toLanguage: '$lang-$region',
+            );
 
             setState(() {
               selected = index;

@@ -42,7 +42,7 @@ const providersMapIos = {
 
 const String privacyPolicy = '''Privacy Policy for Watch Next
 
-Last Updated: November 12, 2025
+Last Updated: February 1, 2026
 
 1. Introduction
 
@@ -52,6 +52,7 @@ This Privacy Policy describes how Watch Next ("we", "our", or "the App") collect
 
 2.1 User Account Information
 - User ID: A unique identifier generated when you first use the App, stored locally on your device and in our secure database.
+- Account timestamps: When you first opened the App and your most recent app open.
 
 2.2 Watchlist Data
 - Movies and TV shows you add to your watchlist
@@ -63,14 +64,23 @@ This Privacy Policy describes how Watch Next ("we", "our", or "the App") collect
 - Firebase Cloud Messaging (FCM) token: A unique device identifier used exclusively to deliver push notifications about content availability changes
 - Device platform (iOS/Android) for notification compatibility
 
-2.4 Analytics Data
+2.4 Usage and Behavioral Data
+We collect information about how you interact with the App to improve your experience:
+- App opens and session timestamps
+- Recommendation requests and the search queries you enter
+- Content you add to or remove from your watchlist, including where in the App you added it from
+- Search queries you perform and results you select
+- Playlists and curated collections you view or interact with
+- Settings changes including language, region, and streaming service preferences
+- General feature usage patterns
+
+2.5 Analytics Data
 We use Firebase Analytics to understand app usage patterns:
-- App opens and session duration
 - Features used within the app
 - General device information (model, OS version)
 - Crash reports and performance data
 
-2.5 Advertising Data
+2.6 Advertising Data
 We use Google Mobile Ads to display advertisements:
 - Ad interaction data (views, clicks)
 - Device advertising ID (can be reset in your device settings)
@@ -81,14 +91,15 @@ We use the collected information for the following purposes:
 - To maintain and sync your watchlist across sessions
 - To check content availability on your selected streaming services
 - To send you daily notifications when watchlisted content becomes available on your streaming services (only if you opt-in to notifications)
-- To improve app performance and user experience
+- To understand how users interact with different features
+- To improve our recommendation system and app experience
 - To display relevant advertisements
 - To analyze app usage and fix technical issues
 
 4. Data Storage and Security
 
 4.1 Cloud Storage
-Your watchlist data and user ID are stored in Google Firebase Firestore, a secure cloud database platform. Firebase implements industry-standard security measures including encryption in transit and at rest.
+Your watchlist data, user ID, and usage data are stored in Google Firebase Firestore, a secure cloud database platform. Firebase implements industry-standard security measures including encryption in transit and at rest.
 
 4.2 Local Storage
 Your user ID, streaming service preferences, and notification settings are stored locally on your device using secure local storage.
@@ -101,7 +112,6 @@ We implement appropriate technical and organizational security measures to prote
 We use the following third-party services that may collect and process data:
 
 5.1 Firebase Services (Google LLC)
-- Firebase Authentication (user identification)
 - Firebase Firestore (data storage)
 - Firebase Cloud Messaging (push notifications)
 - Firebase Analytics (app usage analytics)
@@ -115,6 +125,11 @@ Privacy Policy: https://www.themoviedb.org/privacy-policy
 - Advertisement display and tracking
 Privacy Policy: https://policies.google.com/privacy
 
+5.4 OpenAI
+- Processing of recommendation queries to generate personalized suggestions
+- Your search queries are sent to OpenAI's API to generate recommendations
+Privacy Policy: https://openai.com/privacy
+
 6. Push Notifications
 
 If you grant notification permissions:
@@ -126,6 +141,7 @@ If you grant notification permissions:
 7. Data Retention
 
 - Watchlist data: Retained as long as you use the App
+- Usage data: Retained for up to 24 months to analyze long-term usage patterns
 - FCM tokens: Automatically expire and are refreshed by Firebase; invalid tokens are removed
 - Analytics data: Retained according to Firebase Analytics default retention periods (14 months)
 - You can request deletion of all your data by contacting us

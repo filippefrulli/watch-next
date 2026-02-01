@@ -6,6 +6,7 @@ import 'package:watch_next/pages/home_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 
 ///This is the page where you enter the movie you saw
 class StreamingServicesPage extends StatefulWidget {
@@ -211,6 +212,10 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                   await DatabaseService.saveStreamingServices(selectedStreamingServices);
                   // Clear query cache since streaming services changed
                   await QueryCacheService.clearAllCaches();
+
+                  // Track streaming services updated
+                  UserActionService.logStreamingServicesUpdated();
+
                   if (mounted && seen) {
                     Navigator.of(context).pop();
                   } else if (mounted && !seen) {

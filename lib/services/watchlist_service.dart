@@ -86,8 +86,8 @@ class WatchlistService {
   static const Duration _cacheDuration = Duration(hours: 24);
   static const String _lastRefreshKey = 'watchlist_last_availability_refresh';
 
-  /// Get or create a unique device ID for this user
-  Future<String> _getUserId() async {
+  /// Get or create a unique device ID for this user (public)
+  Future<String> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('user_id');
 
@@ -108,7 +108,7 @@ class WatchlistService {
     String? posterPath,
     bool fetchAvailability = true,
   }) async {
-    final userId = await _getUserId();
+    final userId = await getUserId();
 
     final item = WatchlistItem(
       mediaId: mediaId,
@@ -135,14 +135,14 @@ class WatchlistService {
 
   /// Remove item from watchlist
   Future<void> removeFromWatchlist(int mediaId) async {
-    final userId = await _getUserId();
+    final userId = await getUserId();
 
     await _firestore.collection('users').doc(userId).collection('watchlist').doc(mediaId.toString()).delete();
   }
 
   /// Get all watchlist items
   Stream<List<WatchlistItem>> getWatchlist() async* {
-    final userId = await _getUserId();
+    final userId = await getUserId();
 
     yield* _firestore
         .collection('users')
@@ -159,7 +159,7 @@ class WatchlistService {
 
   /// Check if item is in watchlist
   Future<bool> isInWatchlist(int mediaId) async {
-    final userId = await _getUserId();
+    final userId = await getUserId();
 
     final doc = await _firestore.collection('users').doc(userId).collection('watchlist').doc(mediaId.toString()).get();
 
@@ -171,7 +171,7 @@ class WatchlistService {
     required int mediaId,
     required Map<String, List<int>> availability,
   }) async {
-    final userId = await _getUserId();
+    final userId = await getUserId();
 
     await _firestore.collection('users').doc(userId).collection('watchlist').doc(mediaId.toString()).update({
       'availability': availability,

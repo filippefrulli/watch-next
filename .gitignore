@@ -50,3 +50,5 @@ secrets.dart
 key.properties
 
 .env.local
+
+.vscode

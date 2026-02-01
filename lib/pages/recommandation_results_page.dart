@@ -10,6 +10,7 @@ import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
@@ -94,6 +95,12 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         if (mounted) {
           setState(() => _isInWatchlist = false);
         }
+        // Track watchlist remove
+        UserActionService.logWatchlistRemove(
+          mediaId: selectedWatchObject.id!,
+          title: selectedWatchObject.title ?? '',
+          type: widget.type == 0 ? 'movie' : 'show',
+        );
       } else {
         await _watchlistService.addToWatchlist(
           mediaId: selectedWatchObject.id!,
@@ -111,6 +118,13 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
             },
           );
         }
+        // Track watchlist add
+        UserActionService.logWatchlistAdd(
+          mediaId: selectedWatchObject.id!,
+          title: selectedWatchObject.title ?? '',
+          type: widget.type == 0 ? 'movie' : 'show',
+          source: 'recommendation',
+        );
       }
     } catch (e) {
       // Handle errors if necessary

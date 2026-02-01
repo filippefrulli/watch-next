@@ -8,6 +8,17 @@
     "close": "Close",
     "hint": "What do you feel like watching?",
     "with_action": "with a lot of action",
+    "main_headline": "What would you like to watch today?",
+    "hero_hint": "Describe what you're in the mood for...",
+    "filters": "Filters",
+    "examples": "Examples",
+
+    "browse": "Browse",
+    "curated_playlists": "Curated Playlists",
+    "popular_movies": "Popular Movies",
+    "popular_shows": "Popular Shows",
+    "top_rated_movies": "Top Rated Movies",
+    "top_rated_shows": "Top Rated Shows",
     "connect_to_internet": "Please connect to the internet and try again",
     "invalid_input": "Invalid input, please change your query and try again",
     "need_inspiration": "Need inspiration? \nHere are some examples",
@@ -169,5 +180,13 @@
     "prompt_series_1": "You are a TV show recommendation expert with extensive knowledge of television across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique TV show titles.\n\nIMPORTANT: The user's request may be in ANY language (English, Spanish, German, French, Italian, Portuguese, Japanese, Hindi, etc.). Understand and process it regardless of the language used.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:first air date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old shows\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY shows from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize TV shows that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific show name, return that show plus 29 similar ones.\n\nUSER CRITERIA:",
     "prompt_series_2": "Remember: Pay close attention to time-related criteria. If the user asks for shows \"before 1990\", every single show must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).",
 
-    "no_filter_results": "No items match your filters"
+    "no_filter_results": "No items match your filters",
+
+    "playlists": "Playlists",
+    "playlists_subtitle": "Curated collections for you",
+    "error_loading_playlists": "Error loading playlists",
+    "no_playlists": "No playlists available",
+    "titles": "titles",
+    "no_items": "No items in this playlist",
+    "rent_buy": "Rent/Buy"
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:watch_next/pages/browse_page.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
-import 'package:watch_next/pages/playlists_page.dart';
 import 'package:watch_next/pages/search_media_page.dart';
 import 'package:watch_next/pages/watchlist_page.dart';
 
@@ -41,7 +41,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
               children: const [
                 WatchlistPage(),
                 MainMenuPage(),
-                PlaylistsPage(),
+                BrowsePage(),
                 SearchMediaPage(),
               ],
             ),
@@ -88,8 +88,8 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                       text: 'Discover',
                     ),
                     Tab(
-                      icon: Icon(Icons.playlist_play, size: 22),
-                      text: 'Playlists',
+                      icon: Icon(Icons.explore_outlined, size: 22),
+                      text: 'Browse',
                     ),
                     Tab(
                       icon: Icon(Icons.search, size: 22),

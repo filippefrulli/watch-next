@@ -497,6 +497,244 @@ class HttpService {
       return [];
     }
   }
+
+  /// Get trending movies/shows for this week
+  Future<List<BrowseItem>> getTrending({String mediaType = 'all', String timeWindow = 'week'}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/trending/$mediaType/$timeWindow', {
+              'api_key': apiKey,
+              'language': lang,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        log('TMDB API error getting trending: ${response.statusCode}');
+        return [];
+      }
+
+      final data = jsonDecode(response.body);
+      final results = data['results'] as List;
+
+      return results.map((item) => BrowseItem.fromJson(item)).toList();
+    } catch (e) {
+      log('Error getting trending: $e');
+      return [];
+    }
+  }
+
+  /// Get popular movies
+  Future<List<BrowseItem>> getPopularMovies() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+      String region = prefs.getString('region') ?? 'US';
+
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/movie/popular', {
+              'api_key': apiKey,
+              'language': lang,
+              'region': region,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        log('TMDB API error getting popular movies: ${response.statusCode}');
+        return [];
+      }
+
+      final data = jsonDecode(response.body);
+      final results = data['results'] as List;
+
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: true)).toList();
+    } catch (e) {
+      log('Error getting popular movies: $e');
+      return [];
+    }
+  }
+
+  /// Get popular TV shows
+  Future<List<BrowseItem>> getPopularShows() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/tv/popular', {
+              'api_key': apiKey,
+              'language': lang,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        log('TMDB API error getting popular shows: ${response.statusCode}');
+        return [];
+      }
+
+      final data = jsonDecode(response.body);
+      final results = data['results'] as List;
+
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: false)).toList();
+    } catch (e) {
+      log('Error getting popular shows: $e');
+      return [];
+    }
+  }
+
+  /// Get top rated movies
+  Future<List<BrowseItem>> getTopRatedMovies() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+      String region = prefs.getString('region') ?? 'US';
+
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/movie/top_rated', {
+              'api_key': apiKey,
+              'language': lang,
+              'region': region,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        log('TMDB API error getting top rated movies: ${response.statusCode}');
+        return [];
+      }
+
+      final data = jsonDecode(response.body);
+      final results = data['results'] as List;
+
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: true)).toList();
+    } catch (e) {
+      log('Error getting top rated movies: $e');
+      return [];
+    }
+  }
+
+  /// Get top rated TV shows
+  Future<List<BrowseItem>> getTopRatedShows() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/tv/top_rated', {
+              'api_key': apiKey,
+              'language': lang,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) {
+        log('TMDB API error getting top rated shows: ${response.statusCode}');
+        return [];
+      }
+
+      final data = jsonDecode(response.body);
+      final results = data['results'] as List;
+
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: false)).toList();
+    } catch (e) {
+      log('Error getting top rated shows: $e');
+      return [];
+    }
+  }
+
+  /// Load availability data for a BrowseItem
+  Future<void> loadBrowseItemAvailability(BrowseItem item) async {
+    if (item.availabilityLoaded) return;
+
+    try {
+      final availability = await getCategorizedWatchProviders(item.id, item.isMovie);
+      item.streamingProviderIds = availability.streaming.map((s) => s.providerId ?? 0).toList();
+      item.rentProviderIds = availability.rent.map((s) => s.providerId ?? 0).toList();
+      item.buyProviderIds = availability.buy.map((s) => s.providerId ?? 0).toList();
+      item.availabilityLoaded = true;
+    } catch (e) {
+      log('Error loading availability for ${item.title}: $e');
+      item.availabilityLoaded = true; // Mark as loaded to prevent retries
+    }
+  }
+
+  /// Load availability for multiple items in parallel (with concurrency limit)
+  Future<void> loadBrowseItemsAvailability(List<BrowseItem> items, {int concurrency = 5}) async {
+    final unloaded = items.where((item) => !item.availabilityLoaded).toList();
+
+    for (int i = 0; i < unloaded.length; i += concurrency) {
+      final batch = unloaded.skip(i).take(concurrency);
+      await Future.wait(batch.map((item) => loadBrowseItemAvailability(item)));
+    }
+  }
+}
+
+/// Model for browse/trending items
+class BrowseItem {
+  final int id;
+  final String title;
+  final String? posterPath;
+  final bool isMovie;
+  final String? releaseDate;
+  final double? voteAverage;
+
+  // Availability data (loaded separately)
+  List<int> streamingProviderIds;
+  List<int> rentProviderIds;
+  List<int> buyProviderIds;
+  bool availabilityLoaded;
+
+  BrowseItem({
+    required this.id,
+    required this.title,
+    this.posterPath,
+    required this.isMovie,
+    this.releaseDate,
+    this.voteAverage,
+    this.streamingProviderIds = const [],
+    this.rentProviderIds = const [],
+    this.buyProviderIds = const [],
+    this.availabilityLoaded = false,
+  });
+
+  factory BrowseItem.fromJson(Map<String, dynamic> json, {bool? isMovie}) {
+    final mediaType = json['media_type'];
+    final isMovieType = isMovie ?? (mediaType == 'movie');
+
+    return BrowseItem(
+      id: json['id'],
+      title: isMovieType ? (json['title'] ?? 'Unknown') : (json['name'] ?? 'Unknown'),
+      posterPath: json['poster_path'],
+      isMovie: isMovieType,
+      releaseDate: isMovieType ? json['release_date'] : json['first_air_date'],
+      voteAverage: json['vote_average']?.toDouble(),
+    );
+  }
+
+  String get year {
+    if (releaseDate != null && releaseDate!.length >= 4) {
+      return releaseDate!.substring(0, 4);
+    }
+    return '';
+  }
+
+  /// Check if available on user's streaming services
+  bool isAvailableOnStreaming(List<int> userServiceIds) {
+    return streamingProviderIds.any((id) => userServiceIds.contains(id));
+  }
+
+  /// Check if available for rent or buy
+  bool get hasRentOrBuy => rentProviderIds.isNotEmpty || buyProviderIds.isNotEmpty;
 }
 
 // Model for multi-search results

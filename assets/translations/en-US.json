@@ -8,6 +8,13 @@
     "close": "Close",
     "hint": "What do you feel like watching?",
     "with_action": "with a lot of action",
+
+    "browse": "Browse",
+    "curated_playlists": "Curated Playlists",
+    "popular_movies": "Popular Movies",
+    "popular_shows": "Popular Shows",
+    "top_rated_movies": "Top Rated Movies",
+    "top_rated_shows": "Top Rated Shows",
     "connect_to_internet": "Please connect to the internet and try again",
     "invalid_input": "Invalid input, please change your query and try again",
     "need_inspiration": "Need inspiration? \nHere are some examples",

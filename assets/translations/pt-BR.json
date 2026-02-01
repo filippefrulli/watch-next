@@ -8,6 +8,14 @@
     "close": "Fechar",
     "hint": "O que você está com vontade de assistir?",
     "with_action": "com muita ação",
+
+    "browse": "Explorar",
+    "curated_playlists": "Playlists Selecionadas",
+    "popular_movies": "Filmes Populares",
+    "popular_shows": "Séries Populares",
+    "top_rated_movies": "Filmes Mais Bem Avaliados",
+    "top_rated_shows": "Séries Mais Bem Avaliadas",
+
     "connect_to_internet": "Por favor, conecte-se à internet e tente novamente",
     "invalid_input": "Entrada inválida, por favor altere sua pesquisa e tente novamente",
     "need_inspiration": "Precisa de inspiração? \nAqui estão alguns exemplos",

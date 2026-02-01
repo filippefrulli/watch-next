@@ -6,8 +6,16 @@
     "tv_show": "Série",
     "go": "ALLEZ",
     "close": "Fermer",
-    "hint": "Qu’est-ce que tu as envie de regarder?",
+    "hint": "Qu'est-ce que tu as envie de regarder?",
     "with_action": "avec beaucoup d'action",
+
+    "browse": "Parcourir",
+    "curated_playlists": "Sélections",
+    "popular_movies": "Films Populaires",
+    "popular_shows": "Séries Populaires",
+    "top_rated_movies": "Films les Mieux Notés",
+    "top_rated_shows": "Séries les Mieux Notées",
+
     "connect_to_internet": "Veuillez vous connecter à Internet et réessayer",
     "invalid_input": "Saisie invalide, veuillez modifier votre requête et réessayer",
     "need_inspiration": "Besoin d'inspiration?\nHVoici quelques exemples",

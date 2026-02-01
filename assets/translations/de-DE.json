@@ -8,6 +8,14 @@
     "close": "Schließen",
     "hint": "Worauf hast du Lust?",
     "with_action": "mit viel Action",
+
+    "browse": "Entdecken",
+    "curated_playlists": "Kuratierte Playlists",
+    "popular_movies": "Beliebte Filme",
+    "popular_shows": "Beliebte Serien",
+    "top_rated_movies": "Bestbewertete Filme",
+    "top_rated_shows": "Bestbewertete Serien",
+
     "connect_to_internet": "Bitte verbinde dich mit dem Internet und versuche es nochmal",
     "invalid_input": "Ungültige Eingabe, bitte änder die Eingabe un versuch es nochmal",
     "need_inspiration": "Brauchst du Inspiration? \nHier sind ein Paar Beispiele",

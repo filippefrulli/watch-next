@@ -8,6 +8,14 @@
     "close": "閉じる",
     "hint": "何を観たい気分ですか？",
     "with_action": "アクション満載の",
+
+    "browse": "ブラウズ",
+    "curated_playlists": "おすすめプレイリスト",
+    "popular_movies": "人気の映画",
+    "popular_shows": "人気のドラマ",
+    "top_rated_movies": "高評価の映画",
+    "top_rated_shows": "高評価のドラマ",
+
     "connect_to_internet": "インターネットに接続してから再試行してください",
     "invalid_input": "無効な入力です。検索内容を変更して再試行してください",
     "need_inspiration": "インスピレーションが必要ですか？\nいくつかの例をご紹介します",

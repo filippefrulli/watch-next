@@ -31,10 +31,17 @@ class _LanguagePageState extends State<LanguagePage> {
   static List<String> languageFlags = ['🇺🇸', '🇩🇪', '🇮🇹', '🇫🇷', '🇪🇸', '🇧🇷', '🇯🇵', '🇮🇳'];
 
   int selected = 21;
+  String? _initialLanguage;
 
   @override
   initState() {
     super.initState();
+    _loadInitialLanguage();
+  }
+
+  Future<void> _loadInitialLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    _initialLanguage = prefs.getString('lang');
   }
 
   @override
@@ -112,6 +119,16 @@ class _LanguagePageState extends State<LanguagePage> {
               onTap: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 bool seen = prefs.getBool('skip_intro') ?? false;
+
+                // Log language change only when submitting
+                final currentLang = prefs.getString('lang');
+                if (_initialLanguage != currentLang && currentLang != null) {
+                  UserActionService.logLanguageChanged(
+                    fromLanguage: _initialLanguage ?? 'none',
+                    toLanguage: currentLang,
+                  );
+                }
+
                 if (mounted && seen) {
                   Navigator.of(context).pop();
                 } else if (mounted && !seen) {
@@ -183,17 +200,10 @@ class _LanguagePageState extends State<LanguagePage> {
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           if (mounted) {
-            final previousLang = prefs.getString('lang');
             context.setLocale(Locale(lang, region));
 
             prefs.setInt('language_number', index);
             prefs.setString('lang', '$lang-$region');
-
-            // Track language changed
-            UserActionService.logLanguageChanged(
-              fromLanguage: previousLang ?? 'none',
-              toLanguage: '$lang-$region',
-            );
 
             setState(() {
               selected = index;

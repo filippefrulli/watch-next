@@ -15,11 +15,18 @@ class RegionIntroPage extends StatefulWidget {
 
 class _SecondIntroScreenState extends State<RegionIntroPage> {
   int selected = -1;
+  String? _initialRegion;
 
   @override
   initState() {
     availableRegions.sort((a, b) => a.englishName!.compareTo(b.englishName!));
     super.initState();
+    _loadInitialRegion();
+  }
+
+  Future<void> _loadInitialRegion() async {
+    final prefs = await SharedPreferences.getInstance();
+    _initialRegion = prefs.getString('region');
   }
 
   @override
@@ -90,17 +97,10 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
       child: InkWell(
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          final previousRegion = prefs.getString('region');
           prefs.setString('region', region);
           prefs.setInt('region_number', index);
 
           prefs.setBool('seen', true);
-
-          // Track region changed
-          UserActionService.logRegionChanged(
-            fromRegion: previousRegion ?? 'none',
-            toRegion: region,
-          );
 
           setState(() {
             selected = index;
@@ -188,6 +188,16 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
                   onTap: () async {
+                    // Log region change only when submitting
+                    final prefs = await SharedPreferences.getInstance();
+                    final currentRegion = prefs.getString('region');
+                    if (_initialRegion != currentRegion && currentRegion != null) {
+                      UserActionService.logRegionChanged(
+                        fromRegion: _initialRegion ?? 'none',
+                        toRegion: currentRegion,
+                      );
+                    }
+
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => const StreamingServicesPage(),

@@ -16,6 +16,7 @@ import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
 
@@ -103,6 +104,15 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             'identifier': await WatchlistService().getUserId()
           });
         }
+
+        // Track user action
+        UserActionService.logRecommendationRequested(
+          query: widget.requestString,
+          type: widget.type == 0 ? 'movie' : 'show',
+          includeRentals: widget.includeRentals,
+          includePurchases: widget.includePurchases,
+          streamingServices: userServiceNames,
+        );
 
         // Navigate to results page with the loaded data
         Navigator.of(context).pushReplacement(

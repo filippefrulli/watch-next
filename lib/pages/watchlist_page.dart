@@ -7,6 +7,7 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/imdb_import_service.dart';
 import 'package:watch_next/services/letterboxd_import_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/widgets/watchlist/import_source_dialog.dart';
 import 'package:watch_next/widgets/watchlist/import_instructions_dialog.dart';
 import 'package:watch_next/widgets/watchlist/import_progress_dialog.dart';
@@ -216,7 +217,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
                 item: filteredItems[index],
                 userServiceIds: _userServiceIds,
                 onRemove: () async {
-                  await _watchlistService.removeFromWatchlist(filteredItems[index].mediaId);
+                  final item = filteredItems[index];
+                  await _watchlistService.removeFromWatchlist(item.mediaId);
+                  // Track watchlist remove
+                  UserActionService.logWatchlistRemove(
+                    mediaId: item.mediaId,
+                    title: item.title,
+                    type: item.isMovie ? 'movie' : 'show',
+                  );
                 },
               );
             },
@@ -292,6 +300,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
             },
           );
         }
+
+        // Track watchlist imported
+        UserActionService.logWatchlistImported(
+          source: 'imdb',
+          successCount: successCount,
+          failedCount: failedCount,
+          skippedCount: skippedCount,
+        );
 
         showDialog(
           context: context,
@@ -375,6 +391,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
             },
           );
         }
+
+        // Track watchlist imported
+        UserActionService.logWatchlistImported(
+          source: 'letterboxd',
+          successCount: successCount,
+          failedCount: failedCount,
+          skippedCount: skippedCount,
+        );
 
         showDialog(
           context: context,

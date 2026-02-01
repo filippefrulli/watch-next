@@ -5,6 +5,7 @@ import 'package:watch_next/objects/playlist.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/playlist_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 
 class PlaylistDetailPage extends StatefulWidget {
   final Playlist playlist;
@@ -185,6 +186,15 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
   }
 
   void _openItem(LoadedPlaylistItem item) {
+    // Track playlist item selected
+    UserActionService.logPlaylistItemSelected(
+      playlistId: widget.playlist.id,
+      mediaId: item.tmdbId,
+      title: item.title,
+      type: item.isMovie ? 'movie' : 'show',
+      positionInList: _items.indexOf(item),
+    );
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => MediaDetailPage(

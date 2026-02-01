@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:watch_next/objects/playlist.dart';
 import 'package:watch_next/pages/playlist_detail_page.dart';
 import 'package:watch_next/services/playlist_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 
 class PlaylistsPage extends StatefulWidget {
   const PlaylistsPage({super.key});
@@ -153,6 +154,13 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
   }
 
   void _openPlaylist(Playlist playlist) {
+    // Track playlist viewed
+    UserActionService.logPlaylistViewed(
+      playlistId: playlist.id,
+      playlistTitle: playlist.title,
+      itemsCount: playlist.items.length,
+    );
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => PlaylistDetailPage(playlist: playlist),

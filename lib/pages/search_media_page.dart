@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/widgets/search_media/search_bar_widget.dart';
 import 'package:watch_next/widgets/search_media/search_empty_state.dart';
 import 'package:watch_next/widgets/search_media/search_result_card.dart';
@@ -40,6 +41,15 @@ class _SearchMediaPageState extends State<SearchMediaPage> {
 
     try {
       final results = await HttpService().multiSearch(query);
+
+      // Track search action
+      final movieCount = results.where((r) => r.isMovie).length;
+      final showCount = results.where((r) => !r.isMovie).length;
+      UserActionService.logSearchPerformed(
+        query: query,
+        type: movieCount >= showCount ? 'movie' : 'show',
+        resultsCount: results.length,
+      );
 
       setState(() {
         _searchResults = results;

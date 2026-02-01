@@ -8,6 +8,10 @@
     "close": "Cerrar",
     "hint": "¿Qué te apetece ver?",
     "with_action": "con mucha acción",
+    "main_headline": "¿Qué te gustaría ver hoy?",
+    "hero_hint": "Describe lo que te apetece ver...",
+    "filters": "Filtros",
+    "examples": "Ejemplos",
 
     "browse": "Explorar",
     "curated_playlists": "Listas Curadas",

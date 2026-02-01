@@ -8,6 +8,10 @@
     "close": "Fechar",
     "hint": "O que você está com vontade de assistir?",
     "with_action": "com muita ação",
+    "main_headline": "O que você gostaria de assistir hoje?",
+    "hero_hint": "Descreva o que você está com vontade de ver...",
+    "filters": "Filtros",
+    "examples": "Exemplos",
 
     "browse": "Explorar",
     "curated_playlists": "Playlists Selecionadas",

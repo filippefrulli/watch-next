@@ -8,6 +8,10 @@
     "close": "Close",
     "hint": "What do you feel like watching?",
     "with_action": "with a lot of action",
+    "main_headline": "What would you like to watch today?",
+    "hero_hint": "Describe what you're in the mood for...",
+    "filters": "Filters",
+    "examples": "Examples",
 
     "browse": "Browse",
     "curated_playlists": "Curated Playlists",

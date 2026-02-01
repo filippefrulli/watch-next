@@ -14,12 +14,12 @@ import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
-import 'package:watch_next/widgets/main_menu/examples_dialog.dart';
-import 'package:watch_next/widgets/main_menu/main_menu_top_bar.dart';
+import 'package:watch_next/widgets/main_menu/hero_input.dart';
 import 'package:watch_next/widgets/main_menu/media_type_switch.dart';
-import 'package:watch_next/widgets/main_menu/prompt_input_widget.dart';
 import 'package:watch_next/widgets/main_menu/query_settings_panel.dart';
+import 'package:watch_next/widgets/main_menu/secondary_actions_row.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
+import 'package:watch_next/pages/settings_page.dart';
 
 class MainMenuPage extends StatefulWidget {
   const MainMenuPage({super.key});
@@ -107,42 +107,45 @@ class _MainMenuPageState extends State<MainMenuPage> {
       child: SizedBox(
         height: availableHeight,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               const SizedBox(height: 8),
-              const MainMenuTopBar(),
-              const Spacer(),
-              _buildDescription(),
-              const SizedBox(height: 32),
+              // Settings button top-right
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  _buildSettingsButton(),
+                ],
+              ),
+              const Spacer(flex: 2),
+              // Hero headline
+              _buildHeroHeadline(),
+              const SizedBox(height: 80),
+              // Media type toggle
               MediaTypeSwitch(
                 currentIndex: typeIsMovie,
                 onToggle: (index) => setState(() => typeIsMovie = index),
               ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  QuerySettingsButton(
-                    settings: _querySettings,
-                    onSettingsChanged: (settings) {
-                      setState(() => _querySettings = settings);
-                    },
-                    isMovie: typeIsMovie == 0,
-                  ),
-                  const SizedBox(width: 12),
-                  ExamplesButton(isMovie: typeIsMovie == 0),
-                ],
-              ),
-              const SizedBox(height: 16),
-              PromptInputWidget(
+              const SizedBox(height: 80),
+              // Hero input
+              HeroInput(
                 controller: _controller,
                 textFieldKey: textFieldKey,
                 isLongEnough: isLongEnough,
                 enableLoading: enableLoading,
                 onGoPressed: _onGoPressed,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              // Secondary actions - text links
+              SecondaryActionsRow(
+                querySettings: _querySettings,
+                onSettingsChanged: (settings) {
+                  setState(() => _querySettings = settings);
+                },
+                isMovie: typeIsMovie == 0,
+              ),
+              const Spacer(flex: 3),
             ],
           ),
         ),
@@ -150,14 +153,44 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildSettingsButton() {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.tertiary,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingsPage(),
+              ),
+            );
+          },
+          child: const Icon(
+            Icons.settings_rounded,
+            color: Colors.white,
+            size: 22,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroHeadline() {
     return Text(
-      "find_something".tr(),
+      "main_headline".tr(),
       textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            height: 1.4,
+      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            height: 1.3,
           ),
     );
   }

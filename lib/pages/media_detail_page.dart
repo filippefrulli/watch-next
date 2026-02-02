@@ -234,7 +234,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: BoxDecoration(
-              color: _isInWatchlist ? Colors.orange.withOpacity(0.15) : Theme.of(context).colorScheme.tertiary,
+              color: _isInWatchlist ? Colors.orange.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: _isInWatchlist ? Colors.orange : Theme.of(context).colorScheme.outline,

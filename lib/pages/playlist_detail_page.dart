@@ -92,7 +92,7 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.orange.withOpacity(0.3),
+                      Colors.orange.withValues(alpha: 0.3),
                       Theme.of(context).colorScheme.primary,
                     ],
                   ),
@@ -238,7 +238,7 @@ class _PlaylistItemCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -280,8 +280,8 @@ class _PlaylistItemCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: isAvailable
-                          ? Colors.green.withOpacity(0.9)
-                          : (hasRentOrBuy ? Colors.orange.withOpacity(0.9) : Colors.grey.withOpacity(0.9)),
+                          ? Colors.green.withValues(alpha: 0.9)
+                          : (hasRentOrBuy ? Colors.orange.withValues(alpha: 0.9) : Colors.grey.withValues(alpha: 0.9)),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

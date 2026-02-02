@@ -24,12 +24,12 @@ class HeroInput extends StatelessWidget {
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isLongEnough ? Colors.orange : Colors.orange.withOpacity(0.4),
+          color: isLongEnough ? Colors.orange : Colors.orange.withValues(alpha: 0.3),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(isLongEnough ? 0.25 : 0.1),
+            color: Colors.orange..withValues(alpha: isLongEnough ? 0.25 : 0.1),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -113,7 +113,7 @@ class _GoButton extends StatelessWidget {
         boxShadow: isReady
             ? [
                 BoxShadow(
-                  color: Colors.orange.withOpacity(0.4),
+                  color: Colors.orange.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),

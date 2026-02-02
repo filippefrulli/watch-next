@@ -248,8 +248,10 @@ class _BrowsePageState extends State<BrowsePage> {
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
                           color: isAvailable
-                              ? Colors.green.withOpacity(0.9)
-                              : (hasRentOrBuy ? Colors.orange.withOpacity(0.9) : Colors.grey.withOpacity(0.9)),
+                              ? Colors.green.withValues(alpha: 0.9)
+                              : (hasRentOrBuy
+                                  ? Colors.orange.withValues(alpha: 0.9)
+                                  : Colors.grey.withValues(alpha: 0.9)),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -306,7 +308,7 @@ class _BrowsePageState extends State<BrowsePage> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.2),
+                          color: Colors.orange.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Center(

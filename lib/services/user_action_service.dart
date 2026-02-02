@@ -218,4 +218,22 @@ class UserActionService {
   static Future<void> logStreamingServicesUpdated() async {
     await logAction('streaming_services_updated');
   }
+
+  /// Log when a tab is selected
+  static Future<void> logTabSelected({
+    required String tabName,
+  }) async {
+    await logAction('tab_selected', details: {
+      'tab_name': tabName,
+    });
+  }
+
+  /// Log when a button is pressed
+  static Future<void> logButtonPressed({
+    required String buttonName,
+  }) async {
+    await logAction('button_pressed', details: {
+      'button_name': buttonName,
+    });
+  }
 }

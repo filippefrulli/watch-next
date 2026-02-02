@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/widgets/main_menu/examples_dialog.dart';
 import 'package:watch_next/widgets/main_menu/query_settings_panel.dart';
 
@@ -25,19 +26,25 @@ class SecondaryActionsRow extends StatelessWidget {
           icon: Icons.tune_rounded,
           label: "filters".tr(),
           hasIndicator: querySettings.hasActiveFilters,
-          onTap: () => QuerySettingsPanel.show(
-            context,
-            initialSettings: querySettings,
-            onSettingsChanged: onSettingsChanged,
-            isMovie: isMovie,
-          ),
+          onTap: () {
+            UserActionService.logButtonPressed(buttonName: 'filters');
+            QuerySettingsPanel.show(
+              context,
+              initialSettings: querySettings,
+              onSettingsChanged: onSettingsChanged,
+              isMovie: isMovie,
+            );
+          },
         ),
         const SizedBox(width: 24),
         // Examples button
         _ActionButton(
           icon: Icons.lightbulb_outline_rounded,
           label: "examples".tr(),
-          onTap: () => ExamplesDialog.show(context, isMovie: isMovie),
+          onTap: () {
+            UserActionService.logButtonPressed(buttonName: 'examples');
+            ExamplesDialog.show(context, isMovie: isMovie);
+          },
         ),
       ],
     );

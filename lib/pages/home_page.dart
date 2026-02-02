@@ -3,6 +3,7 @@ import 'package:watch_next/pages/browse_page.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
 import 'package:watch_next/pages/search_media_page.dart';
 import 'package:watch_next/pages/watchlist_page.dart';
+import 'package:watch_next/services/user_action_service.dart';
 
 class TabNavigationPage extends StatefulWidget {
   const TabNavigationPage({super.key});
@@ -14,14 +15,27 @@ class TabNavigationPage extends StatefulWidget {
 class _TabNavigationPageState extends State<TabNavigationPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  static const List<String> _tabNames = ['watchlist', 'discover', 'browse', 'search'];
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this, initialIndex: 1);
+    _tabController.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    // Only log when the tab change is complete (not during swipe animation)
+    if (!_tabController.indexIsChanging) {
+      UserActionService.logTabSelected(
+        tabName: _tabNames[_tabController.index],
+      );
+    }
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
   }

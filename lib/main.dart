@@ -184,6 +184,12 @@ class SplashState extends State<Splash> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool seen = (prefs.getBool('skip_intro') ?? false);
 
+    // Migrate existing users: if they completed the old onboarding,
+    // mark setup as complete so they don't see the setup sheet
+    if (seen && !(prefs.getBool('setup_complete') ?? false)) {
+      prefs.setBool('setup_complete', true);
+    }
+
     if (seen && mounted) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomePage()));
     } else if (mounted) {

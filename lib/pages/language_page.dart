@@ -2,7 +2,7 @@ import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/region_page.dart';
+import 'package:watch_next/pages/home_page.dart';
 import 'package:watch_next/services/user_action_service.dart';
 
 class LanguagePage extends StatefulWidget {
@@ -132,9 +132,16 @@ class _LanguagePageState extends State<LanguagePage> {
                 if (mounted && seen) {
                   Navigator.of(context).pop();
                 } else if (mounted && !seen) {
+                  // Auto-detect region from the selected language
+                  final selectedRegion = regions[selected];
+                  prefs.setString('region', selectedRegion);
+                  prefs.setInt('region_number', selected);
+                  prefs.setBool('seen', true);
+                  prefs.setBool('skip_intro', true);
+
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => const RegionIntroPage(),
+                      builder: (context) => const TabNavigationPage(),
                     ),
                   );
                 }

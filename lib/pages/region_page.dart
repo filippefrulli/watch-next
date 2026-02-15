@@ -16,12 +16,22 @@ class RegionIntroPage extends StatefulWidget {
 class _SecondIntroScreenState extends State<RegionIntroPage> {
   int selected = -1;
   String? _initialRegion;
+  String _searchQuery = '';
+  List<Region> _filteredRegions = availableRegions;
 
   @override
   initState() {
     availableRegions.sort((a, b) => a.englishName!.compareTo(b.englishName!));
     super.initState();
     _loadInitialRegion();
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      _searchQuery = value;
+      _filteredRegions =
+          availableRegions.where((region) => region.englishName!.toLowerCase().contains(value.toLowerCase())).toList();
+    });
   }
 
   Future<void> _loadInitialRegion() async {
@@ -44,7 +54,34 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
               "select_country".tr(),
               style: Theme.of(context).textTheme.displayLarge,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Search country...",
+                  prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.tertiary,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.orange, width: 2),
+                  ),
+                ),
+                onChanged: _onSearchChanged,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 16),
             Expanded(
               child: _regions(),
             ),
@@ -73,7 +110,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
           borderRadius: BorderRadius.circular(16),
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: availableRegions.length,
+            itemCount: _filteredRegions.length,
             separatorBuilder: (context, index) => Divider(
               height: 1,
               thickness: 1,
@@ -81,7 +118,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
               indent: 72,
             ),
             itemBuilder: (context, index) {
-              return _listTile(availableRegions[index].englishName!, availableRegions[index].iso!, index);
+              return _listTile(_filteredRegions[index].englishName!, _filteredRegions[index].iso!, index);
             },
           ),
         ),

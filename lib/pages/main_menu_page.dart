@@ -7,7 +7,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/notification_service.dart';
@@ -19,7 +18,6 @@ import 'package:watch_next/widgets/main_menu/hero_input.dart';
 import 'package:watch_next/widgets/main_menu/media_type_switch.dart';
 import 'package:watch_next/widgets/main_menu/query_settings_panel.dart';
 import 'package:watch_next/widgets/main_menu/secondary_actions_row.dart';
-import 'package:watch_next/widgets/setup_bottom_sheet.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
 import 'package:watch_next/pages/settings_page.dart';
 
@@ -255,16 +253,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Future<void> _onGoPressed() async {
     FocusScope.of(context).unfocus();
-
-    // Check if user has completed setup (region + streaming services)
-    final prefs = await SharedPreferences.getInstance();
-    final setupComplete = prefs.getBool('setup_complete') ?? false;
-
-    if (!setupComplete && mounted) {
-      final completed = await showSetupBottomSheet(context);
-      if (!completed || !mounted) return;
-    }
-
     await _checkConnection();
 
     if (noInternet) {

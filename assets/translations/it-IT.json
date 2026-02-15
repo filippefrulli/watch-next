@@ -171,9 +171,6 @@
     "feedback_settings_message": "Hai un suggerimento o un problema? Ci piacerebbe sentire la tua opinione!",
 
     "select_streaming": "Seleziona i tuoi servizi di streaming",
-    "setup_region_subtitle": "Questo ci permette di mostrarti i risultati disponibili nella tua regione",
-    "setup_streaming_subtitle": "Ti mostreremo solo titoli sui tuoi servizi",
-    "next": "Avanti",
 
     "validation_prompt": "Il tuo compito e' valutare se una frase o una parola e' una richiesta di consigliare un film, dei criteri in base ai quali puoi consigliare un film o il nome di un film. Esempi di richieste corrette sono: \"romantico e divertente, ideale per un primo appuntamento\", \"con Tom Cruise e diretto da Steven Spielberg\", \"sull'intelligenza artificiale, con buone recensioni\", \"azione e avventura\", \"divertente\", \"Moana\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': ",
     "validation_prompt_series": "Il tuo compito e' valutare se una frase e' una richiesta di consigliare una serie tv, dei criteri in base ai quali puoi consigliare una serie tv o il nome di una serie tv. Esempi di richieste corrette sono: \"con meno di 5 stagioni\", \"sullo sport\", \"Lost\", \"con episodi lunghi meno di 30 minuti\", \"divertente\". Se la richiesta e' valida, rispondi con il testo YES, altrimenti NO. la richiesta e': ",

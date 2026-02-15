@@ -171,9 +171,6 @@
     "feedback_settings_message": "Vous avez une suggestion, une plainte ou vous voulez simplement dire bonjour? Nous serions ravis de vous entendre!",
 
     "select_streaming": "Sélectionne tes services de streaming",
-    "setup_region_subtitle": "Cela nous permet de te montrer les résultats disponibles dans ta région",
-    "setup_streaming_subtitle": "Nous ne montrerons que les titres sur tes services",
-    "next": "Suivant",
 
     "validation_prompt": "Votre travail consiste à valider si une phrase ou un mot donnée est une demande de recommandation d'un film, des critères à partir desquels vous pouvez recommander un film ou le nom d'un film. Exemples de messages corrects: \"Recommander un film romantique et drôle, idéal pour un premier rendez-vous\", \"Recommander un film avec Tom Cruise et réalisé par Steven Spielberg\", \"sur l'intelligence artificielle, avec de bonnes critiques \", \"action et aventure\", \"drôle\", \"Moana\". Si l'invite est valide, renvoyez uniquement le texte YES, sinon NO. L'invite est :",
     "validation_prompt_series": "Ton travail consiste à valider si une phrase donnée est une demande de recommandation de séries, des critères à partir desquels vous pouvez recommander un séries ou le nom d'une séries. Voici des exemples d'invites correctes: \"qui a moins de 5 saisons\", \"sur le sport\", \"avec des épisodes de moins de 30 minutes\", \"drôle\", \"Lost\". Si la requête est valide, renvoyez uniquement le texte YES, sinon NO. La requête est: ",

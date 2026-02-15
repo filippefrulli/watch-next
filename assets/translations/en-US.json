@@ -170,9 +170,6 @@
     "feedback_settings_message": "Have a suggestion, complaint, or just want to say hi? We'd love to hear from you!",
 
     "select_streaming": "Select your streaming services",
-    "setup_region_subtitle": "This allows us to show results available in your region",
-    "setup_streaming_subtitle": "We'll only show titles on your services",
-    "next": "Next",
 
     "validation_prompt": "Your job is to validate wether a given sentence or word is a request to recommend a movie, criteria from which you can recommend a movie or a movie name. Examples of correct prompts are: \"romantic and funny, ideal for a first date\", \"starring Tom Cruise and directed by Steven Spielberg\", \"about artificial intelligence, with good reviews\", \"action and adventure\", \"funny\", \"Moana\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",
     "validation_prompt_series": "Your job is to validate wether a given sentence is a request to recommend a tv show, criteria from which you can recommend a tv show or a tv show name. Examples of correct prompts are: \"that has less than 5 seasons\", \"about sports\", \"with episodes shorter than 30 minutes\", \"funny\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",

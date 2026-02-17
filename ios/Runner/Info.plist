@@ -37,7 +37,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-1447855401529208~3015865989</string>
+	<string>ca-app-pub-5560251457557918~5118135319</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>

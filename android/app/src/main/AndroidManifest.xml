@@ -33,7 +33,7 @@
         <meta-data
             tools:replace="android:value"
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-1447855401529208~8555133126"/>
+            android:value="ca-app-pub-5560251457557918~2598612324"/>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="high_importance_channel" />

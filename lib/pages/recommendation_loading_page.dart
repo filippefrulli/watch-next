@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -15,7 +13,6 @@ import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
-import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
@@ -92,18 +89,6 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             .map((provider) => provider.providerName ?? '')
             .where((name) => name.isNotEmpty)
             .toList();
-
-        // Save successful query to Firestore with results count
-        if (!kDebugMode) {
-          FirebaseFirestore.instance.collection('good_queries').add({
-            'type': widget.type == 0 ? 'movie' : 'show',
-            'timestamp': FieldValue.serverTimestamp(),
-            'query': widget.requestString,
-            'results_count': results.length,
-            'streaming_services': userServiceNames,
-            'identifier': await WatchlistService().getUserId()
-          });
-        }
 
         // Track user action
         UserActionService.logRecommendationRequested(

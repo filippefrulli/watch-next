@@ -63,7 +63,7 @@ class SeriesDetails {
   SeriesDetails.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
-    episodeRunTime = json['episode_run_time'].cast<int>();
+    episodeRunTime = (json['episode_run_time'] as List?)?.cast<int>() ?? [];
     firstAirDate = json['first_air_date'];
     if (json['genres'] != null) {
       genres = <Genres>[];
@@ -74,7 +74,7 @@ class SeriesDetails {
     homepage = json['homepage'];
     id = json['id'];
     inProduction = json['in_production'];
-    languages = json['languages'].cast<String>();
+    languages = (json['languages'] as List?)?.cast<String>() ?? [];
     lastAirDate = json['last_air_date'];
     lastEpisodeToAir =
         json['last_episode_to_air'] != null ? LastEpisodeToAir.fromJson(json['last_episode_to_air']) : null;
@@ -87,7 +87,7 @@ class SeriesDetails {
     }
     numberOfEpisodes = json['number_of_episodes'];
     numberOfSeasons = json['number_of_seasons'];
-    originCountry = json['origin_country'].cast<String>();
+    originCountry = (json['origin_country'] as List?)?.cast<String>() ?? [];
     originalLanguage = json['original_language'];
     originalName = json['original_name'];
     overview = json['overview'];
@@ -188,8 +188,8 @@ class LastEpisodeToAir {
   int? id;
   String? name;
   String? overview;
-  int? voteAverage;
-  int? voteCount;
+  double? voteAverage;
+  double? voteCount;
   String? airDate;
   int? episodeNumber;
   String? episodeType;
@@ -218,13 +218,13 @@ class LastEpisodeToAir {
     id = json['id'];
     name = json['name'];
     overview = json['overview'];
-    voteAverage = json['vote_average'];
-    voteCount = json['vote_count'];
+    voteAverage = (json['vote_average'] as num?)?.toDouble();
+    voteCount = (json['vote_count'] as num?)?.toDouble();
     airDate = json['air_date'];
     episodeNumber = json['episode_number'];
     episodeType = json['episode_type'];
     productionCode = json['production_code'];
-    runtime = json['runtime'];
+    runtime = (json['runtime'] as num?)?.toInt();
     seasonNumber = json['season_number'];
     showId = json['show_id'];
     stillPath = json['still_path'];

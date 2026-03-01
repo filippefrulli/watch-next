@@ -189,5 +189,12 @@
     "no_playlists": "Keine Playlists verfügbar",
     "titles": "Titel",
     "no_items": "Keine Einträge in dieser Playlist",
-    "rent_buy": "Leihen/Kaufen"
+    "rent_buy": "Leihen/Kaufen",
+    "details": "Details",
+    "overview": "Übersicht",
+    "cast": "Besetzung",
+    "episode_runtime": "Episodendauer",
+    "status": "Status",
+    "created_by": "Erstellt von",
+    "seasons": "Staffeln"
 }

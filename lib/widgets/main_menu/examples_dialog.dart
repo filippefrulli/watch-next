@@ -10,8 +10,10 @@ class ExamplesDialog extends StatelessWidget {
   });
 
   static void show(BuildContext context, {required bool isMovie}) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (_) => ExamplesDialog(isMovie: isMovie),
     );
   }
@@ -34,107 +36,136 @@ class ExamplesDialog extends StatelessWidget {
             "example_show_5".tr(),
           ];
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline,
-            width: 1,
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildHeader(context),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: examples.map((text) => _ExampleItem(text: text)).toList(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Padding(
+                padding: const EdgeInsets.only(top: 12, bottom: 4),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[600],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              "need_inspiration".tr(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.lightbulb_rounded,
+                        color: Colors.orange,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "need_inspiration".tr().split('\n').first,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(height: 8),
+              Divider(color: Colors.grey[800], height: 1),
+              // Examples list
+              Expanded(
+                child: ListView.separated(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                  itemCount: examples.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) => _ExampleItem(
+                    number: index + 1,
+                    text: examples[index],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
 class _ExampleItem extends StatelessWidget {
+  final int number;
   final String text;
 
-  const _ExampleItem({required this.text});
+  const _ExampleItem({required this.number, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
+          color: Colors.grey[800]!,
           width: 1,
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 28,
+            height: 28,
             decoration: BoxDecoration(
               color: Colors.orange.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
-              Icons.auto_awesome_rounded,
-              color: Colors.orange,
-              size: 14,
+            child: Center(
+              child: Text(
+                '$number',
+                style: const TextStyle(
+                  color: Colors.orange,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Text(
               text,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
-                height: 1.4,
+                fontSize: 15,
+                height: 1.5,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ),

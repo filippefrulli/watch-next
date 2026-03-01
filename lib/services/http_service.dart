@@ -341,6 +341,20 @@ class HttpService {
     return credits;
   }
 
+  Future<MovieCredits> fetchSeriesCredits(int id) async {
+    final response = await _client.get(
+      Uri.https(
+        'api.themoviedb.org',
+        '/3/tv/$id/credits',
+        {'api_key': apiKey},
+      ),
+    );
+
+    MovieCredits credits = MovieCredits.fromJson(jsonDecode(response.body));
+
+    return credits;
+  }
+
   Future<List<TrailerResults>> fetchTrailer(int id) async {
     List<TrailerResults> trailerList = [];
 

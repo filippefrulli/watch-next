@@ -188,5 +188,12 @@
     "no_playlists": "No playlists available",
     "titles": "titles",
     "no_items": "No items in this playlist",
-    "rent_buy": "Rent/Buy"
+    "rent_buy": "Rent/Buy",
+    "details": "Details",
+    "overview": "Overview",
+    "cast": "Cast",
+    "episode_runtime": "Episode runtime",
+    "status": "Status",
+    "created_by": "Created by",
+    "seasons": "seasons"
 }

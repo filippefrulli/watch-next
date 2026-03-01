@@ -189,5 +189,12 @@
     "no_playlists": "No hay listas disponibles",
     "titles": "títulos",
     "no_items": "No hay elementos en esta lista",
-    "rent_buy": "Alquilar/Comprar"
+    "rent_buy": "Alquilar/Comprar",
+    "details": "Detalles",
+    "overview": "Sinopsis",
+    "cast": "Reparto",
+    "episode_runtime": "Durac. episodio",
+    "status": "Estado",
+    "created_by": "Creado por",
+    "seasons": "temporadas"
 }

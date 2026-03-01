@@ -189,5 +189,12 @@
     "no_playlists": "プレイリストがありません",
     "titles": "作品",
     "no_items": "このプレイリストにアイテムがありません",
-    "rent_buy": "レンタル/購入"
+    "rent_buy": "レンタル/購入",
+    "details": "詳細",
+    "overview": "あらすじ",
+    "cast": "キャスト",
+    "episode_runtime": "エピソード時間",
+    "status": "ステータス",
+    "created_by": "制作",
+    "seasons": "シーズン"
 }

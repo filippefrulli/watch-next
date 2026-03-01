@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/movie_credits.dart';
+import 'package:watch_next/objects/person_details.dart';
 import 'package:watch_next/objects/series_details.dart';
 import 'package:watch_next/objects/series_search_results.dart';
 import 'package:watch_next/objects/streaming_service.dart';
@@ -353,6 +354,36 @@ class HttpService {
     MovieCredits credits = MovieCredits.fromJson(jsonDecode(response.body));
 
     return credits;
+  }
+
+  Future<PersonDetails> fetchPersonDetails(int personId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
+    final response = await _client.get(
+      Uri.https(
+        'api.themoviedb.org',
+        '/3/person/$personId',
+        {'api_key': apiKey, 'language': lang},
+      ),
+    );
+
+    return PersonDetails.fromJson(jsonDecode(response.body));
+  }
+
+  Future<PersonCredits> fetchPersonCredits(int personId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
+    final response = await _client.get(
+      Uri.https(
+        'api.themoviedb.org',
+        '/3/person/$personId/combined_credits',
+        {'api_key': apiKey, 'language': lang},
+      ),
+    );
+
+    return PersonCredits.fromJson(jsonDecode(response.body));
   }
 
   Future<List<TrailerResults>> fetchTrailer(int id) async {

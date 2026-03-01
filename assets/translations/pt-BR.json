@@ -196,5 +196,16 @@
     "episode_runtime": "Duração ep.",
     "status": "Status",
     "created_by": "Criado por",
-    "seasons": "temporadas"
+    "seasons": "temporadas",
+
+    "person_filmography": "Filmografia",
+    "person_biography": "Biografia",
+    "person_show_more": "Mostrar mais",
+    "person_show_less": "Mostrar menos",
+    "person_no_credits": "Nenhum crédito encontrado",
+    "person_movies": "filmes",
+    "person_shows": "séries",
+    "person_filter_all": "Tudo",
+    "person_filter_movies": "Filmes",
+    "person_filter_shows": "Séries"
 }

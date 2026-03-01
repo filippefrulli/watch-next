@@ -14,6 +14,7 @@ import 'package:watch_next/objects/series_details.dart';
 import 'package:watch_next/objects/movie_credits.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
+import 'package:watch_next/pages/person_detail_page.dart';
 
 class MediaDetailPage extends StatefulWidget {
   final int mediaId;
@@ -436,7 +437,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     final movie = _movieDetails;
     if (movie == null) return const SizedBox.shrink();
 
-    final director = _credits?.crew?.where((c) => c.job == 'Director').map((c) => c.name ?? '').join(', ');
+    final directors = _credits?.crew?.where((c) => c.job == 'Director').toList() ?? [];
 
     final topCast = _credits?.cast?.take(6).toList() ?? [];
 
@@ -465,9 +466,11 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           ),
           const SizedBox(height: 20),
         ],
-        // Director
-        if (director != null && director.isNotEmpty) ...[
-          _buildDetailRow(Icons.movie_creation_outlined, 'director'.tr(), director),
+        // Director(s)
+        if (directors.isNotEmpty) ...[
+          _buildSectionLabel('director'.tr()),
+          const SizedBox(height: 12),
+          _buildDirectorRow(directors),
           const SizedBox(height: 20),
         ],
         // Cast
@@ -648,31 +651,120 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final actor = cast[index];
-          return SizedBox(
-            width: 72,
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(36),
-                  child: actor.profilePath != null
-                      ? CachedNetworkImage(
-                          imageUrl: 'https://image.tmdb.org/t/p/w185${actor.profilePath}',
-                          width: 64,
-                          height: 64,
-                          fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => _actorPlaceholder(),
-                        )
-                      : _actorPlaceholder(),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  actor.name ?? '',
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey[300], fontSize: 11, height: 1.3),
-                ),
-              ],
+          return GestureDetector(
+            onTap: actor.id != null
+                ? () {
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'person_tapped',
+                      parameters: <String, Object>{
+                        'person_id': actor.id!,
+                        'person_name': actor.name ?? '',
+                        'role': 'cast',
+                      },
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PersonDetailPage(
+                          personId: actor.id!,
+                          personName: actor.name ?? '',
+                          profilePath: actor.profilePath,
+                        ),
+                      ),
+                    );
+                  }
+                : null,
+            child: SizedBox(
+              width: 72,
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(36),
+                    child: actor.profilePath != null
+                        ? CachedNetworkImage(
+                            imageUrl: 'https://image.tmdb.org/t/p/w185${actor.profilePath}',
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                            errorWidget: (_, __, ___) => _actorPlaceholder(),
+                          )
+                        : _actorPlaceholder(),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    actor.name ?? '',
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[300], fontSize: 11, height: 1.3),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDirectorRow(List<Crew> directors) {
+    return SizedBox(
+      height: 110,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: directors.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final director = directors[index];
+          return GestureDetector(
+            onTap: director.id != null
+                ? () {
+                    FirebaseAnalytics.instance.logEvent(
+                      name: 'person_tapped',
+                      parameters: <String, Object>{
+                        'person_id': director.id!,
+                        'person_name': director.name ?? '',
+                        'role': 'director',
+                      },
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PersonDetailPage(
+                          personId: director.id!,
+                          personName: director.name ?? '',
+                          profilePath: director.profilePath,
+                        ),
+                      ),
+                    );
+                  }
+                : null,
+            child: SizedBox(
+              width: 72,
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(36),
+                    child: director.profilePath != null
+                        ? CachedNetworkImage(
+                            imageUrl: 'https://image.tmdb.org/t/p/w185${director.profilePath}',
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                            errorWidget: (_, __, ___) => _actorPlaceholder(),
+                          )
+                        : _actorPlaceholder(),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    director.name ?? '',
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[300], fontSize: 11, height: 1.3),
+                  ),
+                ],
+              ),
             ),
           );
         },

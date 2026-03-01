@@ -196,5 +196,16 @@
     "episode_runtime": "एपिसोड अवधि",
     "status": "स्थिति",
     "created_by": "निर्माता",
-    "seasons": "सीज़न"
+    "seasons": "सीज़न",
+
+    "person_filmography": "फ़िल्मोग्राफ़ी",
+    "person_biography": "जीवनी",
+    "person_show_more": "अधिक दिखाएं",
+    "person_show_less": "कम दिखाएं",
+    "person_no_credits": "कोई क्रेडिट नहीं मिला",
+    "person_movies": "फ़िल्में",
+    "person_shows": "शो",
+    "person_filter_all": "सभी",
+    "person_filter_movies": "फ़िल्में",
+    "person_filter_shows": "टीवी शो"
 }

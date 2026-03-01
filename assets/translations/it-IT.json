@@ -196,5 +196,16 @@
     "episode_runtime": "Durata episodio",
     "status": "Stato",
     "created_by": "Creato da",
-    "seasons": "stagioni"
+    "seasons": "stagioni",
+
+    "person_filmography": "Filmografia",
+    "person_biography": "Biografia",
+    "person_show_more": "Mostra di più",
+    "person_show_less": "Mostra meno",
+    "person_no_credits": "Nessun credito trovato",
+    "person_movies": "film",
+    "person_shows": "serie",
+    "person_filter_all": "Tutti",
+    "person_filter_movies": "Film",
+    "person_filter_shows": "Serie TV"
 }

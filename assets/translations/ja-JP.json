@@ -196,5 +196,16 @@
     "episode_runtime": "エピソード時間",
     "status": "ステータス",
     "created_by": "制作",
-    "seasons": "シーズン"
+    "seasons": "シーズン",
+
+    "person_filmography": "フィルモグラフィー",
+    "person_biography": "経歴",
+    "person_show_more": "もっと見る",
+    "person_show_less": "閉じる",
+    "person_no_credits": "クレジットが見つかりません",
+    "person_movies": "映画",
+    "person_shows": "ドラマ",
+    "person_filter_all": "すべて",
+    "person_filter_movies": "映画",
+    "person_filter_shows": "ドラマ"
 }

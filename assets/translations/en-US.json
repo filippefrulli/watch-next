@@ -195,5 +195,16 @@
     "episode_runtime": "Episode runtime",
     "status": "Status",
     "created_by": "Created by",
-    "seasons": "seasons"
+    "seasons": "seasons",
+
+    "person_filmography": "Filmography",
+    "person_biography": "Biography",
+    "person_show_more": "Show more",
+    "person_show_less": "Show less",
+    "person_no_credits": "No credits found",
+    "person_movies": "movies",
+    "person_shows": "shows",
+    "person_filter_all": "All",
+    "person_filter_movies": "Movies",
+    "person_filter_shows": "TV Shows"
 }

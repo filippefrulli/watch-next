@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/services/http_service.dart';
@@ -191,13 +190,6 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
-          FirebaseAnalytics.instance.logEvent(
-            name: 'watchlist_added',
-            parameters: <String, Object>{
-              'source': 'media_detail',
-              'type': widget.isMovie ? 'movie' : 'show',
-            },
-          );
         }
         UserActionService.logWatchlistAdd(
           mediaId: widget.mediaId,
@@ -654,13 +646,10 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           return GestureDetector(
             onTap: actor.id != null
                 ? () {
-                    FirebaseAnalytics.instance.logEvent(
-                      name: 'person_tapped',
-                      parameters: <String, Object>{
-                        'person_id': actor.id!,
-                        'person_name': actor.name ?? '',
-                        'role': 'cast',
-                      },
+                    UserActionService.logPersonTapped(
+                      personId: actor.id!,
+                      personName: actor.name ?? '',
+                      role: 'cast',
                     );
                     Navigator.push(
                       context,
@@ -719,13 +708,10 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           return GestureDetector(
             onTap: director.id != null
                 ? () {
-                    FirebaseAnalytics.instance.logEvent(
-                      name: 'person_tapped',
-                      parameters: <String, Object>{
-                        'person_id': director.id!,
-                        'person_name': director.name ?? '',
-                        'role': 'director',
-                      },
+                    UserActionService.logPersonTapped(
+                      personId: director.id!,
+                      personName: director.name ?? '',
+                      role: 'director',
                     );
                     Navigator.push(
                       context,

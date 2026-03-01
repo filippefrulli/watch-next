@@ -236,4 +236,32 @@ class UserActionService {
       'button_name': buttonName,
     });
   }
+
+  /// Log when a person (cast/director) is tapped
+  static Future<void> logPersonTapped({
+    required int personId,
+    required String personName,
+    required String role, // 'cast' or 'director'
+  }) async {
+    await logAction('person_tapped', details: {
+      'person_id': personId,
+      'person_name': personName,
+      'role': role,
+    });
+  }
+
+  /// Log when a media item is tapped from a person's filmography page
+  static Future<void> logMediaTappedFromPerson({
+    required int mediaId,
+    required String mediaTitle,
+    required String mediaType, // 'movie' or 'tv'
+    required String personName,
+  }) async {
+    await logAction('media_tapped_from_person', details: {
+      'media_id': mediaId,
+      'media_title': mediaTitle,
+      'media_type': mediaType,
+      'person_name': personName,
+    });
+  }
 }

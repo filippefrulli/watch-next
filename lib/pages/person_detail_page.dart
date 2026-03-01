@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:watch_next/objects/person_details.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 
 class PersonDetailPage extends StatefulWidget {
   final int personId;
@@ -325,6 +326,12 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
   Widget _buildCreditCard(PersonCredit credit) {
     return GestureDetector(
       onTap: () {
+        UserActionService.logMediaTappedFromPerson(
+          mediaId: credit.id ?? 0,
+          mediaTitle: credit.displayTitle,
+          mediaType: credit.isMovie ? 'movie' : 'tv',
+          personName: widget.personName,
+        );
         Navigator.push(
           context,
           MaterialPageRoute(

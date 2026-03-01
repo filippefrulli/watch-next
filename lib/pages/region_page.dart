@@ -16,7 +16,6 @@ class RegionIntroPage extends StatefulWidget {
 class _SecondIntroScreenState extends State<RegionIntroPage> {
   int selected = -1;
   String? _initialRegion;
-  String _searchQuery = '';
   List<Region> _filteredRegions = availableRegions;
 
   @override
@@ -28,7 +27,6 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
 
   void _onSearchChanged(String value) {
     setState(() {
-      _searchQuery = value;
       _filteredRegions =
           availableRegions.where((region) => region.englishName!.toLowerCase().contains(value.toLowerCase())).toList();
     });

@@ -14,7 +14,6 @@ import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 
 class RecommendationResultsPage extends StatefulWidget {
   final List<WatchObject> watchObjects;
@@ -110,13 +109,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
-          FirebaseAnalytics.instance.logEvent(
-            name: 'watchlist_added',
-            parameters: <String, Object>{
-              'source': 'recommendation',
-              'type': widget.type == 0 ? 'movie' : 'show',
-            },
-          );
         }
         // Track watchlist add
         UserActionService.logWatchlistAdd(

@@ -1,8 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/objects/movie_credits.dart';
+import 'package:watch_next/objects/movie_details.dart';
+import 'package:watch_next/objects/season_episodes.dart';
+import 'package:watch_next/objects/series_details.dart';
 import 'package:watch_next/objects/trailer.dart';
+import 'package:watch_next/pages/person_detail_page.dart';
+import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
@@ -39,10 +45,22 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
   final WatchlistService _watchlistService = WatchlistService();
   bool _isInWatchlist = false;
 
+  // Extra details loaded lazily
+  MovieCredits? _credits;
+  MovieDetails? _movieDetails;
+  SeriesDetails? _seriesDetails;
+  bool _detailsLoaded = false;
+
+  // Season episode cache: seasonNumber → episodes
+  final Map<int, List<Episode>> _episodeCache = {};
+  final Set<int> _loadingSeasons = {};
+  final Set<int> _expandedSeasons = {};
+
   @override
   void initState() {
     super.initState();
     _checkIfInWatchlist();
+    _loadDetails();
   }
 
   @override
@@ -50,6 +68,46 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.mediaId != widget.mediaId) {
       _checkIfInWatchlist();
+      _detailsLoaded = false;
+      _credits = null;
+      _movieDetails = null;
+      _seriesDetails = null;
+      _episodeCache.clear();
+      _loadingSeasons.clear();
+      _expandedSeasons.clear();
+      _loadDetails();
+    }
+  }
+
+  Future<void> _loadDetails() async {
+    try {
+      if (widget.isMovie) {
+        final results = await Future.wait([
+          HttpService().fetchMovieCredits(widget.mediaId),
+          HttpService().fetchMovieDetails(widget.mediaId),
+        ]);
+        if (mounted) {
+          setState(() {
+            _credits = results[0] as MovieCredits;
+            _movieDetails = results[1] as MovieDetails;
+            _detailsLoaded = true;
+          });
+        }
+      } else {
+        final results = await Future.wait([
+          HttpService().fetchSeriesCredits(widget.mediaId),
+          HttpService().fetchSeriesDetails(widget.mediaId),
+        ]);
+        if (mounted) {
+          setState(() {
+            _credits = results[0] as MovieCredits;
+            _seriesDetails = results[1] as SeriesDetails;
+            _detailsLoaded = true;
+          });
+        }
+      }
+    } catch (_) {
+      if (mounted) setState(() => _detailsLoaded = true);
     }
   }
 
@@ -69,7 +127,6 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         if (mounted) {
           setState(() => _isInWatchlist = false);
         }
-        // Track watchlist remove
         UserActionService.logWatchlistRemove(
           mediaId: widget.mediaId,
           title: widget.title,
@@ -84,15 +141,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
-          FirebaseAnalytics.instance.logEvent(
-            name: 'watchlist_added',
-            parameters: <String, Object>{
-              'source': 'recommendation_info',
-              'type': widget.isMovie ? 'movie' : 'show',
-            },
-          );
         }
-        // Track watchlist add
         UserActionService.logWatchlistAdd(
           mediaId: widget.mediaId,
           title: widget.title,
@@ -121,7 +170,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         ),
         child: Column(
           children: [
-            // Drag handle - stays at top, not scrollable
+            // Drag handle
             const SizedBox(height: 16),
             Center(
               child: Container(
@@ -143,23 +192,20 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(child: Container()),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.85,
-                            child: Text(
-                              widget.title,
-                              maxLines: 2,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                            ),
+                      // Title
+                      Center(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: Text(
+                            widget.title,
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
                           ),
-                          Expanded(child: Container()),
-                        ],
+                        ),
                       ),
                       const SizedBox(height: 12),
                       // Watchlist button
@@ -170,10 +216,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                             borderRadius: BorderRadius.circular(12),
                             onTap: _toggleWatchlist,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               decoration: BoxDecoration(
                                 color: _isInWatchlist
                                     ? Colors.orange.withValues(alpha: 0.2)
@@ -207,33 +250,9 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Container(
-                        height: 1,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.transparent,
-                              Colors.orange.withValues(alpha: 0.3),
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                      ),
+                      _buildDivider(),
                       const SizedBox(height: 16),
-                      Text(
-                        widget.overview,
-                        maxLines: 17,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              height: 1.5,
-                            ),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        height: 1,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      const SizedBox(height: 16),
+                      // TMDB score
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
@@ -244,21 +263,15 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.orange,
-                              size: 20,
-                            ),
+                            const Icon(Icons.star, color: Colors.orange, size: 20),
                             const SizedBox(width: 8),
                             Text(
-                              "tmdb_score".tr(),
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                    fontSize: 14,
-                                  ),
+                              'tmdb_score'.tr(),
+                              style: Theme.of(context).textTheme.displaySmall?.copyWith(fontSize: 14),
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              (widget.tmdbRating?.toStringAsFixed(1) ?? ''),
+                              widget.tmdbRating?.toStringAsFixed(1) ?? '',
                               style: Theme.of(context).textTheme.displaySmall?.copyWith(
                                     color: Colors.orange,
                                     fontWeight: FontWeight.bold,
@@ -268,11 +281,35 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      _buildDivider(),
                       const SizedBox(height: 16),
-                      Container(
-                        height: 1,
-                        color: Theme.of(context).colorScheme.outline,
+                      // Overview
+                      Text(
+                        widget.overview,
+                        maxLines: 17,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(height: 1.5),
                       ),
+                      const SizedBox(height: 20),
+                      _buildDivider(),
+                      const SizedBox(height: 16),
+                      // Credits / season details
+                      if (!_detailsLoaded)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        )
+                      else ...[
+                        if (widget.isMovie) _buildMovieCredits() else _buildSeriesSeasons(),
+                      ],
+                      const SizedBox(height: 16),
+                      _buildDivider(),
                       const SizedBox(height: 8),
                       TrailerListWidget(
                         trailerList: widget.trailerList,
@@ -290,4 +327,381 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
       ),
     );
   }
+
+  Widget _buildDivider() {
+    return Container(
+      height: 1,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            Colors.orange.withValues(alpha: 0.3),
+            Colors.transparent,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label) {
+    return Text(
+      label,
+      style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+    );
+  }
+
+  // ── MOVIE: genres + runtime + director + cast ─────────────────────────
+
+  Widget _buildMovieCredits() {
+    final directors = _credits?.crew?.where((c) => c.job == 'Director').toList() ?? [];
+    final topCast = _credits?.cast?.take(15).toList() ?? [];
+    final genres = _movieDetails?.genres ?? [];
+    final runtime = _movieDetails?.runtime;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (genres.isNotEmpty) ...[
+          _buildGenreChips(genres.map((g) => g.name ?? '').where((n) => n.isNotEmpty).toList()),
+          const SizedBox(height: 16),
+        ],
+        if (runtime != null && runtime > 0) ...[
+          _buildMetaRow([Icons.timer_outlined], ['$runtime ${'info_min'.tr()}']),
+          const SizedBox(height: 16),
+        ],
+        if (directors.isNotEmpty) ...[
+          _buildSectionLabel('director'.tr()),
+          const SizedBox(height: 12),
+          _buildPersonRow(directors
+              .map((d) => _PersonItem(id: d.id, name: d.name, profilePath: d.profilePath, role: 'director'))
+              .toList()),
+          const SizedBox(height: 20),
+        ],
+        if (topCast.isNotEmpty) ...[
+          _buildSectionLabel('cast'.tr()),
+          const SizedBox(height: 12),
+          _buildPersonRow(topCast
+              .map((a) => _PersonItem(id: a.id, name: a.name, profilePath: a.profilePath, role: 'cast'))
+              .toList()),
+          const SizedBox(height: 4),
+        ],
+      ],
+    );
+  }
+
+  // ── TV SHOW: genres + episode runtime + seasons + cast ─────────────────
+
+  Widget _buildSeriesSeasons() {
+    final topCast = _credits?.cast?.take(15).toList() ?? [];
+    final seasons = _seriesDetails?.seasons?.where((s) => (s.seasonNumber ?? 0) > 0).toList() ?? [];
+    final genres = _seriesDetails?.genres ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (genres.isNotEmpty) ...[
+          _buildGenreChips(genres.map((g) => g.name ?? '').where((n) => n.isNotEmpty).toList()),
+          const SizedBox(height: 16),
+        ],
+        if (seasons.isNotEmpty) ...[
+          _buildSectionLabel('info_seasons'.tr()),
+          const SizedBox(height: 12),
+          ...seasons.map((s) => _buildSeasonRow(s)),
+          const SizedBox(height: 20),
+        ],
+        if (topCast.isNotEmpty) ...[
+          _buildSectionLabel('cast'.tr()),
+          const SizedBox(height: 12),
+          _buildPersonRow(topCast
+              .map((a) => _PersonItem(id: a.id, name: a.name, profilePath: a.profilePath, role: 'cast'))
+              .toList()),
+          const SizedBox(height: 4),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSeasonRow(Seasons season) {
+    final seasonNum = season.seasonNumber ?? 0;
+    final isExpanded = _expandedSeasons.contains(seasonNum);
+    final isLoading = _loadingSeasons.contains(seasonNum);
+    final episodes = _episodeCache[seasonNum];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Tappable header row
+        InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () async {
+            if (isExpanded) {
+              setState(() => _expandedSeasons.remove(seasonNum));
+              return;
+            }
+            setState(() => _expandedSeasons.add(seasonNum));
+            if (!_episodeCache.containsKey(seasonNum)) {
+              setState(() => _loadingSeasons.add(seasonNum));
+              try {
+                final data = await HttpService().fetchSeasonEpisodes(widget.mediaId, seasonNum);
+                if (mounted) {
+                  setState(() {
+                    _episodeCache[seasonNum] = data.episodes ?? [];
+                    _loadingSeasons.remove(seasonNum);
+                  });
+                }
+              } catch (_) {
+                if (mounted) setState(() => _loadingSeasons.remove(seasonNum));
+              }
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.withValues(alpha: 0.4), width: 1),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'S$seasonNum',
+                      style: const TextStyle(color: Colors.orange, fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    season.name ?? 'Season $seasonNum',
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+                if (season.episodeCount != null)
+                  Text(
+                    '${season.episodeCount} ${'info_episodes'.tr()}',
+                    style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                  ),
+                const SizedBox(width: 8),
+                Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  color: Colors.grey[500],
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Expanded episode list
+        if (isExpanded) ...[
+          const SizedBox(height: 4),
+          if (isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                  strokeWidth: 2,
+                ),
+              ),
+            )
+          else if (episodes != null)
+            Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[800]!, width: 1),
+              ),
+              child: Column(
+                children: _buildEpisodeList(episodes),
+              ),
+            ),
+        ],
+        const SizedBox(height: 4),
+      ],
+    );
+  }
+
+  List<Widget> _buildEpisodeList(List<Episode> episodes) {
+    final items = <Widget>[];
+    for (int i = 0; i < episodes.length; i++) {
+      items.add(_buildEpisodeRow(episodes[i]));
+      if (i < episodes.length - 1) {
+        items.add(Divider(
+          height: 1,
+          thickness: 1,
+          color: Colors.grey[850],
+        ));
+      }
+    }
+    return items;
+  }
+
+  Widget _buildEpisodeRow(Episode ep) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Episode number badge
+          SizedBox(
+            width: 28,
+            child: Text(
+              'E${ep.episodeNumber}',
+              style: TextStyle(color: Colors.grey[500], fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Episode name
+          Expanded(
+            child: Text(
+              ep.name ?? '',
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ),
+          // Runtime
+          if (ep.runtime != null && ep.runtime! > 0) ...[
+            const SizedBox(width: 8),
+            Text(
+              '${ep.runtime} ${'info_min'.tr()}',
+              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // ── Genre chips ─────────────────────────────────────────────────────────
+
+  Widget _buildGenreChips(List<String> genres) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      children: genres
+          .map((g) => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3), width: 1),
+                ),
+                child: Text(
+                  g,
+                  style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  // ── Meta row (icon + label) ──────────────────────────────────────────────
+
+  Widget _buildMetaRow(List<IconData> icons, List<String> labels) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 6,
+      children: List.generate(icons.length, (i) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icons[i], color: Colors.grey[400], size: 15),
+            const SizedBox(width: 5),
+            Text(
+              labels[i],
+              style: TextStyle(color: Colors.grey[300], fontSize: 13),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  // ── Shared person avatar row ────────────────────────────────────────────
+
+  Widget _buildPersonRow(List<_PersonItem> people) {
+    return SizedBox(
+      height: 100,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: people.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final person = people[index];
+          return GestureDetector(
+            onTap: person.id != null
+                ? () {
+                    UserActionService.logPersonTapped(
+                      personId: person.id!,
+                      personName: person.name ?? '',
+                      role: person.role,
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PersonDetailPage(
+                          personId: person.id!,
+                          personName: person.name ?? '',
+                          profilePath: person.profilePath,
+                        ),
+                      ),
+                    );
+                  }
+                : null,
+            child: SizedBox(
+              width: 68,
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: person.profilePath != null
+                        ? CachedNetworkImage(
+                            imageUrl: 'https://image.tmdb.org/t/p/w185${person.profilePath}',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                            errorWidget: (_, __, ___) => _personPlaceholder(),
+                          )
+                        : _personPlaceholder(),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    person.name ?? '',
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[300], fontSize: 10, height: 1.3),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _personPlaceholder() {
+    return Container(
+      width: 60,
+      height: 60,
+      color: Theme.of(context).colorScheme.tertiary,
+      child: Icon(Icons.person, color: Colors.grey[600], size: 28),
+    );
+  }
+}
+
+/// Lightweight data holder for person avatar rows.
+class _PersonItem {
+  final int? id;
+  final String? name;
+  final String? profilePath;
+  final String role;
+
+  const _PersonItem({required this.id, required this.name, required this.profilePath, required this.role});
 }

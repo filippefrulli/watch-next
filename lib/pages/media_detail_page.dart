@@ -431,7 +431,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
 
     final directors = _credits?.crew?.where((c) => c.job == 'Director').toList() ?? [];
 
-    final topCast = _credits?.cast?.take(6).toList() ?? [];
+    final topCast = _credits?.cast?.take(15).toList() ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,7 +486,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     final series = _seriesDetails;
     if (series == null) return const SizedBox.shrink();
 
-    final topCast = _credits?.cast?.take(6).toList() ?? [];
+    final topCast = _credits?.cast?.take(15).toList() ?? [];
     final creators = _credits?.crew
         ?.where((c) => c.job == 'Executive Producer' || c.job == 'Creator')
         .take(2)

@@ -207,5 +207,9 @@
     "person_shows": "series",
     "person_filter_all": "Todo",
     "person_filter_movies": "Películas",
-    "person_filter_shows": "Series"
+    "person_filter_shows": "Series",
+
+    "info_seasons": "Temporadas",
+    "info_episodes": "ep.",
+    "info_min": "min"
 }

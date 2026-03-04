@@ -207,5 +207,9 @@
     "person_shows": "ドラマ",
     "person_filter_all": "すべて",
     "person_filter_movies": "映画",
-    "person_filter_shows": "ドラマ"
+    "person_filter_shows": "ドラマ",
+
+    "info_seasons": "シーズン",
+    "info_episodes": "話",
+    "info_min": "分"
 }

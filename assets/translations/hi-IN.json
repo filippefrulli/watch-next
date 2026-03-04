@@ -207,5 +207,9 @@
     "person_shows": "शो",
     "person_filter_all": "सभी",
     "person_filter_movies": "फ़िल्में",
-    "person_filter_shows": "टीवी शो"
+    "person_filter_shows": "टीवी शो",
+
+    "info_seasons": "सीज़न",
+    "info_episodes": "एप.",
+    "info_min": "मिनट"
 }

@@ -50,6 +50,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
   MovieDetails? _movieDetails;
   SeriesDetails? _seriesDetails;
   MovieCredits? _credits;
+  List<BrowseItem> _similarItems = [];
 
   // Trailer state
   List<TrailerResults> _trailerList = [];
@@ -107,14 +108,17 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         final detailsFuture = HttpService().fetchMovieDetails(widget.mediaId);
         final creditsFuture = HttpService().fetchMovieCredits(widget.mediaId);
         final trailerFuture = HttpService().fetchTrailer(widget.mediaId);
+        final similarFuture = HttpService().fetchSimilar(widget.mediaId, isMovie: true);
         final details = await detailsFuture;
         final credits = await creditsFuture;
         final trailers = await trailerFuture;
+        final similar = await similarFuture;
         if (mounted) {
           setState(() {
             _movieDetails = details;
             _credits = credits;
             _trailerList = trailers;
+            _similarItems = similar;
             _isDetailsLoading = false;
           });
         }
@@ -122,14 +126,17 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         final detailsFuture = HttpService().fetchSeriesDetails(widget.mediaId);
         final creditsFuture = HttpService().fetchSeriesCredits(widget.mediaId);
         final trailerFuture = HttpService().fetchTrailerSeries(widget.mediaId);
+        final similarFuture = HttpService().fetchSimilar(widget.mediaId, isMovie: false);
         final details = await detailsFuture;
         final credits = await creditsFuture;
         final trailers = await trailerFuture;
+        final similar = await similarFuture;
         if (mounted) {
           setState(() {
             _seriesDetails = details;
             _credits = credits;
             _trailerList = trailers;
+            _similarItems = similar;
             _isDetailsLoading = false;
           });
         }
@@ -478,6 +485,13 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           trailerImages: _trailerImages,
           onTrailerTap: _launchTrailerURL,
         ),
+        // Similar titles
+        if (_similarItems.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          _buildSectionLabel('similar_titles'.tr()),
+          const SizedBox(height: 12),
+          _buildSimilarCarousel(),
+        ],
       ],
     );
   }
@@ -555,7 +569,86 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           trailerImages: _trailerImages,
           onTrailerTap: _launchTrailerURL,
         ),
+        // Similar titles
+        if (_similarItems.isNotEmpty) ...[
+          const SizedBox(height: 20),
+          _buildSectionLabel('similar_titles'.tr()),
+          const SizedBox(height: 12),
+          _buildSimilarCarousel(),
+        ],
       ],
+    );
+  }
+
+  Widget _buildSimilarCarousel() {
+    return SizedBox(
+      height: 215,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _similarItems.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final item = _similarItems[index];
+          return GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MediaDetailPage(
+                  mediaId: item.id,
+                  title: item.title,
+                  isMovie: item.isMovie,
+                  posterPath: item.posterPath,
+                ),
+              ),
+            ),
+            child: SizedBox(
+              width: 126,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: item.posterPath != null
+                        ? CachedNetworkImage(
+                            imageUrl: 'https://image.tmdb.org/t/p/w185${item.posterPath}',
+                            width: 126,
+                            height: 188,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => Container(
+                              width: 126,
+                              height: 188,
+                              color: Theme.of(context).colorScheme.tertiary,
+                            ),
+                            errorWidget: (_, __, ___) => Container(
+                              width: 126,
+                              height: 188,
+                              color: Theme.of(context).colorScheme.tertiary,
+                              child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 28),
+                            ),
+                          )
+                        : Container(
+                            width: 126,
+                            height: 188,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.tertiary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 28),
+                          ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[300], fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 

@@ -8,6 +8,7 @@ import 'package:watch_next/objects/season_episodes.dart';
 import 'package:watch_next/objects/series_details.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/pages/person_detail_page.dart';
+import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
@@ -56,6 +57,9 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
   final Set<int> _loadingSeasons = {};
   final Set<int> _expandedSeasons = {};
 
+  // Similar titles
+  List<BrowseItem> _similarItems = [];
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +76,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
       _credits = null;
       _movieDetails = null;
       _seriesDetails = null;
+      _similarItems = [];
       _episodeCache.clear();
       _loadingSeasons.clear();
       _expandedSeasons.clear();
@@ -85,11 +90,13 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         final results = await Future.wait([
           HttpService().fetchMovieCredits(widget.mediaId),
           HttpService().fetchMovieDetails(widget.mediaId),
+          HttpService().fetchSimilar(widget.mediaId, isMovie: true),
         ]);
         if (mounted) {
           setState(() {
             _credits = results[0] as MovieCredits;
             _movieDetails = results[1] as MovieDetails;
+            _similarItems = results[2] as List<BrowseItem>;
             _detailsLoaded = true;
           });
         }
@@ -97,11 +104,13 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         final results = await Future.wait([
           HttpService().fetchSeriesCredits(widget.mediaId),
           HttpService().fetchSeriesDetails(widget.mediaId),
+          HttpService().fetchSimilar(widget.mediaId, isMovie: false),
         ]);
         if (mounted) {
           setState(() {
             _credits = results[0] as MovieCredits;
             _seriesDetails = results[1] as SeriesDetails;
+            _similarItems = results[2] as List<BrowseItem>;
             _detailsLoaded = true;
           });
         }
@@ -316,6 +325,11 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                         trailerImages: widget.trailerImages,
                         onTrailerTap: widget.onTrailerTap,
                       ),
+                      if (_similarItems.isNotEmpty) ...[
+                        _buildDivider(),
+                        const SizedBox(height: 16),
+                        _buildSimilarCarousel(),
+                      ],
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -325,6 +339,86 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSimilarCarousel() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionLabel('similar_titles'.tr()),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 215,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _similarItems.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final item = _similarItems[i];
+              return GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MediaDetailPage(
+                      mediaId: item.id,
+                      title: item.title,
+                      isMovie: item.isMovie,
+                      posterPath: item.posterPath,
+                    ),
+                  ),
+                ),
+                child: SizedBox(
+                  width: 126,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: item.posterPath != null
+                            ? CachedNetworkImage(
+                                imageUrl: 'https://image.tmdb.org/t/p/w185${item.posterPath}',
+                                width: 126,
+                                height: 188,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => Container(
+                                  width: 126,
+                                  height: 188,
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                                errorWidget: (_, __, ___) => Container(
+                                  width: 126,
+                                  height: 188,
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                  child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 28),
+                                ),
+                              )
+                            : Container(
+                                width: 126,
+                                height: 188,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 28),
+                              ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        item.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey[300], fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 

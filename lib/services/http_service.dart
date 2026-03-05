@@ -738,6 +738,36 @@ class HttpService {
       await Future.wait(batch.map((item) => loadBrowseItemAvailability(item)));
     }
   }
+
+  /// Fetch similar movies or TV shows for a given id
+  Future<List<BrowseItem>> fetchSimilar(int id, {required bool isMovie}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+      final type = isMovie ? 'movie' : 'tv';
+
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/$type/$id/similar', {
+              'api_key': apiKey,
+              'language': lang,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return [];
+
+      final results = (jsonDecode(response.body)['results'] as List)
+          .where((item) => item['poster_path'] != null)
+          .take(20)
+          .map((item) => BrowseItem.fromJson(item, isMovie: isMovie))
+          .toList();
+
+      return results;
+    } catch (e) {
+      return [];
+    }
+  }
 }
 
 /// Model for browse/trending items

@@ -103,6 +103,7 @@
     "loading": "Caricamento...",
     "failed_load_streaming": "Errore nel caricare le informazioni di streaming",
     "retry": "Riprova",
+    "refresh": "Aggiorna",
     "availability": "Disponibilità",
     "not_available_region": "Non disponibile nella tua regione",
     "stream": "Streaming",

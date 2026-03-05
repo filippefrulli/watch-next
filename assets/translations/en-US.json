@@ -102,6 +102,7 @@
     "loading": "Loading...",
     "failed_load_streaming": "Failed to load streaming information",
     "retry": "Retry",
+    "refresh": "Refresh",
     "availability": "Availability",
     "not_available_region": "Not available in your region",
     "stream": "Stream",

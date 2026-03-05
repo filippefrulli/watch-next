@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class WatchlistHeader extends StatelessWidget {
@@ -30,21 +31,34 @@ class WatchlistHeader extends StatelessWidget {
   }
 
   Widget _buildImportButton(BuildContext context) {
-    return Container(
-      height: 50,
-      width: 50,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isImporting ? null : onImportTap,
-          child: Icon(
-            Icons.arrow_upward_outlined,
-            color: Colors.white,
-            size: 20,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isImporting ? null : onImportTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isImporting)
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
+              else
+                const Icon(Icons.arrow_upward_outlined, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'import'.tr(),
+                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+              ),
+            ],
           ),
         ),
       ),
@@ -52,34 +66,35 @@ class WatchlistHeader extends StatelessWidget {
   }
 
   Widget _buildRefreshButton(BuildContext context) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isRefreshing ? null : onRefreshTap,
         borderRadius: BorderRadius.circular(12),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: isRefreshing ? null : onRefreshTap,
-          child: isRefreshing
-              ? const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isRefreshing)
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                 )
-              : const Icon(
-                  Icons.refresh,
-                  color: Colors.white,
-                  size: 20,
-                ),
+              else
+                const Icon(Icons.refresh, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'refresh'.tr(),
+                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
         ),
       ),
     );

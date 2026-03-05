@@ -103,6 +103,7 @@
     "loading": "読み込み中...",
     "failed_load_streaming": "ストリーミング情報の読み込みに失敗しました",
     "retry": "再試行",
+    "refresh": "更新",
     "availability": "配信状況",
     "not_available_region": "お住まいの地域では利用できません",
     "stream": "ストリーミング",

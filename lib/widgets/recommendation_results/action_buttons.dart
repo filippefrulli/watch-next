@@ -90,13 +90,9 @@ class ActionButtons extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: isWatched
-            ? Colors.green.withValues(alpha: 0.15)
-            : Theme.of(context).colorScheme.tertiary,
+        color: isWatched ? Colors.green.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
-        border: isWatched
-            ? Border.all(color: Colors.green.withValues(alpha: 0.5), width: 1)
-            : null,
+        border: isWatched ? Border.all(color: Colors.green.withValues(alpha: 0.5), width: 1) : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -110,8 +106,7 @@ class ActionButtons extends StatelessWidget {
               children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) =>
-                      ScaleTransition(scale: animation, child: child),
+                  transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
                   child: Icon(
                     Icons.check,
                     key: ValueKey<bool>(isWatched),
@@ -121,9 +116,7 @@ class ActionButtons extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  isWatched && watchedRating != null
-                      ? '${'watched_rating'.tr()} $watchedRating/10'
-                      : 'watched'.tr(),
+                  isWatched && watchedRating != null ? '${'watched_rating'.tr()} $watchedRating/10' : 'watched'.tr(),
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: isWatched ? Colors.green : Colors.white,

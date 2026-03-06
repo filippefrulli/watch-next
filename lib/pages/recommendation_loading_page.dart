@@ -215,7 +215,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       final excludedTitlesStr = QueryCacheService.formatExcludedTitlesForPrompt(cachedTitles);
       // Also exclude any seed titles passed in (e.g. the movie we're finding similars for)
       final seedExclusion = widget.itemsToNotRecommend.isNotEmpty ? widget.itemsToNotRecommend : '';
-      final allExcluded = [if (excludedTitlesStr.isNotEmpty) excludedTitlesStr, if (seedExclusion.isNotEmpty) seedExclusion].join(', ');
+      final allExcluded =
+          [if (excludedTitlesStr.isNotEmpty) excludedTitlesStr, if (seedExclusion.isNotEmpty) seedExclusion].join(', ');
       String doNotRecommend = allExcluded.isNotEmpty ? doNotRecommendPrefix + allExcluded : '';
 
       // Check if user has limited streaming services (1-2) and add priority instruction

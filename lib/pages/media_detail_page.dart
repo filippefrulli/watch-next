@@ -290,6 +290,9 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
 
   Future<void> _generateSimilar() async {
     setState(() => _isGenerating = true);
+    UserActionService.logButtonPressed(
+      buttonName: widget.isMovie ? 'suggest_similar_movies' : 'suggest_similar_shows',
+    );
     final typeLabel = widget.isMovie ? 'Movies' : 'TV shows';
     final requestString = '$typeLabel similar to ${widget.title}';
     await Navigator.of(context).push(

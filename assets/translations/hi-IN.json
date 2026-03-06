@@ -222,5 +222,7 @@
     "stats_harsh_rater": "कठोर समीक्षक",
     "stats_rating_distribution": "रेटिंग वितरण",
     "stats_empty": "पहले कुछ देखें और रेट करें!",
-    "stats_top_genres": "शीर्ष शैलियाँ"
+    "stats_top_genres": "शीर्ष शैलियाँ",
+    "suggest_similar_movies": "समान फ़िल्में सुझाएं",
+    "suggest_similar_shows": "समान शो सुझाएं"
 }

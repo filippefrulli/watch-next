@@ -16,6 +16,7 @@ import 'package:watch_next/objects/movie_credits.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
 import 'package:watch_next/pages/person_detail_page.dart';
+import 'package:watch_next/pages/recommendation_loading_page.dart';
 
 class MediaDetailPage extends StatefulWidget {
   final int mediaId;
@@ -52,6 +53,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
 
   // Details state
   bool _isDetailsLoading = true;
+  bool _isGenerating = false;
   MovieDetails? _movieDetails;
   SeriesDetails? _seriesDetails;
   MovieCredits? _credits;
@@ -284,6 +286,22 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
 
   Future<RatingResult?> _showRatingDialog() {
     return RatingDialog.show(context, title: widget.title);
+  }
+
+  Future<void> _generateSimilar() async {
+    setState(() => _isGenerating = true);
+    final typeLabel = widget.isMovie ? 'Movies' : 'TV shows';
+    final requestString = '$typeLabel similar to ${widget.title}';
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => RecommendationLoadingPage(
+          requestString: requestString,
+          type: widget.isMovie ? 0 : 1,
+          itemsToNotRecommend: widget.title,
+        ),
+      ),
+    );
+    if (mounted) setState(() => _isGenerating = false);
   }
 
   @override
@@ -619,6 +637,9 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           trailerImages: _trailerImages,
           onTrailerTap: _launchTrailerURL,
         ),
+        // Generate similar button
+        const SizedBox(height: 24),
+        _buildGenerateSimilarButton(),
         // Similar titles
         if (_similarItems.isNotEmpty) ...[
           const SizedBox(height: 20),
@@ -703,6 +724,9 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           trailerImages: _trailerImages,
           onTrailerTap: _launchTrailerURL,
         ),
+        // Generate similar button
+        const SizedBox(height: 24),
+        _buildGenerateSimilarButton(),
         // Similar titles
         if (_similarItems.isNotEmpty) ...[
           const SizedBox(height: 20),
@@ -711,6 +735,31 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           _buildSimilarCarousel(),
         ],
       ],
+    );
+  }
+
+  Widget _buildGenerateSimilarButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: _isGenerating ? null : _generateSimilar,
+        icon: _isGenerating
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.orange),
+              )
+            : const Icon(Icons.auto_awesome, size: 18, color: Colors.orange),
+        label: Text(
+          widget.isMovie ? 'suggest_similar_movies'.tr() : 'suggest_similar_shows'.tr(),
+          style: const TextStyle(color: Colors.orange, fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 13),
+          side: const BorderSide(color: Colors.orange, width: 1.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
     );
   }
 

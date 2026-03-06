@@ -222,5 +222,7 @@
     "stats_harsh_rater": "Strenger Kritiker",
     "stats_rating_distribution": "Bewertungsverteilung",
     "stats_empty": "Schau und bewerte zuerst etwas!",
-    "stats_top_genres": "Top-Genres"
+    "stats_top_genres": "Top-Genres",
+    "suggest_similar_movies": "Ähnliche Filme vorschlagen",
+    "suggest_similar_shows": "Ähnliche Serien vorschlagen"
 }

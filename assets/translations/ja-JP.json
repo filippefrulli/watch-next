@@ -222,5 +222,7 @@
     "stats_harsh_rater": "厳しい批評家",
     "stats_rating_distribution": "評価の分布",
     "stats_empty": "まず何か視聴して評価しましょう！",
-    "stats_top_genres": "よく見るジャンル"
+    "stats_top_genres": "よく見るジャンル",
+    "suggest_similar_movies": "似た映画を提案",
+    "suggest_similar_shows": "似たドラマを提案"
 }

@@ -100,7 +100,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                       text: 'Watchlist',
                     ),
                     Tab(
-                      icon: Icon(Icons.check_circle_outline, size: 22),
+                      icon: Icon(Icons.check, size: 22),
                       text: 'Watched',
                     ),
                     Tab(

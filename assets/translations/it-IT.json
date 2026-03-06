@@ -222,5 +222,7 @@
     "stats_harsh_rater": "Critico esigente",
     "stats_rating_distribution": "Distribuzione voti",
     "stats_empty": "Guarda e vota qualcosa prima!",
-    "stats_top_genres": "Generi principali"
+    "stats_top_genres": "Generi principali",
+    "suggest_similar_movies": "Suggerisci film simili",
+    "suggest_similar_shows": "Suggerisci serie simili"
 }

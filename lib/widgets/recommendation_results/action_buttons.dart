@@ -7,6 +7,9 @@ class ActionButtons extends StatelessWidget {
   final VoidCallback onReloadPressed;
   final VoidCallback? onWatchlistPressed;
   final bool isInWatchlist;
+  final VoidCallback? onWatchedPressed;
+  final bool isWatched;
+  final int? watchedRating;
   final int mediaType;
 
   const ActionButtons({
@@ -15,6 +18,9 @@ class ActionButtons extends StatelessWidget {
     required this.onReloadPressed,
     this.onWatchlistPressed,
     this.isInWatchlist = false,
+    this.onWatchedPressed,
+    this.isWatched = false,
+    this.watchedRating,
     required this.mediaType,
   });
 
@@ -24,7 +30,9 @@ class ActionButtons extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (onWatchlistPressed != null) _buildWatchlistButton(context),
-        if (onWatchlistPressed != null && showReloadButton) const SizedBox(height: 8),
+        if (onWatchlistPressed != null && onWatchedPressed != null) const SizedBox(height: 8),
+        if (onWatchedPressed != null) _buildWatchedButton(context),
+        if ((onWatchlistPressed != null || onWatchedPressed != null) && showReloadButton) const SizedBox(height: 8),
         if (showReloadButton) _buildReloadButton(context),
       ],
     );
@@ -68,6 +76,57 @@ class ActionButtons extends StatelessWidget {
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: Colors.white,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWatchedButton(BuildContext context) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: isWatched
+            ? Colors.green.withValues(alpha: 0.15)
+            : Theme.of(context).colorScheme.tertiary,
+        borderRadius: BorderRadius.circular(16),
+        border: isWatched
+            ? Border.all(color: Colors.green.withValues(alpha: 0.5), width: 1)
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onWatchedPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: Icon(
+                    Icons.check,
+                    key: ValueKey<bool>(isWatched),
+                    color: isWatched ? Colors.green : Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  isWatched && watchedRating != null
+                      ? '${'watched_rating'.tr()} $watchedRating/10'
+                      : 'watched'.tr(),
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: isWatched ? Colors.green : Colors.white,
                       ),
                 ),
               ],

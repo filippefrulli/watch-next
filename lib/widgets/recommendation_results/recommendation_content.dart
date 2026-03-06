@@ -17,6 +17,9 @@ class RecommendationContent extends StatelessWidget {
   final VoidCallback onReloadPressed;
   final VoidCallback? onWatchlistPressed;
   final bool isInWatchlist;
+  final bool isWatched;
+  final int? watchedRating;
+  final VoidCallback? onWatchedPressed;
   final bool isRentOnly;
   final bool isBuyOnly;
 
@@ -34,6 +37,9 @@ class RecommendationContent extends StatelessWidget {
     required this.onReloadPressed,
     this.onWatchlistPressed,
     this.isInWatchlist = false,
+    this.isWatched = false,
+    this.watchedRating,
+    this.onWatchedPressed,
     this.isRentOnly = false,
     this.isBuyOnly = false,
   });
@@ -63,6 +69,9 @@ class RecommendationContent extends StatelessWidget {
               onReloadPressed: onReloadPressed,
               onWatchlistPressed: onWatchlistPressed,
               isInWatchlist: isInWatchlist,
+              onWatchedPressed: onWatchedPressed,
+              isWatched: isWatched,
+              watchedRating: watchedRating,
               mediaType: mediaType,
             ),
           ],

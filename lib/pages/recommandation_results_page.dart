@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,6 +12,8 @@ import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/services/watched_service.dart';
+import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
@@ -40,6 +43,7 @@ class RecommendationResultsPage extends StatefulWidget {
 class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   late Future<dynamic> servicesList;
   final WatchlistService _watchlistService = WatchlistService();
+  final WatchedService _watchedService = WatchedService();
 
   int index = 0;
   late int length;
@@ -47,6 +51,8 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   late List<WatchObject> watchObjectsList;
   PanelController pc = PanelController();
   bool _isInWatchlist = false;
+  bool _isWatched = false;
+  int? _watchedRating;
 
   Future<MovieCredits> movieCredits = Future.value(MovieCredits());
 
@@ -67,6 +73,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
     length = watchObjectsList.length;
     selectedWatchObject = watchObjectsList[index];
     _checkIfInWatchlist();
+    _checkIfWatched();
 
     // Preload the first poster
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -82,6 +89,69 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
           _isInWatchlist = inWatchlist;
         });
       }
+    }
+  }
+
+  Future<void> _checkIfWatched() async {
+    if (selectedWatchObject.id != null) {
+      final item = await _watchedService.getWatchedItem(selectedWatchObject.id!);
+      if (mounted) {
+        setState(() {
+          _isWatched = item != null;
+          _watchedRating = item?.rating;
+        });
+      }
+    }
+  }
+
+  Future<void> _toggleWatched() async {
+    if (selectedWatchObject.id == null) return;
+    if (_isWatched) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+          title: Text('remove_from_watched'.tr(), style: const TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text('remove'.tr(), style: const TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+      await _watchedService.removeFromWatched(selectedWatchObject.id!);
+      UserActionService.logWatchedRemove(
+        mediaId: selectedWatchObject.id!,
+        title: selectedWatchObject.title ?? '',
+        type: widget.type == 0 ? 'movie' : 'show',
+      );
+      if (mounted) setState(() { _isWatched = false; _watchedRating = null; });
+    } else {
+      final result = await RatingDialog.show(context, title: selectedWatchObject.title ?? '');
+      if (result == null) return;
+      await _watchedService.markAsWatched(WatchedItem(
+        mediaId: selectedWatchObject.id!,
+        title: selectedWatchObject.title ?? '',
+        isMovie: widget.type == 0,
+        posterPath: selectedWatchObject.posterPath,
+        rating: result.rating,
+        dateWatched: result.dateWatched,
+        overview: selectedWatchObject.overview,
+      ));
+      UserActionService.logWatchedAdd(
+        mediaId: selectedWatchObject.id!,
+        title: selectedWatchObject.title ?? '',
+        type: widget.type == 0 ? 'movie' : 'show',
+        rating: result.rating,
+        source: 'recommendation',
+      );
+      if (mounted) setState(() { _isWatched = true; _watchedRating = result.rating; });
     }
   }
 
@@ -189,9 +259,12 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               totalCount: length,
               mediaType: widget.type,
               isInWatchlist: _isInWatchlist,
+              isWatched: _isWatched,
+              watchedRating: _watchedRating,
               isRentOnly: selectedWatchObject.isRentOnly,
               isBuyOnly: selectedWatchObject.isBuyOnly,
               onWatchlistPressed: _toggleWatchlist,
+              onWatchedPressed: _toggleWatched,
               onPrevious: () {
                 setState(() {
                   if (index > 0) {
@@ -200,6 +273,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                   }
                 });
                 _checkIfInWatchlist();
+                _checkIfWatched();
                 _preloadNextPoster();
               },
               onNext: () {
@@ -210,6 +284,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                   }
                 });
                 _checkIfInWatchlist();
+                _checkIfWatched();
                 _preloadNextPoster();
               },
               onInfoPressed: () async {

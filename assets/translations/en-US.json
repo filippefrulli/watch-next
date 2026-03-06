@@ -222,5 +222,7 @@
     "stats_harsh_rater": "Tough critic",
     "stats_rating_distribution": "Rating Distribution",
     "stats_empty": "Watch and rate something first!",
-    "stats_top_genres": "Top Genres"
+    "stats_top_genres": "Top Genres",
+    "suggest_similar_movies": "Suggest similar movies",
+    "suggest_similar_shows": "Suggest similar shows"
 }

@@ -222,5 +222,7 @@
     "stats_harsh_rater": "Crítico exigente",
     "stats_rating_distribution": "Distribución de puntuaciones",
     "stats_empty": "¡Mira y puntúa algo primero!",
-    "stats_top_genres": "Géneros principales"
+    "stats_top_genres": "Géneros principales",
+    "suggest_similar_movies": "Sugerir películas similares",
+    "suggest_similar_shows": "Sugerir series similares"
 }

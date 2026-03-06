@@ -222,5 +222,7 @@
     "stats_harsh_rater": "Critique sévère",
     "stats_rating_distribution": "Distribution des notes",
     "stats_empty": "Regarde et note quelque chose d'abord !",
-    "stats_top_genres": "Genres préférés"
+    "stats_top_genres": "Genres préférés",
+    "suggest_similar_movies": "Suggérer des films similaires",
+    "suggest_similar_shows": "Suggérer des séries similaires"
 }

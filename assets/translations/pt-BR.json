@@ -12,14 +12,12 @@
     "hero_hint": "Ex: 'Algo engraçado e curto para hoje à noite'",
     "filters": "Filtros",
     "examples": "Exemplos",
-
     "browse": "Explorar",
     "curated_playlists": "Playlists Selecionadas",
     "popular_movies": "Filmes Populares",
     "popular_shows": "Séries Populares",
     "top_rated_movies": "Filmes Mais Bem Avaliados",
     "top_rated_shows": "Séries Mais Bem Avaliadas",
-
     "connect_to_internet": "Por favor, conecte-se à internet e tente novamente",
     "invalid_input": "Entrada inválida, por favor altere sua pesquisa e tente novamente",
     "need_inspiration": "Precisa de inspiração? \nAqui estão alguns exemplos",
@@ -33,7 +31,6 @@
     "example_show_3": "Uma série com episódios de menos de 30 minutos",
     "example_show_4": "Uma série com menos de 5 temporadas",
     "example_show_5": "Uma série de reality show",
-
     "query_settings": "Configurações de busca",
     "release_period": "Período de lançamento",
     "reviews": "Avaliações",
@@ -58,7 +55,6 @@
     "availability_options": "Disponibilidade",
     "include_rentals": "Incluir aluguéis",
     "include_purchases": "Incluir compras",
-
     "here_recommendation": "Recomendamos",
     "stream_it_on": "Streaming em:",
     "rent_buy_on": "Alugar/Comprar em:",
@@ -83,7 +79,6 @@
     "done": "Confirmar",
     "new": "Novo",
     "do_not_recommend": "Não recomende nenhum destes títulos: ",
-
     "change_region": "Alterar região",
     "edit_streaming": "Alterar serviços de streaming",
     "edit_language": "Alterar idioma",
@@ -91,7 +86,6 @@
     "share": "Compartilhar",
     "about": "Sobre",
     "privacy_policy": "Política de privacidade",
-
     "search_media_description": "Descubra onde um filme ou série está disponível",
     "search_media_start_typing": "Comece a digitar para ver resultados",
     "search_media": "Pesquisar Mídia",
@@ -110,13 +104,11 @@
     "rent": "Alugar",
     "buy": "Comprar",
     "unknown": "Desconhecido",
-
     "settings": "Configurações",
     "preferences": "Preferências",
     "support": "Suporte",
     "information": "Informações",
     "search": "Pesquisar",
-
     "watchlist": "Lista de Interesses",
     "watchlist_empty": "Sua lista está vazia",
     "error_loading_watchlist": "Erro ao carregar lista",
@@ -152,7 +144,6 @@
     "import_failed_items": "{count} falharam",
     "import_error": "Falha ao importar lista. Certifique-se de estar usando um arquivo CSV válido do IMDb.",
     "ok": "OK",
-
     "enjoying_watch_next": "Está gostando do Watch Next?",
     "yes": "Sim",
     "not_really": "Não muito",
@@ -170,20 +161,14 @@
     "send_feedback": "Enviar Feedback",
     "feedback_settings_title": "Envie-nos seu feedback",
     "feedback_settings_message": "Tem uma sugestão, reclamação ou só quer dizer oi? Adoraríamos ouvir você!",
-
     "select_streaming": "Selecione seus serviços de streaming",
-
     "validation_prompt": "Seu trabalho é validar se uma determinada frase ou palavra é um pedido para recomendar um filme, critérios a partir dos quais você pode recomendar um filme ou um nome de filme. Exemplos de prompts corretos são: \"romântico e engraçado, ideal para um primeiro encontro\", \"com Tom Cruise e dirigido por Steven Spielberg\", \"sobre inteligência artificial, com boas críticas\", \"ação e aventura\", \"engraçado\", \"Moana\". Se o prompt for válido, retorne apenas o texto YES, caso contrário NO. O prompt é: ",
     "validation_prompt_series": "Seu trabalho é validar se uma determinada frase é um pedido para recomendar uma série, critérios a partir dos quais você pode recomendar uma série ou um nome de série. Exemplos de prompts corretos são: \"que tenha menos de 5 temporadas\", \"sobre esportes\", \"com episódios de menos de 30 minutos\", \"engraçada\". Se o prompt for válido, retorne apenas o texto YES, caso contrário NO. O prompt é: ",
-
     "prompt_1": "Você é um especialista em recomendação de filmes com amplo conhecimento de cinema de todas as décadas e gêneros. Sua tarefa é analisar os critérios do usuário e retornar exatamente 30 títulos de filmes únicos.\n\nFORMATO DE SAÍDA: Retorne títulos neste formato exato: \"título y:data de lançamento\",, (com vírgulas duplas separando cada entrada, em uma linha, sem numeração, sem listas).\n\nEXEMPLO: star wars y:1977,, Jurassic Park y:1993,, The Godfather y:1972\n\nRESTRIÇÕES DE TEMPO: Se o usuário especificar QUALQUER critério relacionado ao tempo (intervalos de anos, décadas, termos como \"clássicos\", \"filmes antigos\", \"vintage\", \"antes de [ano]\", \"depois de [ano]\", \"dos anos [década]\"), você DEVE respeitar estritamente essa restrição. Retorne APENAS filmes desse período especificado.\n\nDISPONIBILIDADE EM STREAMING: Priorize filmes amplamente disponíveis em serviços de streaming.\n\nTÍTULOS SIMILARES: Se for dado um nome de filme específico, retorne esse filme mais 29 similares.\n\nCRITÉRIOS DO USUÁRIO:",
     "prompt_2": "Lembre-se: Preste muita atenção aos critérios relacionados ao tempo. Se o usuário pedir filmes \"antes de 1990\", cada filme deve ser de antes de 1990. Atenda a todos os requisitos específicos do usuário. Formato de saída: título y:ano,, título y:ano,, (sem numeração, sem explicações, apenas a lista).",
-
     "prompt_series_1": "Você é um especialista em recomendação de séries com amplo conhecimento de televisão de todas as décadas e gêneros. Sua tarefa é analisar os critérios do usuário e retornar exatamente 30 títulos de séries únicos.\n\nFORMATO DE SAÍDA: Retorne títulos neste formato exato: \"título y:data de estreia\",, (com vírgulas duplas separando cada entrada, em uma linha, sem numeração, sem listas).\n\nEXEMPLO: Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\nRESTRIÇÕES DE TEMPO: Se o usuário especificar QUALQUER critério relacionado ao tempo (intervalos de anos, décadas, termos como \"clássicos\", \"séries antigas\", \"vintage\", \"antes de [ano]\", \"depois de [ano]\", \"dos anos [década]\"), você DEVE respeitar estritamente essa restrição. Retorne APENAS séries desse período especificado.\n\nDISPONIBILIDADE EM STREAMING: Priorize séries amplamente disponíveis em serviços de streaming.\n\nTÍTULOS SIMILARES: Se for dado um nome de série específico, retorne essa série mais 29 similares.\n\nCRITÉRIOS DO USUÁRIO:",
     "prompt_series_2": "Lembre-se: Preste muita atenção aos critérios relacionados ao tempo. Se o usuário pedir séries \"antes de 1990\", cada série deve ser de antes de 1990. Atenda a todos os requisitos específicos do usuário. Formato de saída: título y:ano,, título y:ano,, (sem numeração, sem explicações, apenas a lista).",
-
     "no_filter_results": "Nenhum item corresponde aos seus filtros",
-
     "playlists": "Playlists",
     "playlists_subtitle": "Coleções selecionadas para você",
     "error_loading_playlists": "Erro ao carregar playlists",
@@ -198,7 +183,6 @@
     "status": "Status",
     "created_by": "Criado por",
     "seasons": "temporadas",
-
     "person_filmography": "Filmografia",
     "person_biography": "Biografia",
     "person_show_more": "Mostrar mais",
@@ -209,9 +193,34 @@
     "person_filter_all": "Tudo",
     "person_filter_movies": "Filmes",
     "person_filter_shows": "Séries",
-
     "info_seasons": "Temporadas",
     "info_episodes": "ep.",
     "info_min": "min",
-    "similar_titles": "Mais como este"
+    "similar_titles": "Mais como este",
+    "watched": "Assistido",
+    "mark_watched": "Marcar como assistido",
+    "watched_rating": "Sua nota:",
+    "remove_from_watched": "Remover de Assistido",
+    "watched_empty": "Nada aqui ainda",
+    "watched_empty_subtitle": "Marque títulos como assistidos para acompanhar o que você viu",
+    "rate_title": "Como foi?",
+    "your_rating": "Sua nota (1–10)",
+    "date_watched": "Data assistida",
+    "confirm": "Confirmar",
+    "edit": "Editar",
+    "sort_date": "Data",
+    "sort_rating": "Nota",
+    "sort_title": "Título",
+    "rating_filter": "nota",
+    "remove_from_watchlist_prompt": "Remover também da lista?",
+    "keep": "Manter",
+    "stats": "Estatísticas",
+    "stats_total": "Total",
+    "stats_avg_rating": "Sua média",
+    "stats_generous_rater": "Generoso",
+    "stats_balanced_rater": "Equilibrado",
+    "stats_harsh_rater": "Crítico exigente",
+    "stats_rating_distribution": "Distribuição de notas",
+    "stats_empty": "Assista e avalie algo primeiro!",
+    "stats_top_genres": "Principais gêneros"
 }

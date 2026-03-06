@@ -7,7 +7,9 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/objects/streaming_service.dart';
+import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:watch_next/objects/movie_details.dart';
 import 'package:watch_next/objects/series_details.dart';
 import 'package:watch_next/objects/movie_credits.dart';
@@ -35,10 +37,13 @@ class MediaDetailPage extends StatefulWidget {
 
 class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProviderStateMixin {
   final WatchlistService _watchlistService = WatchlistService();
+  final WatchedService _watchedService = WatchedService();
 
   // Availability state
   bool _isLoading = true;
   bool _isInWatchlist = false;
+  bool _isWatched = false;
+  int? _watchedRating;
   List<StreamingService> _streamingProviders = [];
   List<StreamingService> _rentProviders = [];
   List<StreamingService> _buyProviders = [];
@@ -82,6 +87,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     try {
       _userServiceIds = await DatabaseService.getStreamingServicesIds();
       final inWatchlist = await _watchlistService.isInWatchlist(widget.mediaId);
+      final watchedItem = await _watchedService.getWatchedItem(widget.mediaId);
       final categorizedProviders = await HttpService().getCategorizedWatchProviders(
         widget.mediaId,
         widget.isMovie,
@@ -89,6 +95,8 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
 
       setState(() {
         _isInWatchlist = inWatchlist;
+        _isWatched = watchedItem != null;
+        _watchedRating = watchedItem?.rating;
         _streamingProviders = categorizedProviders.streaming;
         _rentProviders = categorizedProviders.rent;
         _buyProviders = categorizedProviders.buy;
@@ -210,6 +218,74 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     }
   }
 
+  Future<void> _toggleWatched() async {
+    if (_isWatched) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text('remove_from_watched'.tr(), style: const TextStyle(color: Colors.white)),
+          content: Text(widget.title, style: TextStyle(color: Colors.grey[400])),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text('remove'.tr(), style: const TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+      await _watchedService.removeFromWatched(widget.mediaId);
+      if (mounted)
+        setState(() {
+          _isWatched = false;
+          _watchedRating = null;
+        });
+      UserActionService.logWatchedRemove(
+        mediaId: widget.mediaId,
+        title: widget.title,
+        type: widget.isMovie ? 'movie' : 'show',
+      );
+    } else {
+      final result = await _showRatingDialog();
+      if (result == null) return;
+      await _watchedService.markAsWatched(WatchedItem(
+        mediaId: widget.mediaId,
+        title: widget.title,
+        isMovie: widget.isMovie,
+        posterPath: widget.posterPath,
+        rating: result.rating,
+        dateWatched: result.dateWatched,
+        overview: _movieDetails?.overview ?? _seriesDetails?.overview,
+        genreNames: [
+          ...?_movieDetails?.genres?.map((g) => g.name ?? '').where((n) => n.isNotEmpty),
+          ...?_seriesDetails?.genres?.map((g) => g.name ?? '').where((n) => n.isNotEmpty),
+        ],
+      ));
+      if (mounted)
+        setState(() {
+          _isWatched = true;
+          _watchedRating = result.rating;
+        });
+      UserActionService.logWatchedAdd(
+        mediaId: widget.mediaId,
+        title: widget.title,
+        type: widget.isMovie ? 'movie' : 'show',
+        rating: result.rating,
+        source: 'media_detail',
+      );
+    }
+  }
+
+  Future<RatingResult?> _showRatingDialog() {
+    return RatingDialog.show(context, title: widget.title);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -318,7 +394,10 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
       children: [
         _buildPoster(),
         const SizedBox(height: 14),
-        _buildWatchlistButton(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: _buildWatchlistButton(),
+        ),
       ],
     );
   }
@@ -362,48 +441,103 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     );
   }
 
-  // ── WATCHLIST BUTTON ─────────────────────────────────────────────────────
+  // ── WATCHLIST + WATCHED BUTTONS ─────────────────────────────────────────
 
   Widget _buildWatchlistButton() {
-    return SizedBox(
-      width: 210,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _toggleWatchlist,
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 9),
-            decoration: BoxDecoration(
-              color: _isInWatchlist ? Colors.orange.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Watchlist
+        Expanded(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _toggleWatchlist,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: _isInWatchlist ? Colors.orange : Theme.of(context).colorScheme.outline,
-                width: _isInWatchlist ? 2 : 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                  color: _isInWatchlist ? Colors.orange : Colors.white,
-                  size: 18,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  _isInWatchlist ? 'remove_from_watchlist'.tr() : 'add_to_watchlist'.tr(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                decoration: BoxDecoration(
+                  color:
+                      _isInWatchlist ? Colors.orange.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _isInWatchlist ? Colors.orange : Theme.of(context).colorScheme.outline,
+                    width: _isInWatchlist ? 2 : 1,
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+                      color: _isInWatchlist ? Colors.orange : Colors.white,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        _isInWatchlist ? 'remove_from_watchlist'.tr() : 'add_to_watchlist'.tr(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _isInWatchlist ? Colors.orange : Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-      ),
+        const SizedBox(width: 10),
+        // Watched
+        Expanded(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _toggleWatched,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                decoration: BoxDecoration(
+                  color: _isWatched ? Colors.green.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _isWatched ? Colors.green : Theme.of(context).colorScheme.outline,
+                    width: _isWatched ? 2 : 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _isWatched ? Icons.check_circle : Icons.check_circle_outline,
+                      color: _isWatched ? Colors.green : Colors.white,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        _isWatched ? '${'watched_rating'.tr()} $_watchedRating/10' : 'mark_watched'.tr(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _isWatched ? Colors.green : Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

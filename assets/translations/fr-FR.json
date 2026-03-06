@@ -12,14 +12,12 @@
     "hero_hint": "Ex : 'Quelque chose de drôle et court pour ce soir'",
     "filters": "Filtres",
     "examples": "Exemples",
-
     "browse": "Parcourir",
     "curated_playlists": "Sélections",
     "popular_movies": "Films Populaires",
     "popular_shows": "Séries Populaires",
     "top_rated_movies": "Films les Mieux Notés",
     "top_rated_shows": "Séries les Mieux Notées",
-
     "connect_to_internet": "Veuillez vous connecter à Internet et réessayer",
     "invalid_input": "Saisie invalide, veuillez modifier votre requête et réessayer",
     "need_inspiration": "Besoin d'inspiration?\nHVoici quelques exemples",
@@ -33,7 +31,6 @@
     "example_show_3": "Une séries avec des épisodes de moins de 30 minutes",
     "example_show_4": "Une séries de moins de 5 saisons",
     "example_show_5": "Une séries qui est de la télé-réalité",
-
     "query_settings": "Paramètres de recherche",
     "release_period": "Période de sortie",
     "reviews": "Avis",
@@ -58,7 +55,6 @@
     "availability_options": "Disponibilité",
     "include_rentals": "Inclure les locations",
     "include_purchases": "Inclure les achats",
-
     "here_recommendation": "Nous recommandons",
     "stream_it_on": "Streaming sur:",
     "rent_buy_on": "Louer/Acheter sur:",
@@ -83,7 +79,6 @@
     "done": "Confirmer",
     "new": "Nouveau",
     "do_not_recommend": "Ne recommandez aucun de ces titres: ",
-
     "change_region": "Changer le pays",
     "edit_streaming": "Changer les services de streaming",
     "edit_language": "Changer la langue",
@@ -91,7 +86,6 @@
     "share": "Partager",
     "about": "Info",
     "privacy_policy": "Politique de confidentialité",
-
     "search_media_description": "Découvrez où un film ou une série est disponible",
     "search_media_start_typing": "Commencez à taper pour voir les résultats",
     "search_media": "Rechercher un contenu",
@@ -110,13 +104,11 @@
     "rent": "Louer",
     "buy": "Acheter",
     "unknown": "Inconnu",
-
     "settings": "Paramètres",
     "preferences": "Préférences",
     "support": "Support",
     "information": "Information",
     "search": "Rechercher",
-
     "watchlist": "Liste de suivi",
     "watchlist_empty": "Votre liste de suivi est vide",
     "error_loading_watchlist": "Erreur lors du chargement de la liste",
@@ -152,7 +144,6 @@
     "import_failed_items": "{count} échoués",
     "import_error": "Échec de l'importation. Veuillez utiliser un fichier CSV IMDb valide.",
     "ok": "OK",
-
     "enjoying_watch_next": "Appréciez-vous Watch Next?",
     "yes": "Oui",
     "not_really": "Pas vraiment",
@@ -170,20 +161,14 @@
     "send_feedback": "Envoyer des commentaires",
     "feedback_settings_title": "Envoyez-nous vos commentaires",
     "feedback_settings_message": "Vous avez une suggestion, une plainte ou vous voulez simplement dire bonjour? Nous serions ravis de vous entendre!",
-
     "select_streaming": "Sélectionne tes services de streaming",
-
     "validation_prompt": "Votre travail consiste à valider si une phrase ou un mot donnée est une demande de recommandation d'un film, des critères à partir desquels vous pouvez recommander un film ou le nom d'un film. Exemples de messages corrects: \"Recommander un film romantique et drôle, idéal pour un premier rendez-vous\", \"Recommander un film avec Tom Cruise et réalisé par Steven Spielberg\", \"sur l'intelligence artificielle, avec de bonnes critiques \", \"action et aventure\", \"drôle\", \"Moana\". Si l'invite est valide, renvoyez uniquement le texte YES, sinon NO. L'invite est :",
     "validation_prompt_series": "Ton travail consiste à valider si une phrase donnée est une demande de recommandation de séries, des critères à partir desquels vous pouvez recommander un séries ou le nom d'une séries. Voici des exemples d'invites correctes: \"qui a moins de 5 saisons\", \"sur le sport\", \"avec des épisodes de moins de 30 minutes\", \"drôle\", \"Lost\". Si la requête est valide, renvoyez uniquement le texte YES, sinon NO. La requête est: ",
-
     "prompt_1": "Tu es un expert en recommandations de films avec une connaissance approfondie du cinéma de toutes les décennies et de tous les genres. Ta tâche est d'analyser les critères de l'utilisateur et de renvoyer exactement 30 titres de films uniques.\n\nFORMAT DE SORTIE: Renvoie les titres dans ce format exact: \"titre y:date de sortie\",, (avec des doubles virgules séparant chaque entrée, sur une ligne, pas de numérotation, pas de listes).\n\nEXEMPLE: star wars y:1977,, Jurassic Park y:1993,, Le Parrain y:1972\n\nCONTRAINTES TEMPORELLES: Si l'utilisateur spécifie N'IMPORTE QUEL critère lié au temps (plages d'années, décennies, termes comme \"classiques\", \"vieux films\", \"vintage\", \"avant [année]\", \"après [année]\", \"des années [décennie]\"), tu DOIS strictement respecter cette contrainte. Renvoie UNIQUEMENT des films de la période spécifiée.\n\nDISPONIBILITÉ EN STREAMING: Priorise les films largement disponibles sur les services de streaming.\n\nTITRES SIMILAIRES: Si un nom de film spécifique est donné, renvoie ce film plus 29 similaires.\n\nCRITÈRES DE L'UTILISATEUR:",
     "prompt_2": "Rappel: Fais très attention aux critères liés au temps. Si l'utilisateur demande des films \"avant 1990\", chaque film doit être d'avant 1990. Respecte toutes les exigences spécifiques de l'utilisateur. Format de sortie: titre y:année,, titre y:année,, (pas de numérotation, pas d'explications, juste la liste).",
-
     "prompt_series_1": "Tu es un expert en recommandations de séries TV avec une connaissance approfondie de la télévision de toutes les décennies et de tous les genres. Ta tâche est d'analyser les critères de l'utilisateur et de renvoyer exactement 30 titres de séries TV uniques.\n\nFORMAT DE SORTIE: Renvoie les titres dans ce format exact: \"titre y:date de première diffusion\",, (avec des doubles virgules séparant chaque entrée, sur une ligne, pas de numérotation, pas de listes).\n\nEXEMPLE: Game of Thrones y:2011,, Stranger Things y:2016,, Les Soprano y:1999\n\nCONTRAINTES TEMPORELLES: Si l'utilisateur spécifie N'IMPORTE QUEL critère lié au temps (plages d'années, décennies, termes comme \"classiques\", \"vieilles séries\", \"vintage\", \"avant [année]\", \"après [année]\", \"des années [décennie]\"), tu DOIS strictement respecter cette contrainte. Renvoie UNIQUEMENT des séries de la période spécifiée.\n\nDISPONIBILITÉ EN STREAMING: Priorise les séries TV largement disponibles sur les services de streaming.\n\nTITRES SIMILAIRES: Si un nom de série spécifique est donné, renvoie cette série plus 29 similaires.\n\nCRITÈRES DE L'UTILISATEUR:",
     "prompt_series_2": "Rappel: Fais très attention aux critères liés au temps. Si l'utilisateur demande des séries \"avant 1990\", chaque série doit être d'avant 1990. Respecte toutes les exigences spécifiques de l'utilisateur. Format de sortie: titre y:année,, titre y:année,, (pas de numérotation, pas d'explications, juste la liste).",
-
     "no_filter_results": "Aucun élément ne correspond à vos filtres",
-
     "playlists": "Playlists",
     "playlists_subtitle": "Collections sélectionnées pour vous",
     "error_loading_playlists": "Erreur lors du chargement des playlists",
@@ -198,7 +183,6 @@
     "status": "Statut",
     "created_by": "Créé par",
     "seasons": "saisons",
-
     "person_filmography": "Filmographie",
     "person_biography": "Biographie",
     "person_show_more": "Afficher plus",
@@ -209,9 +193,34 @@
     "person_filter_all": "Tout",
     "person_filter_movies": "Films",
     "person_filter_shows": "Séries",
-
     "info_seasons": "Saisons",
     "info_episodes": "ép.",
     "info_min": "min",
-    "similar_titles": "Dans le même genre"
+    "similar_titles": "Dans le même genre",
+    "watched": "Vu",
+    "mark_watched": "Marquer comme vu",
+    "watched_rating": "Ta note :",
+    "remove_from_watched": "Retirer de Vu",
+    "watched_empty": "Rien ici pour l'instant",
+    "watched_empty_subtitle": "Marque des titres comme vus pour suivre ce que tu as regardé",
+    "rate_title": "Comment c'était ?",
+    "your_rating": "Ta note (1–10)",
+    "date_watched": "Date de visionnage",
+    "confirm": "Confirmer",
+    "edit": "Modifier",
+    "sort_date": "Date",
+    "sort_rating": "Note",
+    "sort_title": "Titre",
+    "rating_filter": "note",
+    "remove_from_watchlist_prompt": "Retirer aussi de la liste ?",
+    "keep": "Garder",
+    "stats": "Statistiques",
+    "stats_total": "Total",
+    "stats_avg_rating": "Ta note moyenne",
+    "stats_generous_rater": "Généreux",
+    "stats_balanced_rater": "Équilibré",
+    "stats_harsh_rater": "Critique sévère",
+    "stats_rating_distribution": "Distribution des notes",
+    "stats_empty": "Regarde et note quelque chose d'abord !",
+    "stats_top_genres": "Genres préférés"
 }

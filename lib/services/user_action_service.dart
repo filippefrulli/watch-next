@@ -264,4 +264,52 @@ class UserActionService {
       'person_name': personName,
     });
   }
+
+  /// Log when an item is marked as watched
+  static Future<void> logWatchedAdd({
+    required int mediaId,
+    required String title,
+    required String type, // 'movie' or 'show'
+    required int rating,
+    required String source, // 'recommendation_info', 'media_detail', 'watchlist_swipe'
+  }) async {
+    await logAction('watched_add', details: {
+      'media_id': mediaId,
+      'title': title,
+      'type': type,
+      'rating': rating,
+      'source': source,
+    });
+  }
+
+  /// Log when a watched item is removed
+  static Future<void> logWatchedRemove({
+    required int mediaId,
+    required String title,
+    required String type, // 'movie' or 'show'
+  }) async {
+    await logAction('watched_remove', details: {
+      'media_id': mediaId,
+      'title': title,
+      'type': type,
+    });
+  }
+
+  /// Log when a watched item's rating or date is edited
+  static Future<void> logWatchedEdit({
+    required int mediaId,
+    required String title,
+    required String field, // 'rating' or 'date'
+  }) async {
+    await logAction('watched_edit', details: {
+      'media_id': mediaId,
+      'title': title,
+      'field': field,
+    });
+  }
+
+  /// Log when the stats page is viewed
+  static Future<void> logStatsViewed() async {
+    await logAction('stats_viewed');
+  }
 }

@@ -3,6 +3,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:watch_next/services/watchlist_service.dart';
+import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/imdb_import_service.dart';
@@ -16,6 +17,7 @@ import 'package:watch_next/widgets/watchlist/watchlist_item_card.dart';
 import 'package:watch_next/widgets/watchlist/watchlist_filters.dart';
 import 'package:watch_next/widgets/watchlist/watchlist_empty_state.dart';
 import 'package:watch_next/widgets/watchlist/watchlist_header.dart';
+import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 
 class WatchlistPage extends StatefulWidget {
@@ -27,6 +29,7 @@ class WatchlistPage extends StatefulWidget {
 
 class _WatchlistPageState extends State<WatchlistPage> {
   final WatchlistService _watchlistService = WatchlistService();
+  final WatchedService _watchedService = WatchedService();
   final HttpService _httpService = HttpService();
   final ImdbImportService _importService = ImdbImportService();
   final LetterboxdImportService _letterboxdImportService = LetterboxdImportService();
@@ -225,6 +228,56 @@ class _WatchlistPageState extends State<WatchlistPage> {
                     title: item.title,
                     type: item.isMovie ? 'movie' : 'show',
                   );
+                },
+                onMarkWatched: () async {
+                  final item = filteredItems[index];
+                  final result = await RatingDialog.show(context, title: item.title);
+                  if (result == null) return;
+                  await _watchedService.markAsWatched(WatchedItem(
+                    mediaId: item.mediaId,
+                    title: item.title,
+                    isMovie: item.isMovie,
+                    posterPath: item.posterPath,
+                    rating: result.rating,
+                    dateWatched: result.dateWatched,
+                  ));
+                  UserActionService.logWatchedAdd(
+                    mediaId: item.mediaId,
+                    title: item.title,
+                    type: item.isMovie ? 'movie' : 'show',
+                    rating: result.rating,
+                    source: 'watchlist_swipe',
+                  );
+                  // Prompt to remove from watchlist
+                  if (mounted) {
+                    final remove = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        backgroundColor: Theme.of(context).colorScheme.tertiary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: Text('remove_from_watchlist_prompt'.tr(), style: const TextStyle(color: Colors.white)),
+                        content: Text(item.title, style: TextStyle(color: Colors.grey[400])),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text('keep'.tr(), style: const TextStyle(color: Colors.grey)),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text('remove'.tr(), style: const TextStyle(color: Colors.orange)),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (remove == true) {
+                      await _watchlistService.removeFromWatchlist(item.mediaId);
+                      UserActionService.logWatchlistRemove(
+                        mediaId: item.mediaId,
+                        title: item.title,
+                        type: item.isMovie ? 'movie' : 'show',
+                      );
+                    }
+                  }
                 },
               );
             },

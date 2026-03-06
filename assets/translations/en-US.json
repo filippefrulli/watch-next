@@ -12,7 +12,6 @@
     "hero_hint": "Try: 'Something funny and short for tonight'",
     "filters": "Filters",
     "examples": "Examples",
-
     "browse": "Browse",
     "curated_playlists": "Curated Playlists",
     "popular_movies": "Popular Movies",
@@ -32,7 +31,6 @@
     "example_show_3": "A show with episodes shorter than 30 minutes",
     "example_show_4": "A show with less than 5 seasons",
     "example_show_5": "A show that is reality television",
-
     "query_settings": "Query Settings",
     "release_period": "Release Period",
     "reviews": "Reviews",
@@ -57,7 +55,6 @@
     "availability_options": "Availability",
     "include_rentals": "Include rentals",
     "include_purchases": "Include purchases",
-
     "here_recommendation": "We recommend",
     "stream_it_on": "Stream it on:",
     "rent_buy_on": "Rent/Buy on:",
@@ -81,8 +78,7 @@
     "select_country": "Select your country",
     "done": "Confirm",
     "new": "New",
-    "do_not_recommend": "Do not recommend any of these titles: ", 
-
+    "do_not_recommend": "Do not recommend any of these titles: ",
     "change_region": "Change region",
     "edit_streaming": "Change streaming services",
     "edit_language": "Change language",
@@ -90,7 +86,6 @@
     "share": "Share",
     "about": "About",
     "privacy_policy": "Privacy policy",
-
     "search_media_description": "Find out where a movie or TV show is available",
     "search_media_start_typing": "Start typing to see results",
     "search_media": "Search Media",
@@ -109,13 +104,11 @@
     "rent": "Rent",
     "buy": "Buy",
     "unknown": "Unknown",
-
     "settings": "Settings",
     "preferences": "Preferences",
     "support": "Support",
     "information": "Information",
     "search": "Search",
-
     "watchlist": "Watchlist",
     "watchlist_empty": "Your watchlist is empty",
     "error_loading_watchlist": "Error loading watchlist",
@@ -151,7 +144,6 @@
     "import_failed_items": "Failed {count}",
     "import_error": "Failed to import watchlist. Please make sure you're using a valid IMDb CSV export.",
     "ok": "OK",
-
     "enjoying_watch_next": "Are you enjoying Watch Next?",
     "yes": "Yes",
     "not_really": "Not really",
@@ -169,20 +161,14 @@
     "send_feedback": "Send Feedback",
     "feedback_settings_title": "Send us your feedback",
     "feedback_settings_message": "Have a suggestion, complaint, or just want to say hi? We'd love to hear from you!",
-
     "select_streaming": "Select your streaming services",
-
     "validation_prompt": "Your job is to validate wether a given sentence or word is a request to recommend a movie, criteria from which you can recommend a movie or a movie name. Examples of correct prompts are: \"romantic and funny, ideal for a first date\", \"starring Tom Cruise and directed by Steven Spielberg\", \"about artificial intelligence, with good reviews\", \"action and adventure\", \"funny\", \"Moana\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",
     "validation_prompt_series": "Your job is to validate wether a given sentence is a request to recommend a tv show, criteria from which you can recommend a tv show or a tv show name. Examples of correct prompts are: \"that has less than 5 seasons\", \"about sports\", \"with episodes shorter than 30 minutes\", \"funny\". If the prompt is valid, return just the text YES, otherwise NO. The prompt is: ",
-
     "prompt_1": "You are a movie recommendation expert with extensive knowledge of cinema across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique movie titles.\n\nIMPORTANT: The user's request may be in ANY language (English, Spanish, German, French, Italian, Portuguese, Japanese, Hindi, etc.). Understand and process it regardless of the language used.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:release date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: star wars y:1977,, Jurassic Park y:1993,, The Godfather y:1972\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old movies\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY movies from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize movies that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific movie name, return that movie plus 29 similar ones.\n\nUSER CRITERIA:",
     "prompt_2": "Remember: Pay close attention to time-related criteria. If the user asks for movies \"before 1990\", every single movie must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).",
-    
     "prompt_series_1": "You are a TV show recommendation expert with extensive knowledge of television across all decades and genres. Your task is to analyze the user's criteria and return exactly 30 unique TV show titles.\n\nIMPORTANT: The user's request may be in ANY language (English, Spanish, German, French, Italian, Portuguese, Japanese, Hindi, etc.). Understand and process it regardless of the language used.\n\nOUTPUT FORMAT: Return titles in this exact format: \"title y:first air date\",, (with double commas separating each entry, on one line, no numbering, no lists).\n\nEXAMPLE: Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\nTIME CONSTRAINTS: If the user specifies ANY time-related criteria (year ranges, decades, terms like \"classics\", \"old shows\", \"vintage\", \"before [year]\", \"after [year]\", \"from the [decade]\"), you MUST strictly honor that constraint. Return ONLY shows from that specified period.\n\nSTREAMING AVAILABILITY: Prioritize TV shows that are widely available on streaming services.\n\nSIMILAR TITLES: If given a specific show name, return that show plus 29 similar ones.\n\nUSER CRITERIA:",
     "prompt_series_2": "Remember: Pay close attention to time-related criteria. If the user asks for shows \"before 1990\", every single show must be from before 1990. Match all the user's specific requirements. Output format: title y:year,, title y:year,, (no numbering, no explanations, just the list).",
-
     "no_filter_results": "No items match your filters",
-
     "playlists": "Playlists",
     "playlists_subtitle": "Curated collections for you",
     "error_loading_playlists": "Error loading playlists",
@@ -197,7 +183,6 @@
     "status": "Status",
     "created_by": "Created by",
     "seasons": "seasons",
-
     "person_filmography": "Filmography",
     "person_biography": "Biography",
     "person_show_more": "Show more",
@@ -208,9 +193,34 @@
     "person_filter_all": "All",
     "person_filter_movies": "Movies",
     "person_filter_shows": "TV Shows",
-
     "info_seasons": "Seasons",
     "info_episodes": "ep.",
     "info_min": "min",
-    "similar_titles": "More Like This"
+    "similar_titles": "More Like This",
+    "watched": "Watched",
+    "mark_watched": "Mark as Watched",
+    "watched_rating": "Your rating:",
+    "remove_from_watched": "Remove from Watched",
+    "watched_empty": "Nothing here yet",
+    "watched_empty_subtitle": "Mark titles as watched to track what you've seen",
+    "rate_title": "How was it?",
+    "your_rating": "Your rating (1–10)",
+    "date_watched": "Date watched",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "sort_date": "Date",
+    "sort_rating": "Rating",
+    "sort_title": "Title",
+    "rating_filter": "rating",
+    "remove_from_watchlist_prompt": "Also remove from Watchlist?",
+    "keep": "Keep",
+    "stats": "Stats",
+    "stats_total": "Total",
+    "stats_avg_rating": "Your avg. rating",
+    "stats_generous_rater": "Generous rater",
+    "stats_balanced_rater": "Balanced rater",
+    "stats_harsh_rater": "Tough critic",
+    "stats_rating_distribution": "Rating Distribution",
+    "stats_empty": "Watch and rate something first!",
+    "stats_top_genres": "Top Genres"
 }

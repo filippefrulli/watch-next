@@ -12,14 +12,12 @@
     "hero_hint": "Z.B. 'Etwas Lustiges und Kurzes für heute Abend'",
     "filters": "Filter",
     "examples": "Beispiele",
-
     "browse": "Entdecken",
     "curated_playlists": "Kuratierte Playlists",
     "popular_movies": "Beliebte Filme",
     "popular_shows": "Beliebte Serien",
     "top_rated_movies": "Bestbewertete Filme",
     "top_rated_shows": "Bestbewertete Serien",
-
     "connect_to_internet": "Bitte verbinde dich mit dem Internet und versuche es nochmal",
     "invalid_input": "Ungültige Eingabe, bitte änder die Eingabe un versuch es nochmal",
     "need_inspiration": "Brauchst du Inspiration? \nHier sind ein Paar Beispiele",
@@ -33,7 +31,6 @@
     "example_show_3": "Eine Serie mit Episoden, die kürzer als 30 Minuten sind",
     "example_show_4": "Eine Serie mit weniger als 5 Staffeln",
     "example_show_5": "Eine Serie die Reality-TV ist",
-
     "query_settings": "Sucheinstellungen",
     "release_period": "Erscheinungszeitraum",
     "reviews": "Bewertungen",
@@ -58,7 +55,6 @@
     "availability_options": "Verfügbarkeit",
     "include_rentals": "Leihfilme einbeziehen",
     "include_purchases": "Kauffilme einbeziehen",
-
     "here_recommendation": "Wir empfehlen",
     "stream_it_on": "Streamen auf:",
     "rent_buy_on": "Leihen/Kaufen auf:",
@@ -82,8 +78,7 @@
     "select_country": "Wähle dein Land aus",
     "done": "Bestätigen",
     "new": "Neue",
-    "do_not_recommend": "Empfehle keinen dieser Titel: ", 
-
+    "do_not_recommend": "Empfehle keinen dieser Titel: ",
     "change_region": "Land ändern",
     "edit_streaming": "Streaming-Dienste ändern",
     "edit_language": "Sprache ändern",
@@ -91,7 +86,6 @@
     "share": "Teilen",
     "about": "Infos",
     "privacy_policy": "Datenschutzrichtlinie",
-
     "search_media_description": "Finde heraus, wo ein Film oder eine Serie verfügbar ist",
     "search_media_start_typing": "Beginne zu tippen, um Ergebnisse zu sehen",
     "search_media": "Medien suchen",
@@ -110,13 +104,11 @@
     "rent": "Leihen",
     "buy": "Kaufen",
     "unknown": "Unbekannt",
-
     "settings": "Einstellungen",
     "preferences": "Präferenzen",
     "support": "Unterstützung",
     "information": "Information",
     "search": "Suchen",
-
     "watchlist": "Merkliste",
     "watchlist_empty": "Deine Merkliste ist leer",
     "error_loading_watchlist": "Fehler beim Laden der Merkliste",
@@ -152,7 +144,6 @@
     "import_failed_items": "{count} fehlgeschlagen",
     "import_error": "Import fehlgeschlagen. Bitte verwenden Sie einen gültigen IMDb CSV-Export.",
     "ok": "OK",
-
     "enjoying_watch_next": "Gefällt dir Watch Next?",
     "yes": "Ja",
     "not_really": "Nicht wirklich",
@@ -170,20 +161,14 @@
     "send_feedback": "Feedback senden",
     "feedback_settings_title": "Sende uns dein Feedback",
     "feedback_settings_message": "Hast du einen Vorschlag, eine Beschwerde oder möchtest einfach Hallo sagen? Wir freuen uns von dir zu hören!",
-
     "select_streaming": "Wähle deine Streaming-Dienste",
-
     "validation_prompt": "Deine Aufgabe besteht darin, zu überprüfen, ob es sich bei einem bestimmten Wort oder Satz um eine Aufforderung zur Empfehlung eines Films, um Kriterien die Filme entsprechen, oder einen Film namen handelt, anhand derer du einen oder mehr Filme empfehlen kannst. Beispiele für richtige Aufforderungen sind: \"romantisch und lustig, ideal für ein erstes Date\", \"mit Tom Cruise und Regie von Steven Spielberg\", \"über künstliche Intelligenz mit guten Bewertungen\". \"Action und Abenteuer\", \"lustig\", \"Moana\". Wenn die Eingabeaufforderung gültig ist, geben Sie nur den Text YES zurück, andernfalls NO. Die Eingabeaufforderung lautet: ",
     "validation_prompt_series": "Deine Aufgabe besteht darin, zu überprüfen, ob ein bestimmter Satz eine Aufforderung zur Empfehlung einer Serie oder um Kriterien handelt, anhand derer du eine Serie empfehlen kannst. Beispiele für richtige Aufforderungen sind: \"Empfehle eine Serie mit weniger als fünf Staffeln\", \"Empfehle eine Serie über Sport\", \"mit Episoden, die kürzer als 30 Minuten sind\", \"lustig\". Wenn die Eingabeaufforderung gültig ist, geben Sie nur den Text YES zurück, andernfalls NO. Die Aufforderung lautet: ",
-
     "prompt_1": "Du bist ein Filmempfehlungsexperte mit umfassendem Wissen über Kino aus allen Jahrzehnten und Genres. Deine Aufgabe ist es, die Kriterien des Benutzers zu analysieren und genau 30 einzigartige Filmtitel zurückzugeben.\n\nAUSGABEFORMAT: Gib Titel in diesem exakten Format zurück: \"Titel y:Veröffentlichungsdatum\",, (mit doppelten Kommas zwischen jedem Eintrag, in einer Zeile, keine Nummerierung, keine Listen).\n\nBEISPIEL: Star Wars y:1977,, Jurassic Park y:1993,, Der Pate y:1972\n\nZEITBESCHRÄNKUNGEN: Wenn der Benutzer IRGENDWELCHE zeitbezogenen Kriterien angibt (Jahresbereiche, Jahrzehnte, Begriffe wie \"Klassiker\", \"alte Filme\", \"Vintage\", \"vor [Jahr]\", \"nach [Jahr]\", \"aus den [Jahrzehnt]\"), MUSST du diese Beschränkung strikt einhalten. Gib NUR Filme aus dem angegebenen Zeitraum zurück.\n\nSTREAMING-VERFÜGBARKEIT: Priorisiere Filme, die weit verbreitet auf Streaming-Diensten verfügbar sind.\n\nÄHNLICHE TITEL: Wenn ein bestimmter Filmname angegeben wird, gib diesen Film plus 29 ähnliche zurück.\n\nBENUTZERKRITERIEN:",
     "prompt_2": "Denke daran: Achte genau auf zeitbezogene Kriterien. Wenn der Benutzer nach Filmen \"vor 1990\" fragt, muss jeder einzelne Film von vor 1990 sein. Erfülle alle spezifischen Anforderungen des Benutzers. Ausgabeformat: Titel y:Jahr,, Titel y:Jahr,, (keine Nummerierung, keine Erklärungen, nur die Liste).",
-
     "prompt_series_1": "Du bist ein TV-Serien-Empfehlungsexperte mit umfassendem Wissen über Fernsehen aus allen Jahrzehnten und Genres. Deine Aufgabe ist es, die Kriterien des Benutzers zu analysieren und genau 30 einzigartige TV-Serien-Titel zurückzugeben.\n\nAUSGABEFORMAT: Gib Titel in diesem exakten Format zurück: \"Titel y:Erstausstrahlungsdatum\",, (mit doppelten Kommas zwischen jedem Eintrag, in einer Zeile, keine Nummerierung, keine Listen).\n\nBEISPIEL: Game of Thrones y:2011,, Stranger Things y:2016,, Die Sopranos y:1999\n\nZEITBESCHRÄNKUNGEN: Wenn der Benutzer IRGENDWELCHE zeitbezogenen Kriterien angibt (Jahresbereiche, Jahrzehnte, Begriffe wie \"Klassiker\", \"alte Serien\", \"Vintage\", \"vor [Jahr]\", \"nach [Jahr]\", \"aus den [Jahrzehnt]\"), MUSST du diese Beschränkung strikt einhalten. Gib NUR Serien aus dem angegebenen Zeitraum zurück.\n\nSTREAMING-VERFÜGBARKEIT: Priorisiere TV-Serien, die weit verbreitet auf Streaming-Diensten verfügbar sind.\n\nÄHNLICHE TITEL: Wenn ein bestimmter Serienname angegeben wird, gib diese Serie plus 29 ähnliche zurück.\n\nBENUTZERKRITERIEN:",
     "prompt_series_2": "Denke daran: Achte genau auf zeitbezogene Kriterien. Wenn der Benutzer nach Serien \"vor 1990\" fragt, muss jede einzelne Serie von vor 1990 sein. Erfülle alle spezifischen Anforderungen des Benutzers. Ausgabeformat: Titel y:Jahr,, Titel y:Jahr,, (keine Nummerierung, keine Erklärungen, nur die Liste).",
-
     "no_filter_results": "Keine Einträge entsprechen deinen Filtern",
-
     "playlists": "Playlists",
     "playlists_subtitle": "Kuratierte Sammlungen für dich",
     "error_loading_playlists": "Fehler beim Laden der Playlists",
@@ -198,7 +183,6 @@
     "status": "Status",
     "created_by": "Erstellt von",
     "seasons": "Staffeln",
-
     "person_filmography": "Filmografie",
     "person_biography": "Biografie",
     "person_show_more": "Mehr anzeigen",
@@ -209,9 +193,34 @@
     "person_filter_all": "Alle",
     "person_filter_movies": "Filme",
     "person_filter_shows": "Serien",
-
     "info_seasons": "Staffeln",
     "info_episodes": "Ep.",
     "info_min": "Min.",
-    "similar_titles": "Ähnliche Titel"
+    "similar_titles": "Ähnliche Titel",
+    "watched": "Gesehen",
+    "mark_watched": "Als gesehen markieren",
+    "watched_rating": "Deine Bewertung:",
+    "remove_from_watched": "Aus Gesehen entfernen",
+    "watched_empty": "Noch nichts hier",
+    "watched_empty_subtitle": "Markiere Titel als gesehen, um deinen Verlauf zu verfolgen",
+    "rate_title": "Wie war es?",
+    "your_rating": "Deine Bewertung (1–10)",
+    "date_watched": "Datum gesehen",
+    "confirm": "Bestätigen",
+    "edit": "Bearbeiten",
+    "sort_date": "Datum",
+    "sort_rating": "Bewertung",
+    "sort_title": "Titel",
+    "rating_filter": "Bewertung",
+    "remove_from_watchlist_prompt": "Auch von der Merkliste entfernen?",
+    "keep": "Behalten",
+    "stats": "Statistiken",
+    "stats_total": "Gesamt",
+    "stats_avg_rating": "Ø Bewertung",
+    "stats_generous_rater": "Großzügig",
+    "stats_balanced_rater": "Ausgewogen",
+    "stats_harsh_rater": "Strenger Kritiker",
+    "stats_rating_distribution": "Bewertungsverteilung",
+    "stats_empty": "Schau und bewerte zuerst etwas!",
+    "stats_top_genres": "Top-Genres"
 }

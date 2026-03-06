@@ -11,8 +11,10 @@ import 'package:watch_next/pages/person_detail_page.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
+import 'package:watch_next/widgets/watched/rating_dialog.dart';
 
 class MovieInfoPanel extends StatefulWidget {
   final int mediaId;
@@ -44,7 +46,10 @@ class MovieInfoPanel extends StatefulWidget {
 
 class _MovieInfoPanelState extends State<MovieInfoPanel> {
   final WatchlistService _watchlistService = WatchlistService();
+  final WatchedService _watchedService = WatchedService();
   bool _isInWatchlist = false;
+  bool _isWatched = false;
+  int? _watchedRating;
 
   // Extra details loaded lazily
   MovieCredits? _credits;
@@ -64,6 +69,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
   void initState() {
     super.initState();
     _checkIfInWatchlist();
+    _checkIfWatched();
     _loadDetails();
   }
 
@@ -72,6 +78,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.mediaId != widget.mediaId) {
       _checkIfInWatchlist();
+      _checkIfWatched();
       _detailsLoaded = false;
       _credits = null;
       _movieDetails = null;
@@ -163,6 +170,81 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
     }
   }
 
+  Future<void> _checkIfWatched() async {
+    final item = await _watchedService.getWatchedItem(widget.mediaId);
+    if (mounted) {
+      setState(() {
+        _isWatched = item != null;
+        _watchedRating = item?.rating;
+      });
+    }
+  }
+
+  Future<void> _toggleWatched() async {
+    if (_isWatched) {
+      // Already watched — offer to remove
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text('remove_from_watched'.tr(), style: const TextStyle(color: Colors.white)),
+          content: Text(widget.title, style: TextStyle(color: Colors.grey[400])),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text('remove'.tr(), style: const TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+      await _watchedService.removeFromWatched(widget.mediaId);
+      if (mounted)
+        setState(() {
+          _isWatched = false;
+          _watchedRating = null;
+        });
+      UserActionService.logWatchedRemove(
+        mediaId: widget.mediaId,
+        title: widget.title,
+        type: widget.isMovie ? 'movie' : 'show',
+      );
+    } else {
+      final result = await RatingDialog.show(context, title: widget.title);
+      if (result == null) return;
+      await _watchedService.markAsWatched(WatchedItem(
+        mediaId: widget.mediaId,
+        title: widget.title,
+        isMovie: widget.isMovie,
+        posterPath: widget.posterPath,
+        rating: result.rating,
+        dateWatched: result.dateWatched,
+        overview: widget.overview,
+        genreNames: [
+          ...?_movieDetails?.genres?.map((g) => g.name ?? '').where((n) => n.isNotEmpty),
+          ...?_seriesDetails?.genres?.map((g) => g.name ?? '').where((n) => n.isNotEmpty),
+        ],
+      ));
+      if (mounted)
+        setState(() {
+          _isWatched = true;
+          _watchedRating = result.rating;
+        });
+      UserActionService.logWatchedAdd(
+        mediaId: widget.mediaId,
+        title: widget.title,
+        type: widget.isMovie ? 'movie' : 'show',
+        rating: result.rating,
+        source: 'recommendation_info',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DelayedDisplay(
@@ -217,46 +299,104 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // Watchlist button
-                      Center(
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: _toggleWatchlist,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: _isInWatchlist
-                                    ? Colors.orange.withValues(alpha: 0.2)
-                                    : Theme.of(context).colorScheme.tertiary,
+                      // Watchlist + Watched buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Watchlist button
+                          Flexible(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _isInWatchlist ? Colors.orange : Colors.grey[700]!,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                                    color: _isInWatchlist ? Colors.orange : Colors.white,
-                                    size: 20,
+                                onTap: _toggleWatchlist,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: _isInWatchlist
+                                        ? Colors.orange.withValues(alpha: 0.2)
+                                        : Theme.of(context).colorScheme.tertiary,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: _isInWatchlist ? Colors.orange : Colors.grey[700]!,
+                                      width: 1,
+                                    ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _isInWatchlist ? 'remove_from_watchlist'.tr() : 'add_to_watchlist'.tr(),
-                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                          fontSize: 14,
-                                          color: _isInWatchlist ? Colors.orange : Colors.white,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+                                        color: _isInWatchlist ? Colors.orange : Colors.white,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          _isInWatchlist ? 'remove_from_watchlist'.tr() : 'add_to_watchlist'.tr(),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                                fontSize: 13,
+                                                color: _isInWatchlist ? Colors.orange : Colors.white,
+                                              ),
                                         ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 10),
+                          // Watched button
+                          Flexible(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: _toggleWatched,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: _isWatched
+                                        ? Colors.green.withValues(alpha: 0.2)
+                                        : Theme.of(context).colorScheme.tertiary,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: _isWatched ? Colors.green : Colors.grey[700]!,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        _isWatched ? Icons.check_circle : Icons.check_circle_outline,
+                                        color: _isWatched ? Colors.green : Colors.white,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          _isWatched
+                                              ? '${"watched_rating".tr()} $_watchedRating/10'
+                                              : 'mark_watched'.tr(),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                                fontSize: 13,
+                                                color: _isWatched ? Colors.green : Colors.white,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 20),
                       _buildDivider(),

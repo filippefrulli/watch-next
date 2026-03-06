@@ -12,14 +12,12 @@
     "hero_hint": "例：'今夜の短くて面白いもの'",
     "filters": "フィルター",
     "examples": "例",
-
     "browse": "ブラウズ",
     "curated_playlists": "おすすめプレイリスト",
     "popular_movies": "人気の映画",
     "popular_shows": "人気のドラマ",
     "top_rated_movies": "高評価の映画",
     "top_rated_shows": "高評価のドラマ",
-
     "connect_to_internet": "インターネットに接続してから再試行してください",
     "invalid_input": "無効な入力です。検索内容を変更して再試行してください",
     "need_inspiration": "インスピレーションが必要ですか？\nいくつかの例をご紹介します",
@@ -33,7 +31,6 @@
     "example_show_3": "1話30分以内のドラマ",
     "example_show_4": "5シーズン以内のドラマ",
     "example_show_5": "リアリティ番組",
-
     "query_settings": "検索設定",
     "release_period": "公開時期",
     "reviews": "レビュー",
@@ -58,7 +55,6 @@
     "availability_options": "利用可能なオプション",
     "include_rentals": "レンタルを含む",
     "include_purchases": "購入を含む",
-
     "here_recommendation": "おすすめ",
     "stream_it_on": "配信中:",
     "rent_buy_on": "レンタル/購入:",
@@ -83,7 +79,6 @@
     "done": "確認",
     "new": "新規",
     "do_not_recommend": "以下のタイトルはおすすめしないでください：",
-
     "change_region": "地域を変更",
     "edit_streaming": "ストリーミングサービスを変更",
     "edit_language": "言語を変更",
@@ -91,7 +86,6 @@
     "share": "共有",
     "about": "このアプリについて",
     "privacy_policy": "プライバシーポリシー",
-
     "search_media_description": "映画やドラマの配信先を検索",
     "search_media_start_typing": "入力を開始すると結果が表示されます",
     "search_media": "メディア検索",
@@ -110,13 +104,11 @@
     "rent": "レンタル",
     "buy": "購入",
     "unknown": "不明",
-
     "settings": "設定",
     "preferences": "環境設定",
     "support": "サポート",
     "information": "情報",
     "search": "検索",
-
     "watchlist": "ウォッチリスト",
     "watchlist_empty": "ウォッチリストは空です",
     "error_loading_watchlist": "ウォッチリストの読み込みエラー",
@@ -152,7 +144,6 @@
     "import_failed_items": "{count}件失敗",
     "import_error": "ウォッチリストのインポートに失敗しました。有効なIMDb CSVファイルを使用してください。",
     "ok": "OK",
-
     "enjoying_watch_next": "Watch Nextを楽しんでいますか？",
     "yes": "はい",
     "not_really": "あまり",
@@ -170,20 +161,14 @@
     "send_feedback": "フィードバックを送信",
     "feedback_settings_title": "フィードバックを送信",
     "feedback_settings_message": "ご提案、ご意見、またはお気軽にメッセージをお送りください！",
-
     "select_streaming": "ストリーミングサービスを選択",
-
     "validation_prompt": "与えられた文または単語が映画のおすすめリクエスト、映画をおすすめするための基準、または映画のタイトルであるかどうかを検証してください。正しいプロンプトの例：「初デートにぴったりなロマンチックで面白い」、「トム・クルーズ主演、スティーブン・スピルバーグ監督」、「AIについての評価の高い」、「アクションとアドベンチャー」、「面白い」、「モアナ」。プロンプトが有効な場合はYESのみを、そうでない場合はNOを返してください。プロンプト：",
     "validation_prompt_series": "与えられた文がドラマのおすすめリクエスト、ドラマをおすすめするための基準、またはドラマのタイトルであるかどうかを検証してください。正しいプロンプトの例：「5シーズン以内」、「スポーツについて」、「1話30分以内」、「面白い」。プロンプトが有効な場合はYESのみを、そうでない場合はNOを返してください。プロンプト：",
-
     "prompt_1": "あなたはあらゆる年代とジャンルの映画に精通した映画おすすめの専門家です。ユーザーの条件を分析し、ちょうど30本のユニークな映画タイトルを返すのがあなたの仕事です。\n\n出力形式：タイトルを次の形式で返してください：\"タイトル y:公開年\",, （各エントリをダブルカンマで区切り、1行で、番号なし、リストなし）。\n\n例：star wars y:1977,, Jurassic Park y:1993,, The Godfather y:1972\n\n時間制約：ユーザーが時間に関する条件（年の範囲、年代、「クラシック」「古い映画」「ビンテージ」「[年]以前」「[年]以降」「[年代]の」などの用語）を指定した場合、その制約を厳密に守らなければなりません。指定された期間の映画のみを返してください。\n\nストリーミング配信：ストリーミングサービスで広く配信されている映画を優先してください。\n\n類似タイトル：特定の映画名が与えられた場合、その映画と類似の29本を返してください。\n\nユーザーの条件：",
     "prompt_2": "注意：時間に関する条件に細心の注意を払ってください。ユーザーが「1990年以前」の映画を求めた場合、すべての映画が1990年以前でなければなりません。ユーザーの具体的な要件をすべて満たしてください。出力形式：タイトル y:年,, タイトル y:年,, （番号なし、説明なし、リストのみ）。",
-
     "prompt_series_1": "あなたはあらゆる年代とジャンルのテレビに精通したドラマおすすめの専門家です。ユーザーの条件を分析し、ちょうど30本のユニークなドラマタイトルを返すのがあなたの仕事です。\n\n出力形式：タイトルを次の形式で返してください：\"タイトル y:初放送年\",, （各エントリをダブルカンマで区切り、1行で、番号なし、リストなし）。\n\n例：Game of Thrones y:2011,, Stranger Things y:2016,, The Sopranos y:1999\n\n時間制約：ユーザーが時間に関する条件（年の範囲、年代、「クラシック」「古いドラマ」「ビンテージ」「[年]以前」「[年]以降」「[年代]の」などの用語）を指定した場合、その制約を厳密に守らなければなりません。指定された期間のドラマのみを返してください。\n\nストリーミング配信：ストリーミングサービスで広く配信されているドラマを優先してください。\n\n類似タイトル：特定のドラマ名が与えられた場合、そのドラマと類似の29本を返してください。\n\nユーザーの条件：",
     "prompt_series_2": "注意：時間に関する条件に細心の注意を払ってください。ユーザーが「1990年以前」のドラマを求めた場合、すべてのドラマが1990年以前でなければなりません。ユーザーの具体的な要件をすべて満たしてください。出力形式：タイトル y:年,, タイトル y:年,, （番号なし、説明なし、リストのみ）。",
-
     "no_filter_results": "フィルターに一致するアイテムがありません",
-
     "playlists": "プレイリスト",
     "playlists_subtitle": "あなたのための厳選コレクション",
     "error_loading_playlists": "プレイリストの読み込みエラー",
@@ -198,7 +183,6 @@
     "status": "ステータス",
     "created_by": "制作",
     "seasons": "シーズン",
-
     "person_filmography": "フィルモグラフィー",
     "person_biography": "経歴",
     "person_show_more": "もっと見る",
@@ -209,9 +193,34 @@
     "person_filter_all": "すべて",
     "person_filter_movies": "映画",
     "person_filter_shows": "ドラマ",
-
     "info_seasons": "シーズン",
     "info_episodes": "話",
     "info_min": "分",
-    "similar_titles": "関連作品"
+    "similar_titles": "関連作品",
+    "watched": "視聴済み",
+    "mark_watched": "視聴済みにする",
+    "watched_rating": "あなたの評価：",
+    "remove_from_watched": "視聴済みから削除",
+    "watched_empty": "まだ何もありません",
+    "watched_empty_subtitle": "タイトルを視聴済みにして記録しましょう",
+    "rate_title": "どうでしたか？",
+    "your_rating": "評価（1〜10）",
+    "date_watched": "視聴日",
+    "confirm": "確認",
+    "edit": "編集",
+    "sort_date": "日付",
+    "sort_rating": "評価",
+    "sort_title": "タイトル",
+    "rating_filter": "評価",
+    "remove_from_watchlist_prompt": "ウォッチリストからも削除しますか？",
+    "keep": "保持",
+    "stats": "統計",
+    "stats_total": "合計",
+    "stats_avg_rating": "平均評価",
+    "stats_generous_rater": "寛大なレビュアー",
+    "stats_balanced_rater": "バランスのよいレビュアー",
+    "stats_harsh_rater": "厳しい批評家",
+    "stats_rating_distribution": "評価の分布",
+    "stats_empty": "まず何か視聴して評価しましょう！",
+    "stats_top_genres": "よく見るジャンル"
 }

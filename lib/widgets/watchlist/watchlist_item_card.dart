@@ -8,12 +8,14 @@ class WatchlistItemCard extends StatelessWidget {
   final WatchlistItem item;
   final List<int> userServiceIds;
   final VoidCallback onRemove;
+  final VoidCallback? onMarkWatched;
 
   const WatchlistItemCard({
     super.key,
     required this.item,
     required this.userServiceIds,
     required this.onRemove,
+    this.onMarkWatched,
   });
 
   @override
@@ -22,58 +24,87 @@ class WatchlistItemCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.tertiary,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline,
-            width: 1,
+      child: Dismissible(
+        key: ValueKey(item.mediaId),
+        direction: DismissDirection.startToEnd,
+        confirmDismiss: (_) async {
+          if (onMarkWatched != null) {
+            onMarkWatched!();
+          }
+          // Don't auto-dismiss — we handle removal in the callback after rating
+          return false;
+        },
+        background: Container(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.only(left: 24),
+          decoration: BoxDecoration(
+            color: Colors.green.withValues(alpha: 0.25),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.check_circle_outline, color: Colors.green, size: 28),
+              const SizedBox(width: 8),
+              Text(
+                'mark_watched'.tr(),
+                style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+            ],
           ),
         ),
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          child: InkWell(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(16),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MediaDetailPage(
-                    mediaId: item.mediaId,
-                    title: item.title,
-                    isMovie: item.isMovie,
-                    posterPath: item.posterPath,
-                  ),
-                ),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildPoster(context),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildInfo(isAvailable),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 0),
-                    child: SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        icon: const Icon(Icons.delete_outline, size: 20),
-                        color: Colors.grey[400],
-                        onPressed: onRemove,
-                      ),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline,
+              width: 1,
+            ),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MediaDetailPage(
+                      mediaId: item.mediaId,
+                      title: item.title,
+                      isMovie: item.isMovie,
+                      posterPath: item.posterPath,
                     ),
                   ),
-                ],
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildPoster(context),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildInfo(isAvailable),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0),
+                      child: SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.delete_outline, size: 20),
+                          color: Colors.grey[400],
+                          onPressed: onRemove,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

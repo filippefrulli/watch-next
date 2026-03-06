@@ -14,6 +14,7 @@ import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
 
@@ -239,9 +240,24 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       );
       final countryName = region.englishName ?? 'United States';
 
+      // Build taste signals from watched history
+      final watchedService = WatchedService();
+      final highlyRated = await watchedService.getHighlyRatedItems(threshold: 7);
+      final lowRated = await watchedService.getLowRatedItems(threshold: 5);
+      String tasteSignals = '';
+      if (highlyRated.isNotEmpty) {
+        final liked = highlyRated.take(10).map((i) => i.title).join(', ');
+        tasteSignals +=
+            'TASTE SIGNALS: The user has highly rated these titles (score ≥7/10): $liked. Recommend titles with similar themes, tone, or style. ';
+      }
+      if (lowRated.isNotEmpty) {
+        final disliked = lowRated.take(5).map((i) => i.title).join(', ');
+        tasteSignals += 'The user gave low ratings to: $disliked. Avoid recommending titles too similar to these. ';
+      }
+
       String queryContent = widget.type == 0
-          ? '${moviePrompt1(countryName)} ${widget.requestString}. $moviePrompt2 $priorityInstruction$doNotRecommend'
-          : '${seriesPrompt1(countryName)} ${widget.requestString}. $seriesPrompt2 $priorityInstruction$doNotRecommend';
+          ? '${moviePrompt1(countryName)} ${widget.requestString}. $moviePrompt2 $tasteSignals$priorityInstruction$doNotRecommend'
+          : '${seriesPrompt1(countryName)} ${widget.requestString}. $seriesPrompt2 $tasteSignals$priorityInstruction$doNotRecommend';
 
       // Direct HTTP request to Gemini API
       final url =

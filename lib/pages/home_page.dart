@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:watch_next/pages/browse_page.dart';
 import 'package:watch_next/pages/main_menu_page.dart';
 import 'package:watch_next/pages/search_media_page.dart';
+import 'package:watch_next/pages/watched_page.dart';
 import 'package:watch_next/pages/watchlist_page.dart';
 import 'package:watch_next/services/user_action_service.dart';
 
@@ -15,12 +16,12 @@ class TabNavigationPage extends StatefulWidget {
 class _TabNavigationPageState extends State<TabNavigationPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  static const List<String> _tabNames = ['watchlist', 'discover', 'browse', 'search'];
+  static const List<String> _tabNames = ['watchlist', 'watched', 'discover', 'browse', 'search'];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this, initialIndex: 1);
+    _tabController = TabController(length: 5, vsync: this, initialIndex: 2);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -54,6 +55,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
               controller: _tabController,
               children: const [
                 WatchlistPage(),
+                WatchedPage(),
                 MainMenuPage(),
                 BrowsePage(),
                 SearchMediaPage(),
@@ -85,17 +87,21 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                   labelColor: Colors.orange,
                   unselectedLabelColor: Colors.grey[400],
                   labelStyle: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
                   unselectedLabelStyle: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
                   tabs: const [
                     Tab(
                       icon: Icon(Icons.bookmark_border, size: 22),
                       text: 'Watchlist',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.check_circle_outline, size: 22),
+                      text: 'Watched',
                     ),
                     Tab(
                       icon: Icon(Icons.home_rounded, size: 22),

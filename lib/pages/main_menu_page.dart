@@ -130,7 +130,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 currentIndex: typeIsMovie,
                 onToggle: (index) => setState(() => typeIsMovie = index),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 32),
               // Hero input
               HeroInput(
                 controller: _controller,
@@ -247,7 +247,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Widget _buildStepArrow() {
     return Padding(
-      padding: const EdgeInsets.only(left: 10, top: 4, bottom: 4),
+      padding: const EdgeInsets.only(left: 5, top: 4, bottom: 4),
       child: Icon(Icons.arrow_downward_rounded, color: Colors.grey[700], size: 14),
     );
   }

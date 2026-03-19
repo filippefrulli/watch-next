@@ -119,15 +119,18 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 ],
               ),
               const Spacer(flex: 2),
-              // Hero headline
+              // Hero headline + subtitle
               _buildHeroHeadline(),
-              const SizedBox(height: 80),
+              const SizedBox(height: 28),
+              // Step guide
+              _buildStepGuide(),
+              const SizedBox(height: 28),
               // Media type toggle
               MediaTypeSwitch(
                 currentIndex: typeIsMovie,
                 onToggle: (index) => setState(() => typeIsMovie = index),
               ),
-              const SizedBox(height: 80),
+              const SizedBox(height: 20),
               // Hero input
               HeroInput(
                 controller: _controller,
@@ -192,6 +195,60 @@ class _MainMenuPageState extends State<MainMenuPage> {
             fontWeight: FontWeight.bold,
             height: 1.3,
           ),
+    );
+  }
+
+  Widget _buildStepGuide() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildStep(1, 'step_1'.tr()),
+        _buildStepArrow(),
+        _buildStep(2, 'step_2'.tr()),
+        _buildStepArrow(),
+        _buildStep(3, 'step_3'.tr()),
+      ],
+    );
+  }
+
+  Widget _buildStep(int number, String label) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: const BoxDecoration(
+            color: Colors.orange,
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              '$number',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 13,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepArrow() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, top: 4, bottom: 4),
+      child: Icon(Icons.arrow_downward_rounded, color: Colors.grey[700], size: 14),
     );
   }
 

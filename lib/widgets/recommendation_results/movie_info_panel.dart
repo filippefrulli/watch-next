@@ -204,11 +204,12 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
       );
       if (confirmed != true) return;
       await _watchedService.removeFromWatched(widget.mediaId);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isWatched = false;
           _watchedRating = null;
         });
+      }
       UserActionService.logWatchedRemove(
         mediaId: widget.mediaId,
         title: widget.title,
@@ -230,11 +231,12 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
           ...?_seriesDetails?.genres?.map((g) => g.name ?? '').where((n) => n.isNotEmpty),
         ],
       ));
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isWatched = true;
           _watchedRating = result.rating;
         });
+      }
       UserActionService.logWatchedAdd(
         mediaId: widget.mediaId,
         title: widget.title,
@@ -372,7 +374,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        _isWatched ? Icons.check_circle : Icons.check_circle_outline,
+                                        Icons.check,
                                         color: _isWatched ? Colors.green : Colors.white,
                                         size: 20,
                                       ),

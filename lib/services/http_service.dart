@@ -548,9 +548,10 @@ class HttpService {
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
       final List results = jsonData['results'] ?? [];
 
-      // Filter for only movies and TV shows, convert to our model
+      // Filter for movies, TV shows, and people
       return results
-          .where((item) => item['media_type'] == 'movie' || item['media_type'] == 'tv')
+          .where(
+              (item) => item['media_type'] == 'movie' || item['media_type'] == 'tv' || item['media_type'] == 'person')
           .map((item) => MultiSearchResult.fromJson(item))
           .toList();
     } catch (e) {
@@ -626,12 +627,14 @@ class HttpService {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String lang = prefs.getString('lang') ?? 'en-US';
+      String region = prefs.getString('region') ?? 'US';
 
       final response = await _client
           .get(
             Uri.https('api.themoviedb.org', '/3/tv/popular', {
               'api_key': apiKey,
               'language': lang,
+              'region': region,
             }),
           )
           .timeout(const Duration(seconds: 10));
@@ -688,12 +691,14 @@ class HttpService {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String lang = prefs.getString('lang') ?? 'en-US';
+      String region = prefs.getString('region') ?? 'US';
 
       final response = await _client
           .get(
             Uri.https('api.themoviedb.org', '/3/tv/top_rated', {
               'api_key': apiKey,
               'language': lang,
+              'region': region,
             }),
           )
           .timeout(const Duration(seconds: 10));
@@ -834,22 +839,26 @@ class MultiSearchResult {
   final String? title;
   final String? name;
   final String? posterPath;
+  final String? profilePath;
   final String mediaType;
   final String? releaseDate;
   final String? firstAirDate;
   final double? voteAverage;
   final String? overview;
+  final String? knownForDepartment;
 
   MultiSearchResult({
     required this.id,
     this.title,
     this.name,
     this.posterPath,
+    this.profilePath,
     required this.mediaType,
     this.releaseDate,
     this.firstAirDate,
     this.voteAverage,
     this.overview,
+    this.knownForDepartment,
   });
 
   factory MultiSearchResult.fromJson(Map<String, dynamic> json) {
@@ -858,11 +867,13 @@ class MultiSearchResult {
       title: json['title'],
       name: json['name'],
       posterPath: json['poster_path'],
+      profilePath: json['profile_path'],
       mediaType: json['media_type'],
       releaseDate: json['release_date'],
       firstAirDate: json['first_air_date'],
       voteAverage: json['vote_average']?.toDouble(),
       overview: json['overview'],
+      knownForDepartment: json['known_for_department'],
     );
   }
 
@@ -877,6 +888,7 @@ class MultiSearchResult {
   }
 
   bool get isMovie => mediaType == 'movie';
+  bool get isPerson => mediaType == 'person';
 }
 
 // Model for categorized watch providers

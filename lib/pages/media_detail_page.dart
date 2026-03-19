@@ -243,11 +243,12 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
       );
       if (confirmed != true) return;
       await _watchedService.removeFromWatched(widget.mediaId);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isWatched = false;
           _watchedRating = null;
         });
+      }
       UserActionService.logWatchedRemove(
         mediaId: widget.mediaId,
         title: widget.title,
@@ -269,11 +270,12 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           ...?_seriesDetails?.genres?.map((g) => g.name ?? '').where((n) => n.isNotEmpty),
         ],
       ));
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isWatched = true;
           _watchedRating = result.rating;
         });
+      }
       UserActionService.logWatchedAdd(
         mediaId: widget.mediaId,
         title: widget.title,
@@ -535,7 +537,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      _isWatched ? Icons.check_circle : Icons.check_circle_outline,
+                      Icons.check,
                       color: _isWatched ? Colors.green : Colors.white,
                       size: 18,
                     ),

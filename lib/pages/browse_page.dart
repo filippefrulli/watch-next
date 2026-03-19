@@ -99,7 +99,7 @@ class _BrowsePageState extends State<BrowsePage> {
                     children: [
                       // Header
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                         child: Text(
                           'browse'.tr(),
                           style: const TextStyle(
@@ -304,21 +304,6 @@ class _BrowsePageState extends State<BrowsePage> {
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Text(
-                            playlist.icon ?? '🎬',
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

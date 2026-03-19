@@ -13,7 +13,7 @@ class SearchEmptyState extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.movie_outlined,
+              Icons.search,
               color: Colors.grey[700],
               size: 40,
             ),

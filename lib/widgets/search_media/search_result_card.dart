@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
+import 'package:watch_next/pages/person_detail_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
@@ -81,18 +82,40 @@ class _SearchResultCardState extends State<SearchResultCard> {
   }
 
   Future<void> _onCardTap() async {
+    final result = widget.result;
+
+    if (result.isPerson) {
+      UserActionService.logPersonTapped(
+        personId: result.id,
+        personName: result.displayTitle,
+        role: result.knownForDepartment ?? 'unknown',
+      );
+      if (!mounted || !context.mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PersonDetailPage(
+            personId: result.id,
+            personName: result.displayTitle,
+            profilePath: result.profilePath,
+          ),
+        ),
+      );
+      return;
+    }
+
     FirebaseAnalytics.instance.logEvent(
       name: 'search_result_clicked',
       parameters: <String, Object>{
-        'type': widget.result.isMovie ? 'movie' : 'show',
+        'type': result.isMovie ? 'movie' : 'show',
       },
     );
 
     // Track search result selected
     UserActionService.logSearchResultSelected(
-      mediaId: widget.result.id,
-      title: widget.result.displayTitle,
-      type: widget.result.isMovie ? 'movie' : 'show',
+      mediaId: result.id,
+      title: result.displayTitle,
+      type: result.isMovie ? 'movie' : 'show',
       positionInList: 0, // Position not available in this context
     );
 
@@ -161,13 +184,14 @@ class _SearchResultCardState extends State<SearchResultCard> {
                 ),
               ),
             ),
-            IconButton(
-              icon: Icon(
-                _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                color: _isInWatchlist ? Colors.orange : Colors.grey[400],
+            if (!result.isPerson)
+              IconButton(
+                icon: Icon(
+                  _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+                  color: _isInWatchlist ? Colors.orange : Colors.grey[400],
+                ),
+                onPressed: _toggleWatchlist,
               ),
-              onPressed: _toggleWatchlist,
-            ),
           ],
         ),
       ),
@@ -175,29 +199,30 @@ class _SearchResultCardState extends State<SearchResultCard> {
   }
 
   Widget _buildPoster(MultiSearchResult result) {
+    final imagePath = result.isPerson ? result.profilePath : result.posterPath;
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: result.posterPath != null
+      borderRadius: BorderRadius.circular(result.isPerson ? 30 : 8),
+      child: imagePath != null
           ? Image.network(
-              'https://image.tmdb.org/t/p/w200${result.posterPath}',
+              'https://image.tmdb.org/t/p/w200$imagePath',
               width: 60,
               height: 90,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
-                return _buildPlaceholderPoster();
+                return _buildPlaceholderPoster(result.isPerson);
               },
             )
-          : _buildPlaceholderPoster(),
+          : _buildPlaceholderPoster(result.isPerson),
     );
   }
 
-  Widget _buildPlaceholderPoster() {
+  Widget _buildPlaceholderPoster(bool isPerson) {
     return Container(
       width: 60,
       height: 90,
       color: Theme.of(context).colorScheme.tertiary,
       child: Icon(
-        Icons.movie_outlined,
+        isPerson ? Icons.person_outline : Icons.movie_outlined,
         color: Colors.grey[600],
         size: 32,
       ),
@@ -227,11 +252,13 @@ class _SearchResultCardState extends State<SearchResultCard> {
                 vertical: 4,
               ),
               decoration: BoxDecoration(
-                color: result.isMovie ? Colors.orange : Colors.blue,
+                color: result.isPerson ? Colors.purple : (result.isMovie ? Colors.orange : Colors.blue),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                result.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
+                result.isPerson
+                    ? (result.knownForDepartment ?? 'person'.tr())
+                    : (result.isMovie ? 'movie'.tr() : 'tv_show'.tr()),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 11,

@@ -135,7 +135,7 @@ class _StatsPageState extends State<StatsPage> {
           // Summary cards
           Row(
             children: [
-              Expanded(child: _buildStatCard('stats_total'.tr(), '$_totalCount', Icons.check_circle_outline)),
+              Expanded(child: _buildStatCard('stats_total'.tr(), '$_totalCount', Icons.check)),
               const SizedBox(width: 12),
               Expanded(child: _buildStatCard('movies'.tr(), '$_movieCount', Icons.movie_outlined)),
               const SizedBox(width: 12),

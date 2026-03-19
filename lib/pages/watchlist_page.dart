@@ -34,6 +34,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
   final ImdbImportService _importService = ImdbImportService();
   final LetterboxdImportService _letterboxdImportService = LetterboxdImportService();
   List<int> _userServiceIds = [];
+  Map<int, String> _userServicesMap = {};
   bool _isRefreshing = false;
   bool _isImporting = false;
   List<WatchlistItem> _currentItems = [];
@@ -49,8 +50,16 @@ class _WatchlistPageState extends State<WatchlistPage> {
 
   Future<void> _loadUserServices() async {
     final services = await DatabaseService.getStreamingServicesIds();
+    final allServices = await DatabaseService.getAllStreamingServices();
+    final map = <int, String>{};
+    for (final row in allServices) {
+      final id = row['streaming_id'] as int;
+      final logo = row['streaming_logo'] as String;
+      map[id] = logo;
+    }
     setState(() {
       _userServiceIds = services;
+      _userServicesMap = map;
     });
   }
 
@@ -219,6 +228,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
               return WatchlistItemCard(
                 item: filteredItems[index],
                 userServiceIds: _userServiceIds,
+                userServicesMap: _userServicesMap,
                 onRemove: () async {
                   final item = filteredItems[index];
                   await _watchlistService.removeFromWatchlist(item.mediaId);

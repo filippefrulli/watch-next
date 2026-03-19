@@ -16,7 +16,7 @@ class TabNavigationPage extends StatefulWidget {
 class _TabNavigationPageState extends State<TabNavigationPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  static const List<String> _tabNames = ['watchlist', 'watched', 'discover', 'browse', 'search'];
+  static const List<String> _tabNames = ['watchlist', 'watched', 'home', 'discover', 'search'];
 
   @override
   void initState() {
@@ -105,11 +105,11 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                     ),
                     Tab(
                       icon: Icon(Icons.home_rounded, size: 22),
-                      text: 'Discover',
+                      text: 'Home',
                     ),
                     Tab(
-                      icon: Icon(Icons.explore_outlined, size: 22),
-                      text: 'Browse',
+                      icon: Icon(Icons.grid_view_rounded, size: 22),
+                      text: 'Discover',
                     ),
                     Tab(
                       icon: Icon(Icons.search, size: 22),

@@ -19,12 +19,26 @@ class WatchlistHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildImportButton(context),
-          const SizedBox(width: 12),
-          _buildRefreshButton(context),
+          Text(
+            'watchlist'.tr(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildImportButton(context),
+              const SizedBox(width: 12),
+              _buildRefreshButton(context),
+            ],
+          ),
         ],
       ),
     );

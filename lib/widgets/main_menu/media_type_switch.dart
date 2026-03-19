@@ -25,10 +25,10 @@ class MediaTypeSwitch extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(4),
       child: ToggleSwitch(
-        minWidth: 140.0,
-        minHeight: 48.0,
+        minWidth: 110.0,
+        minHeight: 38.0,
         initialLabelIndex: currentIndex,
-        cornerRadius: 12.0,
+        cornerRadius: 10.0,
         animate: true,
         animationDuration: 300,
         activeFgColor: Colors.white,
@@ -38,7 +38,7 @@ class MediaTypeSwitch extends StatelessWidget {
         labels: ['movie'.tr(), 'tv_show'.tr()],
         customTextStyles: const [
           TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ],

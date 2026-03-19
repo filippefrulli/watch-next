@@ -324,129 +324,138 @@ class _WatchedPageState extends State<WatchedPage> {
   Widget _buildCard(WatchedItem item) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.tertiary,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MediaDetailPage(
-                  mediaId: item.mediaId,
-                  title: item.title,
-                  isMovie: item.isMovie,
-                  posterPath: item.posterPath,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 150),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MediaDetailPage(
+                    mediaId: item.mediaId,
+                    title: item.title,
+                    isMovie: item.isMovie,
+                    posterPath: item.posterPath,
+                  ),
                 ),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  // Poster
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: item.posterPath != null
-                        ? CachedNetworkImage(
-                            imageUrl: 'https://image.tmdb.org/t/p/w200${item.posterPath}',
-                            width: 60,
-                            height: 90,
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => Container(
-                              width: 60,
-                              height: 90,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            errorWidget: (_, __, ___) => Container(
-                              width: 60,
-                              height: 90,
-                              color: Theme.of(context).colorScheme.primary,
-                              child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 24),
-                            ),
-                          )
-                        : Container(
-                            width: 60,
-                            height: 90,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 24),
-                          ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          item.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                        // Poster
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(11),
+                            bottomLeft: Radius.circular(11),
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: 2 / 3,
+                            child: item.posterPath != null
+                                ? CachedNetworkImage(
+                                    imageUrl: 'https://image.tmdb.org/t/p/w200${item.posterPath}',
+                                    fit: BoxFit.fill,
+                                    placeholder: (_, __) => Container(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 24),
+                                    ),
+                                    errorWidget: (_, __, ___) => Container(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 24),
+                                    ),
+                                  )
+                                : Container(
+                                    color: Colors.black26,
+                                    child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 24),
+                                  ),
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        // Type badge + date
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                item.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
-                                style: TextStyle(color: Colors.grey[400], fontSize: 11),
-                              ),
+                        const SizedBox(width: 12),
+                        // Info
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 12, 12, 40),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        item.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
+                                        style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      DateFormat('d MMM yyyy').format(item.dateWatched),
+                                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                _buildRatingStars(item.rating),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              DateFormat('d MMM yyyy').format(item.dateWatched),
-                              style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        // Star rating display
-                        _buildRatingStars(item.rating),
                       ],
                     ),
                   ),
-                  // Action buttons column
-                  Column(
-                    children: [
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        icon: const Icon(Icons.edit_outlined, size: 20),
-                        color: Colors.grey[400],
-                        onPressed: () => _editItem(item),
-                        tooltip: 'edit'.tr(),
-                      ),
-                      const SizedBox(height: 12),
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        icon: const Icon(Icons.delete_outline, size: 20),
-                        color: Colors.grey[400],
-                        onPressed: () => _confirmDelete(item),
-                        tooltip: 'remove'.tr(),
-                      ),
-                    ],
+                  Positioned(
+                    bottom: 6,
+                    right: 6,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.edit_outlined, size: 20),
+                          color: Colors.grey[400],
+                          onPressed: () => _editItem(item),
+                          tooltip: 'edit'.tr(),
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                          onPressed: () => _confirmDelete(item),
+                          tooltip: 'remove'.tr(),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -505,7 +514,7 @@ class _WatchedPageState extends State<WatchedPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle_outline, size: 64, color: Colors.grey[700]),
+          Icon(Icons.check, size: 64, color: Colors.grey[700]),
           const SizedBox(height: 16),
           Text(
             'watched_empty'.tr(),

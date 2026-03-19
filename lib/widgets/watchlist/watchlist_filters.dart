@@ -28,16 +28,7 @@ class WatchlistFilters extends StatelessWidget {
                 child: _buildMediaTypeDropdown(context),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: _buildFilterChip(
-                  context: context,
-                  label: 'available_only'.tr(),
-                  isSelected: showOnlyAvailable,
-                  icon: Icons.check_circle,
-                  onTap: onAvailabilityToggled,
-                ),
-              ),
+              _buildAvailableToggle(context),
             ],
           ),
           const SizedBox(height: 16),
@@ -54,7 +45,7 @@ class WatchlistFilters extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () => _showMediaTypeMenu(context),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
@@ -66,16 +57,16 @@ class WatchlistFilters extends StatelessWidget {
             children: [
               Icon(
                 _getMediaTypeIcon(),
-                size: 18,
+                size: 16,
                 color: Colors.grey[300],
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   _getMediaTypeLabel(),
                   style: TextStyle(
                     color: Colors.grey[300],
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -83,11 +74,37 @@ class WatchlistFilters extends StatelessWidget {
               Icon(
                 Icons.arrow_drop_down,
                 color: Colors.grey[400],
-                size: 24,
+                size: 20,
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAvailableToggle(BuildContext context) {
+    return GestureDetector(
+      onTap: onAvailabilityToggled,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'available_only'.tr(),
+            style: TextStyle(
+              color: showOnlyAvailable ? Colors.orange : Colors.grey[400],
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Switch(
+            value: showOnlyAvailable,
+            onChanged: (_) => onAvailabilityToggled(),
+            activeColor: Colors.orange,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ],
       ),
     );
   }
@@ -163,54 +180,6 @@ class WatchlistFilters extends StatelessWidget {
               color: Colors.orange,
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip({
-    required BuildContext context,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-    IconData? icon,
-  }) {
-    return Material(
-      color: isSelected ? Colors.orange.withValues(alpha: 0.2) : Theme.of(context).colorScheme.tertiary,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? Colors.orange : Colors.grey[700]!,
-              width: 1.5,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  size: 16,
-                  color: isSelected ? Colors.orange : Colors.grey[400],
-                ),
-                const SizedBox(width: 6),
-              ],
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.orange : Colors.grey[300],
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

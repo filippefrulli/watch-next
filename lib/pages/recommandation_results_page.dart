@@ -131,11 +131,12 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         title: selectedWatchObject.title ?? '',
         type: widget.type == 0 ? 'movie' : 'show',
       );
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isWatched = false;
           _watchedRating = null;
         });
+      }
     } else {
       final result = await RatingDialog.show(context, title: selectedWatchObject.title ?? '');
       if (result == null) return;
@@ -155,11 +156,12 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         rating: result.rating,
         source: 'recommendation',
       );
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isWatched = true;
           _watchedRating = result.rating;
         });
+      }
     }
   }
 

@@ -38,31 +38,37 @@ class _BrowsePageState extends State<BrowsePage> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    await _playlistService.initialize();
+    try {
+      await _playlistService.initialize().timeout(const Duration(seconds: 10));
 
-    // Load user's streaming services and all data in parallel
-    final results = await Future.wait([
-      DatabaseService.getStreamingServicesIds(),
-      _httpService.getPopularMovies(),
-      _httpService.getPopularShows(),
-      _httpService.getTopRatedMovies(),
-      _httpService.getTopRatedShows(),
-      _playlistService.getPlaylists(),
-    ]);
+      // Load user's streaming services and all data in parallel
+      final results = await Future.wait([
+        DatabaseService.getStreamingServicesIds(),
+        _httpService.getPopularMovies(),
+        _httpService.getPopularShows(),
+        _httpService.getTopRatedMovies(),
+        _httpService.getTopRatedShows(),
+        _playlistService.getPlaylists(),
+      ]).timeout(const Duration(seconds: 20));
 
-    if (mounted) {
-      setState(() {
-        _userServiceIds = results[0] as List<int>;
-        _popularMovies = results[1] as List<BrowseItem>;
-        _popularShows = results[2] as List<BrowseItem>;
-        _topRatedMovies = results[3] as List<BrowseItem>;
-        _topRatedShows = results[4] as List<BrowseItem>;
-        _playlists = results[5] as List<Playlist>;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _userServiceIds = results[0] as List<int>;
+          _popularMovies = results[1] as List<BrowseItem>;
+          _popularShows = results[2] as List<BrowseItem>;
+          _topRatedMovies = results[3] as List<BrowseItem>;
+          _topRatedShows = results[4] as List<BrowseItem>;
+          _playlists = results[5] as List<Playlist>;
+          _isLoading = false;
+        });
 
-      // Load availability in the background
-      _loadAvailability();
+        // Load availability in the background
+        _loadAvailability();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

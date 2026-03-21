@@ -10,6 +10,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/notification_service.dart';
+import 'package:watch_next/services/ad_preload_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/utils/prompts.dart';
@@ -74,9 +75,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
   void _checkLength() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
+        final wasLongEnough = isLongEnough;
         setState(() {
           isLongEnough = _controller.text.length >= 5;
         });
+        // Preload the ad the moment the query is long enough
+        if (!wasLongEnough && isLongEnough) {
+          AdPreloadService.instance.preload(context);
+        }
       }
     });
   }

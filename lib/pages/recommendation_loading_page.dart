@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/database_service.dart';
+import 'package:watch_next/services/ad_preload_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
@@ -41,6 +42,7 @@ class RecommendationLoadingPage extends StatefulWidget {
 class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
   NativeAd? nativeAd;
   bool _nativeAdIsLoaded = false;
+  Color? _adBgColor;
 
   // Use test ad for debugging - switch to production ad for release
   final String _adUnitId = Platform.isAndroid
@@ -65,7 +67,20 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     super.didChangeDependencies();
     if (!_adLoaded) {
       _adLoaded = true;
-      loadAd();
+      final preloaded = AdPreloadService.instance.consume();
+      if (preloaded != null) {
+        // Ad was preloaded while user was typing — show immediately
+        debugPrint('✅ Using preloaded ad');
+        setState(() {
+          nativeAd = preloaded;
+          _nativeAdIsLoaded = true;
+        });
+      } else {
+        // Fallback: start loading now
+        debugPrint('⚠️ No preloaded ad, loading fresh');
+        _adBgColor = Theme.of(context).colorScheme.primary;
+        loadAd();
+      }
     }
   }
 
@@ -130,70 +145,56 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (_nativeAdIsLoaded)
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.outline,
-                        width: 2,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: 280,
-                            minHeight: 250,
-                            maxWidth: MediaQuery.of(context).size.width * 0.9,
-                            maxHeight: 350,
-                          ),
-                          child: AdWidget(ad: nativeAd!),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Advertisement',
-                          style: TextStyle(color: Colors.grey[400], fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 40),
-                LoadingAnimationWidget.threeArchedCircle(
-                  color: Colors.orange,
-                  size: 50,
-                ),
-                const SizedBox(height: 24),
-                if (askingGpt)
-                  Text(
-                    "generating".tr(),
-                    style: Theme.of(context).textTheme.displaySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                if (fetchingMovieInfo)
-                  Text(
-                    "fetching".tr(),
-                    style: Theme.of(context).textTheme.displaySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                if (filtering)
-                  Text(
-                    "filtering".tr(),
-                    style: Theme.of(context).textTheme.displaySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                const SizedBox(height: 40),
-              ],
+        child: Column(
+          children: [
+            // Ad fills all available space
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: _nativeAdIsLoaded
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: AdWidget(ad: nativeAd!),
+                      )
+                    : const SizedBox.shrink(),
+              ),
             ),
-          ),
+            // Compact spinner strip at the bottom — full width so it's always centred
+            SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LoadingAnimationWidget.threeArchedCircle(
+                      color: Colors.orange,
+                      size: 36,
+                    ),
+                    const SizedBox(height: 12),
+                    if (askingGpt)
+                      Text(
+                        "generating".tr(),
+                        style: Theme.of(context).textTheme.displaySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    if (fetchingMovieInfo)
+                      Text(
+                        "fetching".tr(),
+                        style: Theme.of(context).textTheme.displaySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    if (filtering)
+                      Text(
+                        "filtering".tr(),
+                        style: Theme.of(context).textTheme.displaySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -486,6 +487,10 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           debugPrint('❌ Ad failed to load: ${error.code} - ${error.message}');
           debugPrint('Domain: ${error.domain}');
           ad.dispose();
+          // Retry once after a short delay
+          Future.delayed(const Duration(seconds: 3), () {
+            if (mounted && !_nativeAdIsLoaded) loadAd();
+          });
         },
         onAdClicked: (ad) {
           debugPrint('Ad clicked');
@@ -499,31 +504,31 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       request: const AdRequest(),
       nativeTemplateStyle: NativeTemplateStyle(
         templateType: TemplateType.medium,
-        mainBackgroundColor: Theme.of(context).colorScheme.primary,
-        cornerRadius: 15.0,
+        mainBackgroundColor: _adBgColor!,
+        cornerRadius: 12.0,
         callToActionTextStyle: NativeTemplateTextStyle(
           textColor: Colors.black,
           backgroundColor: Colors.orange,
-          style: NativeTemplateFontStyle.monospace,
+          style: NativeTemplateFontStyle.bold,
           size: 16.0,
         ),
         primaryTextStyle: NativeTemplateTextStyle(
           textColor: Colors.orange,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          style: NativeTemplateFontStyle.italic,
-          size: 16.0,
-        ),
-        secondaryTextStyle: NativeTemplateTextStyle(
-          textColor: Colors.grey[200],
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: _adBgColor!,
           style: NativeTemplateFontStyle.bold,
           size: 16.0,
         ),
-        tertiaryTextStyle: NativeTemplateTextStyle(
-          textColor: Colors.grey[200],
-          backgroundColor: Theme.of(context).colorScheme.primary,
+        secondaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.white,
+          backgroundColor: _adBgColor!,
           style: NativeTemplateFontStyle.normal,
-          size: 16.0,
+          size: 14.0,
+        ),
+        tertiaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.grey.shade400,
+          backgroundColor: _adBgColor!,
+          style: NativeTemplateFontStyle.normal,
+          size: 13.0,
         ),
       ),
     )..load();

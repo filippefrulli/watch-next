@@ -309,21 +309,28 @@ class HttpService {
   Future<List<StreamingService>> getWatchProvidersByLocale() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String region = prefs.getString('region') ?? 'DE';
-    final response = await _client.get(
-      Uri.https(
-        'api.themoviedb.org',
-        '/3/watch/providers/movie',
-        {'api_key': apiKey, 'language': 'en-US', 'watch_region': region},
-      ),
-    );
+    final response = await _client
+        .get(
+          Uri.https(
+            'api.themoviedb.org',
+            '/3/watch/providers/movie',
+            {'api_key': apiKey, 'language': 'en-US', 'watch_region': region},
+          ),
+        )
+        .timeout(const Duration(seconds: 10));
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'getWatchProvidersByLocale HTTP ${response.statusCode}: ${response.body.length > 200 ? response.body.substring(0, 200) : response.body}');
+    }
 
     ResultProviders providers = ResultProviders.fromJson(
       jsonDecode(response.body),
     );
 
-    List<StreamingService> list = providers.results!;
+    List<StreamingService> list = providers.results ?? [];
     list.removeWhere(
-      (item) => item.displayPriority! > 100,
+      (item) => (item.displayPriority ?? 999) > 100,
     );
 
     return list;
@@ -475,53 +482,48 @@ class HttpService {
   }
 
   Future<CategorizedWatchProviders> getCategorizedWatchProviders(int id, bool isMovie) async {
-    try {
-      final endpoint = isMovie ? '/3/movie/$id/watch/providers' : '/3/tv/$id/watch/providers';
+    final endpoint = isMovie ? '/3/movie/$id/watch/providers' : '/3/tv/$id/watch/providers';
 
-      final response = await _client
-          .get(
-            Uri.https(
-              'api.themoviedb.org',
-              endpoint,
-              {'api_key': apiKey, 'language': 'en-US'},
-            ),
-          )
-          .timeout(const Duration(seconds: 10));
+    final response = await _client
+        .get(
+          Uri.https(
+            'api.themoviedb.org',
+            endpoint,
+            {'api_key': apiKey, 'language': 'en-US'},
+          ),
+        )
+        .timeout(const Duration(seconds: 10));
 
-      if (response.statusCode != 200) {
-        log('TMDB API error getting watch providers: ${response.statusCode}');
-        return CategorizedWatchProviders(streaming: [], rent: [], buy: []);
-      }
+    if (response.statusCode != 200) {
+      throw Exception(
+          'getCategorizedWatchProviders HTTP ${response.statusCode} for $endpoint: ${response.body.length > 200 ? response.body.substring(0, 200) : response.body}');
+    }
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String region = prefs.getString('region') ?? 'DE';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String region = prefs.getString('region') ?? 'DE';
 
-      final results = jsonDecode(response.body)["results"];
-      if (results == null || !results.keys.toList().contains(region)) {
-        return CategorizedWatchProviders(streaming: [], rent: [], buy: []);
-      }
-
-      ProviderRegion provider = ProviderRegion.fromJson(results[region]);
-
-      // Get all available providers with details
-      final allProviders = await getWatchProvidersByLocale();
-
-      // Helper function to convert provider IDs to StreamingService objects
-      List<StreamingService> getServicesByIds(List<StreamingType>? types) {
-        if (types == null) return [];
-        final ids = types.map((t) => t.providerId).whereType<int>().toList();
-        return allProviders.where((service) => ids.contains(service.providerId)).toList();
-      }
-
-      return CategorizedWatchProviders(
-        streaming: getServicesByIds(provider.flatrate),
-        rent: getServicesByIds(provider.rent),
-        buy: getServicesByIds(provider.buy),
-      );
-    } catch (e) {
-      log('Error getting categorized watch providers: $e');
+    final results = jsonDecode(response.body)["results"];
+    if (results == null || !results.keys.toList().contains(region)) {
       return CategorizedWatchProviders(streaming: [], rent: [], buy: []);
     }
+
+    ProviderRegion provider = ProviderRegion.fromJson(results[region]);
+
+    // Get all available providers with details
+    final allProviders = await getWatchProvidersByLocale();
+
+    // Helper function to convert provider IDs to StreamingService objects
+    List<StreamingService> getServicesByIds(List<StreamingType>? types) {
+      if (types == null) return [];
+      final ids = types.map((t) => t.providerId).whereType<int>().toList();
+      return allProviders.where((service) => ids.contains(service.providerId)).toList();
+    }
+
+    return CategorizedWatchProviders(
+      streaming: getServicesByIds(provider.flatrate),
+      rent: getServicesByIds(provider.rent),
+      buy: getServicesByIds(provider.buy),
+    );
   }
 
   Future<List<MultiSearchResult>> multiSearch(String query) async {

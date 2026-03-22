@@ -28,6 +28,7 @@ class _BrowsePageState extends State<BrowsePage> {
   List<int> _userServiceIds = [];
 
   bool _isLoading = true;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -67,7 +68,10 @@ class _BrowsePageState extends State<BrowsePage> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Error loading Discover: $e';
+        });
       }
     }
   }
@@ -95,76 +99,106 @@ class _BrowsePageState extends State<BrowsePage> {
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator(color: Colors.orange))
-            : RefreshIndicator(
-                onRefresh: _loadData,
-                color: Colors.orange,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                        child: Text(
-                          'browse'.tr(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+            : _errorMessage.isNotEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                          const SizedBox(height: 16),
+                          SelectableText(
+                            _errorMessage,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey[400], fontSize: 13),
                           ),
-                        ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() => _errorMessage = '');
+                              _loadData();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: Text('retry'.tr()),
+                          ),
+                        ],
                       ),
-
-                      // Popular Movies section
-                      if (_popularMovies.isNotEmpty)
-                        _buildCarouselSection(
-                          title: 'popular_movies'.tr(),
-                          items: _popularMovies,
-                        ),
-
-                      // Popular Shows section
-                      if (_popularShows.isNotEmpty)
-                        _buildCarouselSection(
-                          title: 'popular_shows'.tr(),
-                          items: _popularShows,
-                        ),
-
-                      // Curated Playlists section
-                      if (_playlists.isNotEmpty) ...[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-                          child: Text(
-                            'curated_playlists'.tr(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadData,
+                    color: Colors.orange,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                            child: Text(
+                              'browse'.tr(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        _buildPlaylistsSection(),
-                      ],
 
-                      // Top Rated Movies section
-                      if (_topRatedMovies.isNotEmpty)
-                        _buildCarouselSection(
-                          title: 'top_rated_movies'.tr(),
-                          items: _topRatedMovies,
-                        ),
+                          // Popular Movies section
+                          if (_popularMovies.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'popular_movies'.tr(),
+                              items: _popularMovies,
+                            ),
 
-                      // Top Rated Shows section
-                      if (_topRatedShows.isNotEmpty)
-                        _buildCarouselSection(
-                          title: 'top_rated_shows'.tr(),
-                          items: _topRatedShows,
-                        ),
+                          // Popular Shows section
+                          if (_popularShows.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'popular_shows'.tr(),
+                              items: _popularShows,
+                            ),
 
-                      const SizedBox(height: 24),
-                    ],
+                          // Curated Playlists section
+                          if (_playlists.isNotEmpty) ...[
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                              child: Text(
+                                'curated_playlists'.tr(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            _buildPlaylistsSection(),
+                          ],
+
+                          // Top Rated Movies section
+                          if (_topRatedMovies.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'top_rated_movies'.tr(),
+                              items: _topRatedMovies,
+                            ),
+
+                          // Top Rated Shows section
+                          if (_topRatedShows.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'top_rated_shows'.tr(),
+                              items: _topRatedShows,
+                            ),
+
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
       ),
     );
   }

@@ -107,7 +107,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'failed_load_streaming'.tr();
+        _errorMessage = '${'failed_load_streaming'.tr()}\n\nError: $e';
       });
     }
   }
@@ -1068,10 +1068,10 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
             children: [
               const Icon(Icons.error_outline, color: Colors.red, size: 64),
               const SizedBox(height: 16),
-              Text(
+              SelectableText(
                 _errorMessage,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                style: TextStyle(color: Colors.grey[400], fontSize: 13),
               ),
               const SizedBox(height: 24),
               ElevatedButton(

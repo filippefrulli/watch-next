@@ -113,9 +113,14 @@ class DatabaseHelper {
       ''');
     }
     if (oldVersion < 4) {
-      await db.execute(
-        'ALTER TABLE $watchedTable ADD COLUMN genre_names TEXT',
-      );
+      // Only add column if it doesn't already exist (v3 CREATE already includes it)
+      final columns = await db.rawQuery('PRAGMA table_info($watchedTable)');
+      final hasGenreNames = columns.any((col) => col['name'] == 'genre_names');
+      if (!hasGenreNames) {
+        await db.execute(
+          'ALTER TABLE $watchedTable ADD COLUMN genre_names TEXT',
+        );
+      }
     }
   }
 }

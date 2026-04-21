@@ -44,7 +44,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   void initState() {
     super.initState();
-    openAI = OpenAIClient(apiKey: openApiKey);
+    openAI = OpenAIClient(apiKey: openAiKey);
     _controller.addListener(_checkLength);
     _loadQuerySettings();
     // Reschedule notification with proper translations once context is available

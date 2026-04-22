@@ -16,6 +16,8 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:openai_dart/openai_dart.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
 
@@ -264,39 +266,65 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           ? '${moviePrompt1(countryName)} ${widget.requestString}. $moviePrompt2 $tasteSignals$priorityInstruction$doNotRecommend'
           : '${seriesPrompt1(countryName)} ${widget.requestString}. $seriesPrompt2 $tasteSignals$priorityInstruction$doNotRecommend';
 
-      // Direct HTTP request to Gemini API
-      final url =
-          Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent');
+      // Determine which LLM provider to use via Remote Config
+      final remoteConfig = FirebaseRemoteConfig.instance;
+      final llmProvider = remoteConfig.getString('llm_provider');
 
-      final response = await http.post(
-        url,
-        headers: {
-          'x-goog-api-key': geminiApiKey,
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'contents': [
-            {
-              'parts': [
-                {'text': queryContent}
-              ]
+      String responseContent;
+      if (llmProvider == 'gemini') {
+        // Gemini API call
+        final url =
+            Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent');
+
+        final response = await http.post(
+          url,
+          headers: {
+            'x-goog-api-key': geminiApiKey,
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'contents': [
+              {
+                'parts': [
+                  {'text': queryContent}
+                ]
+              }
+            ],
+            'generationConfig': {
+              'thinkingConfig': {'thinkingLevel': 'low'}
             }
-          ],
-          'generationConfig': {
-            'thinkingConfig': {'thinkingLevel': 'low'}
-          }
-        }),
-      );
+          }),
+        );
 
-      if (response.statusCode != 200) {
-        throw Exception('Gemini API request failed: ${response.statusCode} - ${response.body}');
-      }
+        if (response.statusCode != 200) {
+          throw Exception('Gemini API request failed: ${response.statusCode} - ${response.body}');
+        }
 
-      final responseData = jsonDecode(response.body);
-      final responseContent = responseData['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '';
+        final responseData = jsonDecode(response.body);
+        responseContent = responseData['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '';
 
-      if (responseContent.isEmpty) {
-        throw Exception('Empty response from Gemini API');
+        if (responseContent.isEmpty) {
+          throw Exception('Empty response from Gemini API');
+        }
+      } else {
+        // OpenAI API call (default)
+        final openAI = OpenAIClient(apiKey: openAiKey);
+        final openAiResponse = await openAI.createChatCompletion(
+          request: CreateChatCompletionRequest(
+            model: ChatCompletionModel.modelId('gpt-5.4-mini'),
+            messages: [
+              ChatCompletionMessage.user(
+                content: ChatCompletionUserMessageContent.string(queryContent),
+              ),
+            ],
+            reasoningEffort: ReasoningEffort.low,
+          ),
+        );
+        responseContent = openAiResponse.choices.first.message.content ?? '';
+
+        if (responseContent.isEmpty) {
+          throw Exception('Empty response from OpenAI API');
+        }
       }
 
       // Parse titles from response and add to cache

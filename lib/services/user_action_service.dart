@@ -35,6 +35,7 @@ class UserActionService {
           'created_at': FieldValue.serverTimestamp(),
           'first_open': FieldValue.serverTimestamp(),
           'last_open': FieldValue.serverTimestamp(),
+          'platform': defaultTargetPlatform.name,
         });
       } else {
         // Returning user - update last_open

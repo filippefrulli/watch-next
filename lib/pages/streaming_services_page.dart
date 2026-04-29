@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/home_page.dart';
+import 'package:watch_next/pages/region_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
@@ -48,29 +48,74 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
   }
 
   Widget body() {
-    return Column(
-      children: [
-        const SizedBox(height: 60),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              Text(
-                "select_streaming".tr(),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displayLarge,
-              ),
-            ],
+    return SafeArea(
+      child: Column(
+        children: [
+          const SizedBox(height: 32),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              "select_streaming".tr(),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.displayLarge,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              "We'll only suggest movies & shows you can actually watch on your subscriptions.",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[500],
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          _stepDots(1),
+          const SizedBox(height: 20),
+          Expanded(child: streamingGrid()),
+          const SizedBox(height: 8),
+          _selectionCount(),
+          const SizedBox(height: 8),
+          closeButton(),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _selectionCount() {
+    if (selectedStreamingServices.isEmpty) return const SizedBox.shrink();
+    final count = selectedStreamingServices.length;
+    return Text(
+      "$count service${count == 1 ? '' : 's'} selected",
+      style: TextStyle(
+        color: Colors.orange[300],
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  Widget _stepDots(int step) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        3,
+        (i) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: i == step ? 20 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: i == step ? Colors.orange : Colors.grey[700],
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
-        const SizedBox(height: 32),
-        Expanded(
-          child: streamingGrid(),
-        ),
-        const SizedBox(height: 16),
-        closeButton(),
-        const SizedBox(height: 32),
-      ],
+      ),
     );
   }
 
@@ -208,20 +253,24 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                 onTap: () async {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   bool seen = prefs.getBool('skip_intro') ?? false;
-                  prefs.setBool('skip_intro', true);
                   await DatabaseService.saveStreamingServices(selectedStreamingServices);
-                  // Clear query cache since streaming services changed
                   await QueryCacheService.clearAllCaches();
-
-                  // Track streaming services updated
                   UserActionService.logStreamingServicesUpdated();
 
                   if (mounted && seen) {
+                    prefs.setBool('skip_intro', true);
                     Navigator.of(context).pop();
                   } else if (mounted && !seen) {
                     Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const TabNavigationPage(),
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, _) => const RegionIntroPage(),
+                        transitionsBuilder: (context, animation, _, child) => SlideTransition(
+                          position: Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                              .chain(CurveTween(curve: Curves.easeInOut))
+                              .animate(animation),
+                          child: child,
+                        ),
+                        transitionDuration: const Duration(milliseconds: 550),
                       ),
                     );
                   }

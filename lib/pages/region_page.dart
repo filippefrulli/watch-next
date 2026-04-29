@@ -1,10 +1,9 @@
-import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/services/user_action_service.dart';
-import 'streaming_services_page.dart';
+import 'package:watch_next/pages/home_page.dart';
 
 class RegionIntroPage extends StatefulWidget {
   const RegionIntroPage({super.key});
@@ -14,7 +13,7 @@ class RegionIntroPage extends StatefulWidget {
 }
 
 class _SecondIntroScreenState extends State<RegionIntroPage> {
-  int selected = -1;
+  String? _selectedIso;
   String? _initialRegion;
   List<Region> _filteredRegions = availableRegions;
 
@@ -29,64 +28,118 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
     setState(() {
       _filteredRegions =
           availableRegions.where((region) => region.englishName!.toLowerCase().contains(value.toLowerCase())).toList();
+      _selectedIso = null;
     });
   }
 
   Future<void> _loadInitialRegion() async {
     final prefs = await SharedPreferences.getInstance();
     _initialRegion = prefs.getString('region');
+
+    final String? savedRegion = prefs.getString('region');
+    if (savedRegion != null) {
+      if (mounted) setState(() => _selectedIso = savedRegion);
+    } else {
+      final countryCode = WidgetsBinding.instance.platformDispatcher.locale.countryCode;
+      if (countryCode != null) {
+        final match = _filteredRegions.firstWhere(
+          (r) => r.iso == countryCode,
+          orElse: () => Region(iso: null, englishName: null),
+        );
+        if (match.iso != null) {
+          await prefs.setString('region', match.iso!);
+          await prefs.setBool('seen', true);
+          if (mounted) setState(() => _selectedIso = match.iso);
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: DelayedDisplay(
-        delay: const Duration(milliseconds: 200),
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            const SizedBox(height: 48),
-            Text(
-              "select_country".tr(),
-              style: Theme.of(context).textTheme.displayLarge,
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search country...",
-                  prefixIcon: const Icon(Icons.search, color: Colors.orange),
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.tertiary,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Colors.orange, width: 2),
-                  ),
-                ),
-                onChanged: _onSearchChanged,
-                style: Theme.of(context).textTheme.bodyMedium,
+              const SizedBox(height: 32),
+              Text(
+                "select_country".tr(),
+                style: Theme.of(context).textTheme.displayLarge,
               ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: _regions(),
-            ),
-            const SizedBox(height: 16),
-            nextButton(),
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  "So we know which titles are available to stream where you live.",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _stepDots(2),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Search country...",
+                    prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.tertiary,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Colors.orange, width: 2),
+                    ),
+                  ),
+                  onChanged: _onSearchChanged,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(child: _regions()),
+              const SizedBox(height: 12),
+              nextButton(),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+    );
+  }
+
+  String _isoToFlag(String iso) {
+    const base = 0x1F1E6 - 0x41;
+    return iso.toUpperCase().split('').map((c) => String.fromCharCode(c.codeUnitAt(0) + base)).join();
+  }
+
+  Widget _stepDots(int step) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        3,
+        (i) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: i == step ? 20 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: i == step ? Colors.orange : Colors.grey[700],
+            borderRadius: BorderRadius.circular(4),
+          ),
         ),
       ),
     );
@@ -125,7 +178,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
   }
 
   Widget _listTile(String country, String region, int index) {
-    bool isSelected = selected == index;
+    bool isSelected = _selectedIso == region;
 
     return Material(
       color: isSelected ? Colors.orange.withValues(alpha: 0.1) : Colors.transparent,
@@ -133,30 +186,23 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('region', region);
-          prefs.setInt('region_number', index);
-
           prefs.setBool('seen', true);
 
           setState(() {
-            selected = index;
+            _selectedIso = region;
           });
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Row(
             children: [
-              Container(
+              SizedBox(
                 width: 48,
                 height: 48,
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.orange : Theme.of(context).colorScheme.tertiary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: Center(
-                  child: Icon(
-                    Icons.location_on_rounded,
-                    color: isSelected ? Colors.white : Colors.grey[600],
-                    size: 24,
+                  child: Text(
+                    _isoToFlag(region),
+                    style: const TextStyle(fontSize: 28),
                   ),
                 ),
               ),
@@ -196,9 +242,10 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
   }
 
   Widget nextButton() {
-    return selected > -1
-        ? DelayedDisplay(
-            delay: const Duration(milliseconds: 100),
+    return _selectedIso != null
+        ? AnimatedOpacity(
+            opacity: 1.0,
+            duration: const Duration(milliseconds: 200),
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               width: double.infinity,
@@ -233,11 +280,22 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                       );
                     }
 
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const StreamingServicesPage(),
-                      ),
-                    );
+                    prefs.setBool('skip_intro', true);
+
+                    if (mounted) {
+                      Navigator.of(context).pushReplacement(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, _) => const TabNavigationPage(),
+                          transitionsBuilder: (context, animation, _, child) => SlideTransition(
+                            position: Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                                .chain(CurveTween(curve: Curves.easeInOut))
+                                .animate(animation),
+                            child: child,
+                          ),
+                          transitionDuration: const Duration(milliseconds: 550),
+                        ),
+                      );
+                    }
                   },
                   child: Center(
                     child: Text(

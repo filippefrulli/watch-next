@@ -2,7 +2,7 @@ import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/region_page.dart';
+import 'package:watch_next/pages/streaming_services_page.dart';
 import 'package:watch_next/services/user_action_service.dart';
 
 class LanguagePage extends StatefulWidget {
@@ -42,6 +42,22 @@ class _LanguagePageState extends State<LanguagePage> {
   Future<void> _loadInitialLanguage() async {
     final prefs = await SharedPreferences.getInstance();
     _initialLanguage = prefs.getString('lang');
+
+    final int? savedIndex = prefs.getInt('language_number');
+    if (savedIndex != null && savedIndex < lang.length) {
+      if (mounted) setState(() => selected = savedIndex);
+    } else {
+      final deviceLang = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      final index = lang.indexOf(deviceLang);
+      if (index != -1) {
+        await prefs.setInt('language_number', index);
+        await prefs.setString('lang', '${lang[index]}-${regions[index]}');
+        if (mounted) {
+          context.setLocale(Locale(lang[index], regions[index]));
+          setState(() => selected = index);
+        }
+      }
+    }
   }
 
   @override
@@ -75,7 +91,9 @@ class _LanguagePageState extends State<LanguagePage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
+                  _stepDots(0),
+                  const SizedBox(height: 24),
                   _languages(),
                   const SizedBox(height: 24),
                 ],
@@ -133,8 +151,15 @@ class _LanguagePageState extends State<LanguagePage> {
                   Navigator.of(context).pop();
                 } else if (mounted && !seen) {
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const RegionIntroPage(),
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, _) => const StreamingServicesPage(),
+                      transitionsBuilder: (context, animation, _, child) => SlideTransition(
+                        position: Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+                            .chain(CurveTween(curve: Curves.easeInOut))
+                            .animate(animation),
+                        child: child,
+                      ),
+                      transitionDuration: const Duration(milliseconds: 550),
                     ),
                   );
                 }
@@ -155,6 +180,25 @@ class _LanguagePageState extends State<LanguagePage> {
     } else {
       return Container();
     }
+  }
+
+  Widget _stepDots(int step) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        3,
+        (i) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: i == step ? 20 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: i == step ? Colors.orange : Colors.grey[700],
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _languages() {

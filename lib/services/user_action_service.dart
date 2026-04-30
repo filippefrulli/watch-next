@@ -313,4 +313,13 @@ class UserActionService {
   static Future<void> logStatsViewed() async {
     await logAction('stats_viewed');
   }
+
+  /// Mark user as premium in Firestore and log the purchase
+  static Future<void> markPremium() async {
+    try {
+      final userId = await _getUserId();
+      await _firestore.collection('users').doc(userId).update({'premium': true});
+    } catch (_) {}
+    await logAction('remove_ads_purchased');
+  }
 }

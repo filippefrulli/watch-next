@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/widgets/shared/native_ad_widget.dart';
 import 'package:watch_next/objects/playlist.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/pages/playlist_detail_page.dart';
@@ -179,6 +180,8 @@ class _BrowsePageState extends State<BrowsePage> {
                             ),
                             _buildPlaylistsSection(),
                           ],
+
+                          const NativeAdWidget(),
 
                           // Top Rated Movies section
                           if (_topRatedMovies.isNotEmpty)

@@ -4,6 +4,8 @@ import 'package:watch_next/pages/main_menu_page.dart';
 import 'package:watch_next/pages/search_media_page.dart';
 import 'package:watch_next/pages/watched_page.dart';
 import 'package:watch_next/pages/watchlist_page.dart';
+import 'package:watch_next/services/native_ad_pool.dart';
+import 'package:watch_next/services/purchase_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 
 class TabNavigationPage extends StatefulWidget {
@@ -23,6 +25,8 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
     super.initState();
     _tabController = TabController(length: 5, vsync: this, initialIndex: 2);
     _tabController.addListener(_onTabChanged);
+    PurchaseService.initialize();
+    NativeAdPool.instance.init();
   }
 
   void _onTabChanged() {
@@ -38,6 +42,8 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
   void dispose() {
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
+    PurchaseService.dispose();
+    NativeAdPool.instance.dispose();
     super.dispose();
   }
 

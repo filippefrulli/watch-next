@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/services/purchase_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -81,6 +82,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     const SizedBox(height: 8),
+                    _premiumSection(),
+                    const SizedBox(height: 24),
                     _sectionTitle('preferences'.tr()),
                     const SizedBox(height: 12),
                     _settingsCard(
@@ -230,6 +233,144 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const SizedBox(height: 32),
                   ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _premiumSection() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: PurchaseService.adsRemovedNotifier,
+      builder: (context, adsRemoved, _) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.orange.withValues(alpha: 0.4),
+              width: 1,
+            ),
+          ),
+          child: adsRemoved ? _premiumActiveRow() : _premiumBuyColumn(),
+        );
+      },
+    );
+  }
+
+  Widget _premiumActiveRow() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.star_rounded, color: Colors.orange, size: 22),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Remove Ads',
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Purchased — thank you!',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.check_circle_rounded, color: Colors.orange, size: 22),
+        ],
+      ),
+    );
+  }
+
+  Widget _premiumBuyColumn() {
+    final price = PurchaseService.product?.price;
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.star_rounded, color: Colors.orange, size: 22),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Remove Ads',
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'One-time purchase, no subscription',
+                      style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: ElevatedButton(
+              onPressed: () => PurchaseService.buyRemoveAds(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                price != null ? 'Remove Ads — $price' : 'Remove Ads — €1.99',
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Center(
+            child: GestureDetector(
+              onTap: () => PurchaseService.restorePurchases(),
+              child: Text(
+                'Restore purchase',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 13,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.grey[500],
                 ),
               ),
             ),

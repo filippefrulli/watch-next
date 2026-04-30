@@ -7,6 +7,7 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/widgets/shared/native_ad_widget.dart';
 import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/objects/streaming_service.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
@@ -645,6 +646,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         // Generate similar button
         const SizedBox(height: 24),
         _buildGenerateSimilarButton(),
+        const NativeAdWidget(),
         // Similar titles
         if (_similarItems.isNotEmpty) ...[
           const SizedBox(height: 20),
@@ -732,6 +734,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         // Generate similar button
         const SizedBox(height: 24),
         _buildGenerateSimilarButton(),
+        const NativeAdWidget(),
         // Similar titles
         if (_similarItems.isNotEmpty) ...[
           const SizedBox(height: 20),

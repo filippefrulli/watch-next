@@ -5,6 +5,7 @@ import 'package:watch_next/objects/person_details.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/widgets/shared/native_ad_widget.dart';
 
 class PersonDetailPage extends StatefulWidget {
   final int personId;
@@ -127,6 +128,7 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
             ),
           ),
         ),
+        const SliverToBoxAdapter(child: NativeAdWidget()),
         _buildFilmographyGrid(),
         const SliverToBoxAdapter(child: SizedBox(height: 32)),
       ],

@@ -355,7 +355,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               child: Text(
-                price != null ? 'Remove Ads — $price' : 'Remove Ads — €1.99',
+                price != null ? 'Remove Ads — $price' : 'Remove Ads',
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
               ),
             ),

@@ -12,6 +12,7 @@ import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/pages/recommandation_results_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/ad_preload_service.dart';
+import 'package:watch_next/services/purchase_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
@@ -69,6 +70,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     super.didChangeDependencies();
     if (!_adLoaded) {
       _adLoaded = true;
+      if (PurchaseService.adsRemoved) return;
       final preloaded = AdPreloadService.instance.consume();
       if (preloaded != null) {
         // Ad was preloaded while user was typing — show immediately
@@ -153,12 +155,18 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: _nativeAdIsLoaded
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: AdWidget(ad: nativeAd!),
-                      )
-                    : const SizedBox.shrink(),
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: PurchaseService.adsRemovedNotifier,
+                  builder: (context, adsRemoved, _) {
+                    if (adsRemoved || !_nativeAdIsLoaded || nativeAd == null) {
+                      return const SizedBox.shrink();
+                    }
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: AdWidget(ad: nativeAd!),
+                    );
+                  },
+                ),
               ),
             ),
             // Compact spinner strip at the bottom — full width so it's always centred

@@ -4,9 +4,11 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:watch_next/services/native_ad_pool.dart';
 import 'package:watch_next/services/purchase_service.dart';
 import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/pages/settings_page.dart';
 
 class NativeAdWidget extends StatefulWidget {
-  const NativeAdWidget({super.key});
+  final bool showRemoveAdsLink;
+  const NativeAdWidget({super.key, this.showRemoveAdsLink = true});
 
   @override
   State<NativeAdWidget> createState() => _NativeAdWidgetState();
@@ -133,6 +135,25 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
                   child: AdWidget(ad: _nativeAd!),
                 ),
               ),
+              if (widget.showRemoveAdsLink) ...[
+                const SizedBox(height: 6),
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                  ),
+                  child: Text(
+                    'Remove ads',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 11,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         );

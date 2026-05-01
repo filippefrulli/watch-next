@@ -119,6 +119,7 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
         SliverToBoxAdapter(child: _buildProfileHeader()),
         if (_person?.biography != null && _person!.biography!.isNotEmpty) SliverToBoxAdapter(child: _buildBiography()),
         SliverToBoxAdapter(child: _buildFilterChips()),
+        const SliverToBoxAdapter(child: NativeAdWidget()),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -128,7 +129,6 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
             ),
           ),
         ),
-        const SliverToBoxAdapter(child: NativeAdWidget()),
         _buildFilmographyGrid(),
         const SliverToBoxAdapter(child: SizedBox(height: 32)),
       ],

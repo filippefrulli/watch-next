@@ -232,5 +232,9 @@
   "watchlist_empty_subtitle": "発見した映画やドラマをここに保存しよう。",
   "get_recommendations": "おすすめを見る",
   "example_movie_1": "今夜笑えるもの",
-  "example_movie_2": "一人で見るスリラー"
+  "example_movie_2": "一人で見るスリラー",
+  "region_subtitle": "あなたの地域で視聴できるタイトルを把握するために必要です。",
+  "search_country": "国を検索...",
+  "streaming_subtitle": "あなたのサブスクで実際に視聴できる作品のみをおすすめします。",
+  "services_selected": "{count}件のサービスを選択中"
 }

@@ -232,5 +232,9 @@
   "watchlist_empty_subtitle": "खोजते समय फिल्में और शो यहाँ सेव करें।",
   "get_recommendations": "सिफारिशें पाएं",
   "example_movie_1": "आज रात कुछ मजेदार",
-  "example_movie_2": "अकेले देखने के लिए थ्रिलर"
+  "example_movie_2": "अकेले देखने के लिए थ्रिलर",
+  "region_subtitle": "ताकि हम जान सकें कि आपके यहाँ कौन से शीर्षक स्ट्रीम उपलब्ध हैं।",
+  "search_country": "देश खोजें...",
+  "streaming_subtitle": "हम केवल वही फ़िल्में और शो सुझाएंगे जो आपकी सदस्यता पर उपलब्ध हैं।",
+  "services_selected": "{count} सेवा(एं) चुनी गई"
 }

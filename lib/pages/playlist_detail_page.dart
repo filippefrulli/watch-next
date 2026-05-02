@@ -133,21 +133,31 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
     if (_error != null) {
       return SliverFillRemaining(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, color: Colors.grey[600], size: 48),
-              const SizedBox(height: 16),
-              Text(
-                'error_occurred'.tr(),
-                style: TextStyle(color: Colors.grey[400]),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: _loadData,
-                child: Text('retry'.tr()),
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                const SizedBox(height: 16),
+                Text(
+                  'error_occurred'.tr(),
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _loadData,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  ),
+                  child: Text('retry'.tr(), style: const TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ],
+            ),
           ),
         ),
       );

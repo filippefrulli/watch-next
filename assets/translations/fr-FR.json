@@ -232,5 +232,9 @@
   "watchlist_empty_subtitle": "Sauvegarde des films et séries au fil de tes découvertes.",
   "get_recommendations": "Obtenir des recommandations",
   "example_movie_1": "Quelque chose de drôle ce soir",
-  "example_movie_2": "Un thriller à regarder seul"
+  "example_movie_2": "Un thriller à regarder seul",
+  "region_subtitle": "Pour savoir quels titres sont disponibles en streaming près de chez toi.",
+  "search_country": "Rechercher un pays...",
+  "streaming_subtitle": "On ne suggérera que des films & séries disponibles sur tes abonnements.",
+  "services_selected": "{count} service(s) sélectionné(s)"
 }

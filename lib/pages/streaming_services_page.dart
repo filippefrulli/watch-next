@@ -64,7 +64,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
-              "We'll only suggest movies & shows you can actually watch on your subscriptions.",
+              "streaming_subtitle".tr(),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.grey[500],
@@ -91,7 +91,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
     if (selectedStreamingServices.isEmpty) return const SizedBox.shrink();
     final count = selectedStreamingServices.length;
     return Text(
-      "$count service${count == 1 ? '' : 's'} selected",
+      "services_selected".tr(namedArgs: {'count': '$count'}),
       style: TextStyle(
         color: Colors.orange[300],
         fontSize: 13,
@@ -126,26 +126,18 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(32),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.error_outline, size: 48, color: Colors.red),
-                  ),
-                  SizedBox(height: 24),
+                  const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                  const SizedBox(height: 16),
                   Text(
                     "error_occurred".tr(),
-                    style: Theme.of(context).textTheme.displayMedium,
+                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -155,15 +147,10 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: Text(
-                      "Try Again",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child: Text('retry'.tr(), style: const TextStyle(fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),

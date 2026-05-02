@@ -232,5 +232,9 @@
   "watchlist_empty_subtitle": "Speichere hier Filme & Serien, wenn du sie entdeckst.",
   "get_recommendations": "Empfehlungen erhalten",
   "example_movie_1": "Etwas Lustiges für heute Abend",
-  "example_movie_2": "Ein Thriller zum Alleineschauen"
+  "example_movie_2": "Ein Thriller zum Alleineschauen",
+  "region_subtitle": "So wissen wir, welche Titel bei dir gestreamt werden können.",
+  "search_country": "Land suchen...",
+  "streaming_subtitle": "Wir empfehlen nur Filme & Serien, die du mit deinen Abos wirklich sehen kannst.",
+  "services_selected": "{count} Dienst(e) ausgewählt"
 }

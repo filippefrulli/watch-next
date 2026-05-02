@@ -247,7 +247,7 @@ class _BrowsePageState extends State<BrowsePage> {
           ),
         ),
         SizedBox(
-          height: 200,
+          height: 220,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -268,7 +268,7 @@ class _BrowsePageState extends State<BrowsePage> {
     return GestureDetector(
       onTap: () => _openItem(item),
       child: Container(
-        width: 120,
+        width: 140,
         margin: const EdgeInsets.symmetric(horizontal: 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,7 +323,7 @@ class _BrowsePageState extends State<BrowsePage> {
                           isAvailable ? 'stream'.tr() : (hasRentOrBuy ? 'rent_buy'.tr() : 'N/A'),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 9,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

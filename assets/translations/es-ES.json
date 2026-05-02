@@ -232,5 +232,9 @@
   "watchlist_empty_subtitle": "Guarda aquí películas y series mientras las descubres.",
   "get_recommendations": "Obtener recomendaciones",
   "example_movie_1": "Algo gracioso para esta noche",
-  "example_movie_2": "Un thriller para ver solo"
+  "example_movie_2": "Un thriller para ver solo",
+  "region_subtitle": "Para saber qué títulos están disponibles en streaming donde vives.",
+  "search_country": "Buscar país...",
+  "streaming_subtitle": "Solo sugeriremos películas y series que puedas ver con tus suscripciones.",
+  "services_selected": "{count} servicio(s) seleccionado(s)"
 }

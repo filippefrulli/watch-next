@@ -232,5 +232,9 @@
   "watchlist_empty_subtitle": "Save movies & shows here as you discover them.",
   "get_recommendations": "Get recommendations",
   "example_movie_1": "Something funny for tonight",
-  "example_movie_2": "A thriller to watch alone"
+  "example_movie_2": "A thriller to watch alone",
+  "region_subtitle": "So we know which titles are available to stream where you live.",
+  "search_country": "Search country...",
+  "streaming_subtitle": "We'll only suggest movies & shows you can actually watch on your subscriptions.",
+  "services_selected": "{count} service(s) selected"
 }

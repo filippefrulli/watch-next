@@ -72,7 +72,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Text(
-                  "So we know which titles are available to stream where you live.",
+                  "region_subtitle".tr(),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.grey[500],
@@ -88,7 +88,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: TextField(
                   decoration: InputDecoration(
-                    hintText: "Search country...",
+                    hintText: "search_country".tr(),
                     prefixIcon: const Icon(Icons.search, color: Colors.orange),
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.tertiary,

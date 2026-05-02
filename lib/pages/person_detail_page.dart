@@ -25,6 +25,7 @@ class PersonDetailPage extends StatefulWidget {
 
 class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerProviderStateMixin {
   bool _isLoading = true;
+  bool _hasError = false;
   PersonDetails? _person;
   List<PersonCredit> _movieCredits = [];
   List<PersonCredit> _showCredits = [];
@@ -73,7 +74,7 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() { _isLoading = false; _hasError = true; });
     }
   }
 
@@ -108,6 +109,38 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
                 ],
               ),
             )
+          : _hasError
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                        const SizedBox(height: 16),
+                        Text(
+                          'error_occurred'.tr(),
+                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() { _isLoading = true; _hasError = false; });
+                            _loadData();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                          ),
+                          child: Text('retry'.tr(), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
           : _buildContent(),
     );
   }
@@ -426,11 +459,19 @@ class _ExpandableBiographyState extends State<_ExpandableBiography> {
           style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        Text(
-          widget.biography,
-          maxLines: _expanded ? null : 4,
-          overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-          style: TextStyle(color: Colors.grey[300], fontSize: 14, height: 1.6),
+        AnimatedCrossFade(
+          duration: const Duration(milliseconds: 250),
+          crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          firstChild: Text(
+            widget.biography,
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.grey[300], fontSize: 14, height: 1.6),
+          ),
+          secondChild: Text(
+            widget.biography,
+            style: TextStyle(color: Colors.grey[300], fontSize: 14, height: 1.6),
+          ),
         ),
         const SizedBox(height: 4),
         GestureDetector(

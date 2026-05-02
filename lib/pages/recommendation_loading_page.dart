@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
-import 'package:watch_next/pages/recommandation_results_page.dart';
+import 'package:watch_next/pages/recommendation_results_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/ad_preload_service.dart';
 import 'package:watch_next/services/purchase_service.dart';

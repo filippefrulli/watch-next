@@ -494,30 +494,34 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
-                  color:
-                      _isInWatchlist ? Colors.orange.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+                  color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: _isInWatchlist ? Colors.orange : Theme.of(context).colorScheme.outline,
-                    width: _isInWatchlist ? 2 : 1,
+                    color: Theme.of(context).colorScheme.outline,
+                    width: 1,
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                      color: _isInWatchlist ? Colors.orange : Colors.white,
-                      size: 18,
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                      child: Icon(
+                        _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+                        key: ValueKey(_isInWatchlist),
+                        color: _isInWatchlist ? Colors.orange : Colors.white,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
-                        _isInWatchlist ? 'remove_from_watchlist'.tr() : 'add_to_watchlist'.tr(),
+                        'watchlist'.tr(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: _isInWatchlist ? Colors.orange : Colors.white,
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -540,29 +544,34 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
-                  color: _isWatched ? Colors.green.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+                  color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: _isWatched ? Colors.green : Theme.of(context).colorScheme.outline,
-                    width: _isWatched ? 2 : 1,
+                    color: Theme.of(context).colorScheme.outline,
+                    width: 1,
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.check,
-                      color: _isWatched ? Colors.green : Colors.white,
-                      size: 18,
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                      child: Icon(
+                        _isWatched ? Icons.check_circle : Icons.check_circle_outline,
+                        key: ValueKey(_isWatched),
+                        color: _isWatched ? Colors.green[400] : Colors.white,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
-                        _isWatched ? '${'watched_rating'.tr()} $_watchedRating/10' : 'mark_watched'.tr(),
+                        _isWatched && _watchedRating != null ? '${'watched'.tr()} · $_watchedRating/10' : 'watched'.tr(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: _isWatched ? Colors.green : Colors.white,
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),

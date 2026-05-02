@@ -64,7 +64,7 @@ class ActionButtons extends StatelessWidget {
                     );
                   },
                   child: Icon(
-                    isInWatchlist ? Icons.bookmark : Icons.add,
+                    isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
                     key: ValueKey<bool>(isInWatchlist),
                     color: isInWatchlist ? Theme.of(context).colorScheme.secondary : Colors.white,
                     size: 22,
@@ -90,9 +90,8 @@ class ActionButtons extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: isWatched ? Colors.green.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
-        border: isWatched ? Border.all(color: Colors.green.withValues(alpha: 0.5), width: 1) : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -108,18 +107,18 @@ class ActionButtons extends StatelessWidget {
                   duration: const Duration(milliseconds: 300),
                   transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
                   child: Icon(
-                    Icons.check,
+                    isWatched ? Icons.check_circle : Icons.check_circle_outline,
                     key: ValueKey<bool>(isWatched),
-                    color: isWatched ? Colors.green : Colors.white,
+                    color: isWatched ? Colors.green[400] : Colors.white,
                     size: 22,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  isWatched && watchedRating != null ? '${'watched_rating'.tr()} $watchedRating/10' : 'watched'.tr(),
+                  isWatched && watchedRating != null ? '${'watched'.tr()} · $watchedRating/10' : 'watched'.tr(),
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: isWatched ? Colors.green : Colors.white,
+                        color: Colors.white,
                       ),
                 ),
               ],

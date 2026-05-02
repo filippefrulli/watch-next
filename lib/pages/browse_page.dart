@@ -333,16 +333,19 @@ class _BrowsePageState extends State<BrowsePage> {
               ),
             ),
             const SizedBox(height: 8),
-            // Title
-            Text(
-              item.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+            // Title — fixed height so all posters are the same size
+            SizedBox(
+              height: 36,
+              child: Text(
+                item.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

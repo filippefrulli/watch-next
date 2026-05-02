@@ -147,7 +147,7 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey[600],
-                      fontSize: 11,
+                      fontSize: 12,
                       decoration: TextDecoration.underline,
                       decorationColor: Colors.grey[600],
                     ),

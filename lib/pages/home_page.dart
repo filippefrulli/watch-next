@@ -90,8 +90,8 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                   indicatorColor: Colors.orange,
                   indicatorWeight: 3,
                   dividerColor: Colors.transparent,
-                  labelColor: Colors.orange,
-                  unselectedLabelColor: Colors.grey[400],
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.grey[600],
                   labelStyle: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -115,7 +115,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                     ),
                     Tab(
                       icon: Icon(Icons.grid_view_rounded, size: 22),
-                      text: 'Discover',
+                      text: 'Browse',
                     ),
                     Tab(
                       icon: Icon(Icons.search, size: 22),

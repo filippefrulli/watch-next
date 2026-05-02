@@ -190,7 +190,7 @@ class _LanguagePageState extends State<LanguagePage> {
         (i) => AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: i == step ? 20 : 8,
+          width: i == step ? 20 : 10,
           height: 8,
           decoration: BoxDecoration(
             color: i == step ? Colors.orange : Colors.grey[700],

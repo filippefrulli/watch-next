@@ -252,7 +252,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         minHeight: 0,
         maxHeight: MediaQuery.of(context).size.height * 0.90,
         backdropEnabled: true,
-        backdropOpacity: 0.8,
+        backdropOpacity: 0.55,
         color: Theme.of(context).colorScheme.primary,
         body: pageBody(),
       ),

@@ -189,6 +189,19 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'added_to_watchlist'.tr(),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: Colors.green[700],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 2),
+            ),
+          );
         }
         // Track watchlist add
         UserActionService.logWatchlistAdd(
@@ -261,7 +274,30 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: RecommendationContent(
+            child: GestureDetector(
+              onHorizontalDragEnd: (details) {
+                final velocity = details.primaryVelocity ?? 0;
+                if (velocity < -300 && index < length - 1) {
+                  // Swipe left → next
+                  setState(() {
+                    index++;
+                    selectedWatchObject = watchObjectsList[index];
+                  });
+                  _checkIfInWatchlist();
+                  _checkIfWatched();
+                  _preloadNextPoster();
+                } else if (velocity > 300 && index > 0) {
+                  // Swipe right → previous
+                  setState(() {
+                    index--;
+                    selectedWatchObject = watchObjectsList[index];
+                  });
+                  _checkIfInWatchlist();
+                  _checkIfWatched();
+                  _preloadNextPoster();
+                }
+              },
+              child: RecommendationContent(
               posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
               watchProviders: selectedWatchObject.watchProviders,
               servicesList: servicesList,
@@ -330,6 +366,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                   ),
                 );
               },
+            ),
             ),
           ),
         ],

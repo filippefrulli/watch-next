@@ -208,6 +208,19 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         );
         if (mounted) {
           setState(() => _isInWatchlist = true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'added_to_watchlist'.tr(),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: Colors.green[700],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 2),
+            ),
+          );
         }
         UserActionService.logWatchlistAdd(
           mediaId: widget.mediaId,

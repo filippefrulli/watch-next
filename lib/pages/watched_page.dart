@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
+import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/pages/stats_page.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
@@ -169,6 +170,22 @@ class _WatchedPageState extends State<WatchedPage> {
                   ],
                 ),
               ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsPage()),
+            ),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.tertiary,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.settings_rounded, color: Colors.white, size: 18),
             ),
           ),
         ],

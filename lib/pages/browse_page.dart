@@ -7,6 +7,7 @@ import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/pages/playlist_detail_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/services/playlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 
@@ -141,13 +142,34 @@ class _BrowsePageState extends State<BrowsePage> {
                           // Header
                           Padding(
                             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                            child: Text(
-                              'browse'.tr(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'browse'.tr(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                                  ),
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.tertiary,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(Icons.settings_rounded, color: Colors.white, size: 18),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
 

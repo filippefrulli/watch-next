@@ -169,43 +169,55 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
                 ),
               ),
             ),
-            // Compact spinner strip at the bottom — full width so it's always centred
-            SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    LoadingAnimationWidget.threeArchedCircle(
-                      color: Colors.orange,
-                      size: 36,
-                    ),
-                    const SizedBox(height: 12),
-                    if (askingGpt)
-                      Text(
-                        "generating".tr(),
-                        style: Theme.of(context).textTheme.displaySmall,
-                        textAlign: TextAlign.center,
-                      ),
-                    if (fetchingMovieInfo)
-                      Text(
-                        "fetching".tr(),
-                        style: Theme.of(context).textTheme.displaySmall,
-                        textAlign: TextAlign.center,
-                      ),
-                    if (filtering)
-                      Text(
-                        "filtering".tr(),
-                        style: Theme.of(context).textTheme.displaySmall,
-                        textAlign: TextAlign.center,
-                      ),
-                  ],
-                ),
+            // Progress strip at the bottom
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  LoadingAnimationWidget.threeArchedCircle(color: Colors.orange, size: 36),
+                  const SizedBox(height: 16),
+                  // Step label
+                  Text(
+                    askingGpt
+                        ? "generating".tr()
+                        : fetchingMovieInfo
+                            ? "fetching".tr()
+                            : filtering
+                                ? "filtering".tr()
+                                : '',
+                    style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  // Step dots
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _stepDot(active: askingGpt || fetchingMovieInfo || filtering),
+                      const SizedBox(width: 8),
+                      _stepDot(active: fetchingMovieInfo || filtering),
+                      const SizedBox(width: 8),
+                      _stepDot(active: filtering),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _stepDot({required bool active}) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: active ? 20 : 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: active ? Colors.orange : Colors.grey[700],
+        borderRadius: BorderRadius.circular(4),
       ),
     );
   }

@@ -59,12 +59,12 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
             bottom: MediaQuery.of(context).padding.bottom + 70,
             child: TabBarView(
               controller: _tabController,
-              children: const [
-                WatchlistPage(),
-                WatchedPage(),
-                MainMenuPage(),
-                BrowsePage(),
-                SearchMediaPage(),
+              children: [
+                WatchlistPage(onGetStarted: () => _tabController.animateTo(2)),
+                const WatchedPage(),
+                const MainMenuPage(),
+                const BrowsePage(),
+                const SearchMediaPage(),
               ],
             ),
           ),

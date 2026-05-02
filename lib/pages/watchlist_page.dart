@@ -21,7 +21,8 @@ import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 
 class WatchlistPage extends StatefulWidget {
-  const WatchlistPage({super.key});
+  final VoidCallback? onGetStarted;
+  const WatchlistPage({super.key, this.onGetStarted});
 
   @override
   State<WatchlistPage> createState() => _WatchlistPageState();
@@ -171,7 +172,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
+            child: CircularProgressIndicator(color: Colors.orange),
           );
         }
 
@@ -206,7 +207,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         });
 
         if (allItems.isEmpty) {
-          return const WatchlistEmptyState();
+          return WatchlistEmptyState(onGetStarted: widget.onGetStarted);
         }
 
         if (filteredItems.isEmpty) {

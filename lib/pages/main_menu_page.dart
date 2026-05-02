@@ -146,6 +146,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 onGoPressed: _onGoPressed,
               ),
               const SizedBox(height: 20),
+              // Example prompt chips
+              _buildExampleChips(),
+              const SizedBox(height: 12),
               // Secondary actions - text links
               SecondaryActionsRow(
                 querySettings: _querySettings,
@@ -188,6 +191,49 @@ class _MainMenuPageState extends State<MainMenuPage> {
             size: 22,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildExampleChips() {
+    final examples = typeIsMovie == 0
+        ? ['example_movie_1'.tr(), 'example_movie_2'.tr()]
+        : ['example_show_1'.tr(), 'example_show_2'.tr()];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: examples.map((example) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () {
+                _controller.text = example;
+                _controller.selection = TextSelection.fromPosition(
+                  TextPosition(offset: example.length),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.grey[700]!),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.lightbulb_outline, color: Colors.grey[500], size: 13),
+                    const SizedBox(width: 5),
+                    Text(
+                      example,
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

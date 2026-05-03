@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class DividerWidget extends StatelessWidget {
   // make these final
@@ -17,7 +18,7 @@ class DividerWidget extends StatelessWidget {
       ),
       child: Divider(
         height: height,
-        color: Colors.grey[700],
+        color: context.appColors.border,
       ),
     );
   }

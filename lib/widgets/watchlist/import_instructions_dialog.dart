@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class ImportInstructionsDialog extends StatelessWidget {
   final String source;
@@ -20,7 +21,7 @@ class ImportInstructionsDialog extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.tertiary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey[700]!, width: 1),
+        side: BorderSide(color: context.appColors.border, width: 1),
       ),
       title: Row(
         children: [
@@ -68,7 +69,7 @@ class ImportInstructionsDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[700]!, width: 1),
+                  border: Border.all(color: context.appColors.border, width: 1),
                 ),
                 child: Material(
                   color: Colors.transparent,
@@ -95,7 +96,7 @@ class ImportInstructionsDialog extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.orange, Colors.orange[700]!],
+                    colors: [context.appColors.accent, context.appColors.accentDark],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),

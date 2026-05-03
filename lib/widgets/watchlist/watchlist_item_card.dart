@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class WatchlistItemCard extends StatelessWidget {
   final WatchlistItem item;
@@ -224,15 +225,15 @@ class WatchlistItemCard extends StatelessWidget {
             width: 47,
             height: 47,
             fit: BoxFit.cover,
-            placeholder: (_, __) => Container(
+            placeholder: (ctx, __) => Container(
               width: 47,
               height: 47,
-              color: Colors.grey[800],
+              color: ctx.appColors.surface,
             ),
-            errorWidget: (_, __, ___) => Container(
+            errorWidget: (ctx, __, ___) => Container(
               width: 47,
               height: 47,
-              color: Colors.grey[800],
+              color: ctx.appColors.surface,
               child: const Icon(Icons.tv, size: 20, color: Colors.grey),
             ),
           ),

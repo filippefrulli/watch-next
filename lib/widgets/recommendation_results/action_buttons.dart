@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class ActionButtons extends StatelessWidget {
   final bool showReloadButton;
@@ -135,7 +136,7 @@ class ActionButtons extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [Theme.of(context).colorScheme.secondary, const Color(0xFFFF8C00)],
+          colors: [Theme.of(context).colorScheme.secondary, context.appColors.accentDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

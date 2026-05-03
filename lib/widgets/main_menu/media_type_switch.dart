@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class MediaTypeSwitch extends StatelessWidget {
   final int currentIndex;
@@ -42,9 +43,9 @@ class MediaTypeSwitch extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ],
-        activeBgColors: const [
-          [Colors.orange],
-          [Colors.orange],
+        activeBgColors: [
+          [context.appColors.accent],
+          [context.appColors.accent],
         ],
         onToggle: (index) {
           if (index != null) {

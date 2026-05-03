@@ -11,6 +11,7 @@ import 'package:watch_next/pages/streaming_services_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/widgets/shared/divider.dart';
 import 'package:watch_next/widgets/shared/privacy_policy_widget.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -251,7 +252,7 @@ class _SettingsPageState extends State<SettingsPage> {
             color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey[800]!,
+              color: context.appColors.surface,
               width: 1,
             ),
           ),
@@ -270,7 +271,7 @@ class _SettingsPageState extends State<SettingsPage> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.grey[800],
+              color: context.appColors.surface,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.star_rounded, color: Colors.white, size: 22),
@@ -314,7 +315,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: context.appColors.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.star_rounded, color: Colors.white, size: 22),
@@ -348,7 +349,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: ElevatedButton(
               onPressed: () => PurchaseService.buyRemoveAds(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+                backgroundColor: context.appColors.accent,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -432,7 +433,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: context.appColors.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -536,7 +537,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Container(
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Colors.grey[700],
+                          color: context.appColors.border,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Material(
@@ -559,7 +560,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Container(
                         height: 48,
                         decoration: BoxDecoration(
-                          color: isSubmitting ? Colors.orange.withValues(alpha: 0.7) : Colors.orange,
+                          color: isSubmitting ? context.appColors.accent.withValues(alpha: 0.7) : context.appColors.accent,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Material(

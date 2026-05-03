@@ -7,6 +7,7 @@ import 'package:watch_next/pages/watchlist_page.dart';
 import 'package:watch_next/services/native_ad_pool.dart';
 import 'package:watch_next/services/purchase_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class TabNavigationPage extends StatefulWidget {
   const TabNavigationPage({super.key});
@@ -87,7 +88,7 @@ class _TabNavigationPageState extends State<TabNavigationPage> with SingleTicker
                 top: false,
                 child: TabBar(
                   controller: _tabController,
-                  indicatorColor: Colors.orange,
+                  indicatorColor: context.appColors.accent,
                   indicatorWeight: 3,
                   dividerColor: Colors.transparent,
                   labelColor: Colors.white,

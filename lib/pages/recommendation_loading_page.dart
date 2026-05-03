@@ -22,6 +22,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class RecommendationLoadingPage extends StatefulWidget {
   final String requestString;
@@ -217,7 +218,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       width: active ? 20 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: active ? Colors.orange : Colors.grey[700],
+        color: active ? context.appColors.accent : context.appColors.inactive,
         borderRadius: BorderRadius.circular(4),
       ),
     );
@@ -563,12 +564,12 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
         cornerRadius: 12.0,
         callToActionTextStyle: NativeTemplateTextStyle(
           textColor: Colors.black,
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.defaults.accent,
           style: NativeTemplateFontStyle.bold,
           size: 16.0,
         ),
         primaryTextStyle: NativeTemplateTextStyle(
-          textColor: Colors.orange,
+          textColor: AppColors.defaults.accent,
           backgroundColor: _adBgColor!,
           style: NativeTemplateFontStyle.bold,
           size: 16.0,

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class ErrorStateWidget extends StatelessWidget {
   final VoidCallback onRetry;
@@ -47,7 +48,7 @@ class ErrorStateWidget extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: Colors.grey[800],
+                color: context.appColors.surface,
               ),
               child: TextButton.icon(
                 onPressed: onRetry,

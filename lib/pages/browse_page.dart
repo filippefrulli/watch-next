@@ -10,6 +10,7 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/pages/settings_page.dart';
 import 'package:watch_next/services/playlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class BrowsePage extends StatefulWidget {
   const BrowsePage({super.key});
@@ -122,7 +123,7 @@ class _BrowsePageState extends State<BrowsePage> {
                               _loadData();
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
+                              backgroundColor: context.appColors.accent,
                               foregroundColor: Colors.white,
                             ),
                             child: Text('retry'.tr()),
@@ -287,21 +288,21 @@ class _BrowsePageState extends State<BrowsePage> {
                             width: double.infinity,
                             height: double.infinity,
                             placeholder: (context, url) => Container(
-                              color: Colors.grey[800],
-                              child: const Center(
+                              color: context.appColors.surface,
+                              child: Center(
                                 child: CircularProgressIndicator(
-                                  color: Colors.orange,
+                                  color: context.appColors.accent,
                                   strokeWidth: 2,
                                 ),
                               ),
                             ),
                             errorWidget: (context, url, error) => Container(
-                              color: Colors.grey[800],
+                              color: context.appColors.surface,
                               child: const Icon(Icons.movie, color: Colors.grey),
                             ),
                           )
                         : Container(
-                            color: Colors.grey[800],
+                            color: context.appColors.surface,
                             child: const Icon(Icons.movie, color: Colors.grey),
                           ),
                   ),

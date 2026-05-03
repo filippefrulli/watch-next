@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/services/watched_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -107,17 +108,17 @@ class _StatsPageState extends State<StatsPage> {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? Colors.orange.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+          color: selected ? context.appColors.accent.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? Colors.orange : Theme.of(context).colorScheme.outline,
+            color: selected ? context.appColors.accent : Theme.of(context).colorScheme.outline,
             width: selected ? 1.5 : 1,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? Colors.orange : Colors.white,
+            color: selected ? context.appColors.accent : Colors.white,
             fontSize: 13,
             fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -196,7 +197,7 @@ class _StatsPageState extends State<StatsPage> {
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.orange, size: 24),
+          Icon(icon, color: context.appColors.accent, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
@@ -245,7 +246,7 @@ class _StatsPageState extends State<StatsPage> {
                         child: Container(
                           height: 22,
                           decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.75),
+                            color: context.appColors.accent.withValues(alpha: 0.75),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -288,8 +289,8 @@ class _StatsPageState extends State<StatsPage> {
                 child: Text(
                   '$rating',
                   textAlign: TextAlign.right,
-                  style: const TextStyle(
-                    color: Colors.orange,
+                  style: TextStyle(
+                    color: context.appColors.accent,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -310,7 +311,7 @@ class _StatsPageState extends State<StatsPage> {
                         child: Container(
                           height: 22,
                           decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.7),
+                            color: context.appColors.accent.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -339,7 +340,7 @@ class _StatsPageState extends State<StatsPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.bar_chart_rounded, size: 64, color: Colors.grey[700]),
+          Icon(Icons.bar_chart_rounded, size: 64, color: context.appColors.inactive),
           const SizedBox(height: 16),
           Text(
             'stats_empty'.tr(),

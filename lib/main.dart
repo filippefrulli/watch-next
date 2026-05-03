@@ -12,6 +12,7 @@ import 'package:watch_next/pages/language_page.dart';
 import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'pages/home_page.dart';
+import 'package:watch_next/utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 void main() async {
@@ -92,12 +93,13 @@ class MyApp extends StatelessWidget {
         },
         theme: ThemeData(
           colorScheme: theme.colorScheme.copyWith(
-            primary: const Color.fromARGB(255, 14, 14, 14),
-            secondary: Colors.orange,
-            tertiary: const Color.fromARGB(255, 30, 31, 31),
-            outline: Colors.grey[800],
+            primary: AppColors.defaults.background,
+            secondary: AppColors.defaults.accent,
+            tertiary: AppColors.defaults.surface,
+            outline: AppColors.defaults.border,
             brightness: Brightness.dark,
           ),
+          extensions: const [AppColors.defaults],
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
@@ -147,9 +149,9 @@ class MyApp extends StatelessWidget {
               color: Colors.grey[400],
               fontWeight: FontWeight.w400,
             ),
-            bodyMedium: const TextStyle(
+            bodyMedium: TextStyle(
               fontSize: 20.0,
-              color: Colors.orange,
+              color: AppColors.defaults.accent,
               fontWeight: FontWeight.w400,
               letterSpacing: 1.2,
             ),
@@ -239,10 +241,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {},
-      child: const Scaffold(
-        backgroundColor: Color.fromRGBO(11, 14, 23, 1),
+      child: Scaffold(
+        backgroundColor: AppColors.defaults.background,
         resizeToAvoidBottomInset: false,
-        body: TabNavigationPage(),
+        body: const TabNavigationPage(),
       ),
     );
   }

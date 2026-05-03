@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class WatchlistEmptyState extends StatelessWidget {
   final VoidCallback? onGetStarted;
@@ -30,7 +31,7 @@ class WatchlistEmptyState extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  color: context.appColors.accent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

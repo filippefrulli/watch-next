@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 enum ReleaseFilter { any, recent, old }
 
@@ -317,7 +318,7 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
         children: [
           Icon(
             Icons.tune_rounded,
-            color: Colors.orange,
+            color: context.appColors.accent,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -661,18 +662,18 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: value ? Colors.orange.withValues(alpha: 0.2) : Colors.transparent,
+              color: value ? context.appColors.accent.withValues(alpha: 0.2) : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: value ? Colors.orange : Colors.grey[600]!,
+                color: value ? context.appColors.accent : Colors.grey[600]!,
                 width: 2,
               ),
             ),
             child: value
-                ? const Icon(
+                ? Icon(
                     Icons.check,
                     size: 16,
-                    color: Colors.orange,
+                    color: context.appColors.accent,
                   )
                 : null,
           ),
@@ -680,7 +681,7 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
           Text(
             label,
             style: TextStyle(
-              color: value ? Colors.orange : Colors.white,
+              color: value ? context.appColors.accent : Colors.white,
               fontSize: 14,
             ),
           ),
@@ -700,17 +701,17 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.orange.withValues(alpha: 0.2) : Theme.of(context).colorScheme.tertiary,
+          color: isSelected ? context.appColors.accent.withValues(alpha: 0.2) : Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Colors.orange : Theme.of(context).colorScheme.outline,
+            color: isSelected ? context.appColors.accent : Theme.of(context).colorScheme.outline,
             width: 1,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.orange : Colors.white,
+            color: isSelected ? context.appColors.accent : Colors.white,
             fontSize: 14,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -766,7 +767,7 @@ class QuerySettingsButton extends StatelessWidget {
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                color: Colors.orange[800],
+                color: context.appColors.accentDark,
                 shape: BoxShape.circle,
               ),
             ),

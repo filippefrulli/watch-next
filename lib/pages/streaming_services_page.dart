@@ -7,6 +7,7 @@ import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 ///This is the page where you enter the movie you saw
 class StreamingServicesPage extends StatefulWidget {
@@ -93,7 +94,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
     return Text(
       "services_selected".tr(namedArgs: {'count': '$count'}),
       style: TextStyle(
-        color: Colors.orange[300],
+        color: context.appColors.accent,
         fontSize: 13,
         fontWeight: FontWeight.w500,
       ),
@@ -111,7 +112,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
           width: i == step ? 20 : 10,
           height: 8,
           decoration: BoxDecoration(
-            color: i == step ? Colors.orange : Colors.grey[700],
+            color: i == step ? context.appColors.accent : context.appColors.inactive,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -145,7 +146,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: context.appColors.accent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -204,7 +205,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
         } else {
           return Center(
             child: CircularProgressIndicator(
-              color: Colors.orange,
+              color: context.appColors.accent,
             ),
           );
         }
@@ -220,14 +221,14 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
             height: 56,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.orange, Colors.orange[700]!],
+                colors: [context.appColors.accent, context.appColors.accentDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.orange.withValues(alpha: 0.3),
+                  color: context.appColors.accent.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -286,13 +287,13 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           width: 3,
-          color: isSelected ? Colors.orange : Colors.grey[700]!,
+          color: isSelected ? context.appColors.accent : context.appColors.border,
         ),
         color: Theme.of(context).colorScheme.tertiary,
         boxShadow: isSelected
             ? [
                 BoxShadow(
-                  color: Colors.orange.withValues(alpha: 0.3),
+                  color: context.appColors.accent.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -334,7 +335,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  color: context.appColors.accent,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(

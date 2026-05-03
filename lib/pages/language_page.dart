@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/pages/streaming_services_page.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class LanguagePage extends StatefulWidget {
   const LanguagePage({super.key});
@@ -117,14 +118,14 @@ class _LanguagePageState extends State<LanguagePage> {
           height: 56,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange, Colors.orange[700]!],
+              colors: [context.appColors.accent, context.appColors.accentDark],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.orange.withValues(alpha: 0.3),
+                color: context.appColors.accent.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -193,7 +194,7 @@ class _LanguagePageState extends State<LanguagePage> {
           width: i == step ? 20 : 10,
           height: 8,
           decoration: BoxDecoration(
-            color: i == step ? Colors.orange : Colors.grey[700],
+            color: i == step ? context.appColors.accent : context.appColors.inactive,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -239,7 +240,7 @@ class _LanguagePageState extends State<LanguagePage> {
     bool isSelected = selected == index;
 
     return Material(
-      color: isSelected ? Colors.orange.withValues(alpha: 0.1) : Colors.transparent,
+      color: isSelected ? context.appColors.accent.withValues(alpha: 0.1) : Colors.transparent,
       child: InkWell(
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -275,7 +276,7 @@ class _LanguagePageState extends State<LanguagePage> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 16,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? Colors.orange : Colors.white,
+                        color: isSelected ? context.appColors.accent : Colors.white,
                       ),
                 ),
               ),
@@ -286,7 +287,7 @@ class _LanguagePageState extends State<LanguagePage> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: Colors.orange,
+                    color: context.appColors.accent,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

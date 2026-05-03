@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class LoadingStateWidget extends StatelessWidget {
   final bool nativeAdIsLoaded;
@@ -58,7 +59,7 @@ class LoadingStateWidget extends StatelessWidget {
           ),
         const SizedBox(height: 32),
         LoadingAnimationWidget.threeArchedCircle(
-          color: Colors.orange,
+          color: context.appColors.accent,
           size: 50,
         ),
         const SizedBox(height: 24),

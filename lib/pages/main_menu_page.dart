@@ -14,6 +14,7 @@ import 'package:watch_next/services/ad_preload_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/utils/prompts.dart';
+import 'package:watch_next/utils/app_colors.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
 import 'package:watch_next/widgets/main_menu/hero_input.dart';
 import 'package:watch_next/widgets/main_menu/media_type_switch.dart';
@@ -285,7 +286,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey[700]!),
+            border: Border.all(color: context.appColors.border),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -371,7 +372,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   Widget _buildStepArrow() {
     return Padding(
       padding: const EdgeInsets.only(left: 5, top: 4, bottom: 4),
-      child: Icon(Icons.arrow_downward_rounded, color: Colors.grey[700], size: 14),
+      child: Icon(Icons.arrow_downward_rounded, color: context.appColors.inactive, size: 14),
     );
   }
 
@@ -439,7 +440,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
       showToastWidget(
         ToastWidget(
           title: "connect_to_internet".tr(),
-          icon: const Icon(Icons.cloud_off, color: Colors.orange, size: 36),
+          icon: Icon(Icons.cloud_off, color: context.appColors.accent, size: 36),
         ),
         duration: const Duration(seconds: 4),
       );

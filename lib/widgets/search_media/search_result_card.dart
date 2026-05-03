@@ -8,6 +8,7 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class SearchResultCard extends StatefulWidget {
   final MultiSearchResult result;
@@ -188,7 +189,7 @@ class _SearchResultCardState extends State<SearchResultCard> {
               IconButton(
                 icon: Icon(
                   _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                  color: _isInWatchlist ? Colors.orange : Colors.grey[400],
+                  color: _isInWatchlist ? context.appColors.accent : Colors.grey[400],
                 ),
                 onPressed: _toggleWatchlist,
               ),
@@ -252,7 +253,7 @@ class _SearchResultCardState extends State<SearchResultCard> {
                 vertical: 4,
               ),
               decoration: BoxDecoration(
-                color: result.isPerson ? Colors.purple : (result.isMovie ? Colors.orange : Colors.blue),
+                color: result.isPerson ? Colors.purple : (result.isMovie ? context.appColors.accent : Colors.blue),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -282,9 +283,9 @@ class _SearchResultCardState extends State<SearchResultCard> {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.star,
-                color: Colors.orange,
+                color: context.appColors.accent,
                 size: 16,
               ),
               const SizedBox(width: 4),

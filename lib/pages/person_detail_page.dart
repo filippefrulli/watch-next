@@ -6,6 +6,7 @@ import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/widgets/shared/native_ad_widget.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class PersonDetailPage extends StatefulWidget {
   final int personId;
@@ -98,8 +99,8 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(context.appColors.accent),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -130,7 +131,7 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
                             _loadData();
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
+                            backgroundColor: context.appColors.accent,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
@@ -263,7 +264,7 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[800]!),
+        border: Border.all(color: context.appColors.surface),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -305,17 +306,17 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.orange.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
+          color: isSelected ? context.appColors.accent.withValues(alpha: 0.15) : Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? Colors.orange : Colors.grey[700]!,
+            color: isSelected ? context.appColors.accent : context.appColors.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.orange : Colors.grey[400],
+            color: isSelected ? context.appColors.accent : Colors.grey[400],
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -416,7 +417,7 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
   Widget _posterPlaceholder() {
     return Container(
       color: Theme.of(context).colorScheme.tertiary,
-      child: Icon(Icons.movie_outlined, color: Colors.grey[700], size: 32),
+      child: Icon(Icons.movie_outlined, color: context.appColors.inactive, size: 32),
     );
   }
 
@@ -478,7 +479,7 @@ class _ExpandableBiographyState extends State<_ExpandableBiography> {
           onTap: () => setState(() => _expanded = !_expanded),
           child: Text(
             _expanded ? 'person_show_less'.tr() : 'person_show_more'.tr(),
-            style: const TextStyle(color: Colors.orange, fontSize: 13, fontWeight: FontWeight.w600),
+            style: TextStyle(color: context.appColors.accent, fontSize: 13, fontWeight: FontWeight.w600),
           ),
         ),
       ],

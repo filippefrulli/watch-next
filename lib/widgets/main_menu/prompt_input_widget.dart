@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class PromptInputWidget extends StatelessWidget {
   final TextEditingController controller;
@@ -40,7 +41,7 @@ class PromptInputWidget extends StatelessWidget {
               maxLines: 4,
               minLines: 1,
               controller: controller,
-              cursorColor: Colors.orange,
+              cursorColor: context.appColors.accent,
               style: Theme.of(context).textTheme.displayMedium!.copyWith(
                     fontSize: 15,
                     height: 1.4,
@@ -98,19 +99,19 @@ class _GoButton extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: isLongEnough && !enableLoading
             ? LinearGradient(
-                colors: [Colors.orange, Colors.orange[700]!],
+                colors: [context.appColors.accent, context.appColors.accentDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
             : null,
         color: enableLoading
-            ? Colors.orange.withValues(alpha: 0.7)
+            ? context.appColors.accent.withValues(alpha: 0.7)
             : (isLongEnough ? null : Theme.of(context).colorScheme.tertiary),
         borderRadius: BorderRadius.circular(12),
         boxShadow: isLongEnough && !enableLoading
             ? [
                 BoxShadow(
-                  color: Colors.orange.withValues(alpha: 0.3),
+                  color: context.appColors.accent.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

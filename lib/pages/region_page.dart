@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/pages/home_page.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class RegionIntroPage extends StatefulWidget {
   const RegionIntroPage({super.key});
@@ -103,7 +104,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Colors.orange, width: 2),
+                      borderSide: BorderSide(color: context.appColors.accent, width: 2),
                     ),
                   ),
                   onChanged: _onSearchChanged,
@@ -137,7 +138,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
           width: i == step ? 20 : 10,
           height: 8,
           decoration: BoxDecoration(
-            color: i == step ? Colors.orange : Colors.grey[700],
+            color: i == step ? context.appColors.accent : context.appColors.inactive,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -181,7 +182,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
     bool isSelected = _selectedIso == region;
 
     return Material(
-      color: isSelected ? Colors.orange.withValues(alpha: 0.1) : Colors.transparent,
+      color: isSelected ? context.appColors.accent.withValues(alpha: 0.1) : Colors.transparent,
       child: InkWell(
         onTap: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -213,7 +214,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 16,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? Colors.orange : Colors.white,
+                        color: isSelected ? context.appColors.accent : Colors.white,
                       ),
                 ),
               ),
@@ -224,7 +225,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: Colors.orange,
+                    color: context.appColors.accent,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -252,14 +253,14 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
               height: 56,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.orange, Colors.orange[700]!],
+                  colors: [context.appColors.accent, context.appColors.accentDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.orange.withValues(alpha: 0.3),
+                    color: context.appColors.accent.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),

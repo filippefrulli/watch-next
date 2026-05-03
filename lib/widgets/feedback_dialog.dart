@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:watch_next/services/feedback_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class FeedbackDialog extends StatefulWidget {
   const FeedbackDialog({super.key});
@@ -77,7 +78,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             Expanded(
               child: _buildButton(
                 text: 'not_really'.tr(),
-                color: Colors.grey[700]!,
+                color: context.appColors.border,
                 onPressed: () {
                   setState(() => _step = 2);
                   FeedbackService.markFeedbackDialogShown();
@@ -118,7 +119,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             Expanded(
               child: _buildButton(
                 text: 'maybe_later'.tr(),
-                color: Colors.grey[700]!,
+                color: context.appColors.border,
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -126,7 +127,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             Expanded(
               child: _buildButton(
                 text: 'leave_review'.tr(),
-                color: Colors.orange,
+                color: context.appColors.accent,
                 onPressed: () async {
                   await FeedbackService.requestReview();
                   if (mounted) Navigator.pop(context);
@@ -188,7 +189,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             Expanded(
               child: _buildButton(
                 text: 'cancel'.tr(),
-                color: Colors.grey[700]!,
+                color: context.appColors.border,
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -196,7 +197,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             Expanded(
               child: _buildButton(
                 text: _isSubmitting ? 'sending'.tr() : 'send'.tr(),
-                color: Colors.orange,
+                color: context.appColors.accent,
                 onPressed: _isSubmitting ? null : _submitFeedback,
               ),
             ),

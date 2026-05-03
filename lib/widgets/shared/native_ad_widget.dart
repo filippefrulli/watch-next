@@ -5,6 +5,7 @@ import 'package:watch_next/services/native_ad_pool.dart';
 import 'package:watch_next/services/purchase_service.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/pages/settings_page.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class NativeAdWidget extends StatefulWidget {
   final bool showRemoveAdsLink;
@@ -53,12 +54,12 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
         cornerRadius: 12.0,
         callToActionTextStyle: NativeTemplateTextStyle(
           textColor: Colors.black,
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.defaults.accent,
           style: NativeTemplateFontStyle.bold,
           size: 16.0,
         ),
         primaryTextStyle: NativeTemplateTextStyle(
-          textColor: Colors.orange,
+          textColor: AppColors.defaults.accent,
           backgroundColor: bgColor,
           style: NativeTemplateFontStyle.bold,
           size: 16.0,
@@ -127,7 +128,7 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
               Container(
                 height: 320,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[800]!),
+                  border: Border.all(color: context.appColors.surface),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ClipRRect(

@@ -8,6 +8,7 @@ import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:watch_next/widgets/shared/confirm_dialog.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class WatchedPage extends StatefulWidget {
   const WatchedPage({super.key});
@@ -112,7 +113,7 @@ class _WatchedPageState extends State<WatchedPage> {
             _buildFilters(),
             Expanded(
               child: _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Colors.orange))
+                  ? Center(child: CircularProgressIndicator(color: context.appColors.accent))
                   : _allItems.isEmpty
                       ? _buildEmptyState()
                       : _filteredItems.isEmpty
@@ -162,7 +163,7 @@ class _WatchedPageState extends State<WatchedPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.bar_chart_rounded, color: Colors.orange, size: 18),
+                    Icon(Icons.bar_chart_rounded, color: context.appColors.accent, size: 18),
                     const SizedBox(width: 6),
                     Text(
                       'stats'.tr(),
@@ -218,7 +219,7 @@ class _WatchedPageState extends State<WatchedPage> {
           // Rating range row
           Row(
             children: [
-              Icon(Icons.star, color: Colors.orange, size: 16),
+              Icon(Icons.star, color: context.appColors.accent, size: 16),
               const SizedBox(width: 6),
               Text(
                 '$_minRating–$_maxRating',
@@ -234,8 +235,8 @@ class _WatchedPageState extends State<WatchedPage> {
                   min: 1,
                   max: 10,
                   divisions: 9,
-                  activeColor: Colors.orange,
-                  inactiveColor: Colors.grey[700],
+                  activeColor: context.appColors.accent,
+                  inactiveColor: context.appColors.inactive,
                   onChanged: (values) {
                     setState(() {
                       _minRating = values.start.round();
@@ -263,17 +264,17 @@ class _WatchedPageState extends State<WatchedPage> {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? Colors.orange.withValues(alpha: 0.2) : Theme.of(context).colorScheme.tertiary,
+          color: selected ? context.appColors.accent.withValues(alpha: 0.2) : Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? Colors.orange : Theme.of(context).colorScheme.outline,
+            color: selected ? context.appColors.accent : Theme.of(context).colorScheme.outline,
             width: selected ? 1.5 : 1,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? Colors.orange : Colors.white,
+            color: selected ? context.appColors.accent : Colors.white,
             fontSize: 12,
             fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
           ),
@@ -302,7 +303,7 @@ class _WatchedPageState extends State<WatchedPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Row(
                   children: [
-                    if (_sortBy == e.key) const Icon(Icons.check, color: Colors.orange, size: 14),
+                    if (_sortBy == e.key) Icon(Icons.check, color: context.appColors.accent, size: 14),
                     if (_sortBy != e.key) const SizedBox(width: 14),
                     const SizedBox(width: 8),
                     Text(e.value, style: const TextStyle(color: Colors.white, fontSize: 13)),
@@ -487,12 +488,12 @@ class _WatchedPageState extends State<WatchedPage> {
   Widget _buildRatingStars(int rating) {
     return Row(
       children: [
-        const Icon(Icons.star, color: Colors.orange, size: 16),
+        Icon(Icons.star, color: context.appColors.accent, size: 16),
         const SizedBox(width: 4),
         Text(
           '$rating/10',
-          style: const TextStyle(
-            color: Colors.orange,
+          style: TextStyle(
+            color: context.appColors.accent,
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
@@ -517,7 +518,7 @@ class _WatchedPageState extends State<WatchedPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check, size: 64, color: Colors.grey[700]),
+          Icon(Icons.check, size: 64, color: context.appColors.inactive),
           const SizedBox(height: 16),
           Text(
             'watched_empty'.tr(),

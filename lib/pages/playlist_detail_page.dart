@@ -6,6 +6,7 @@ import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/playlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class PlaylistDetailPage extends StatefulWidget {
   final Playlist playlist;
@@ -92,7 +93,7 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.orange.withValues(alpha: 0.3),
+                      context.appColors.accent.withValues(alpha: 0.3),
                       Theme.of(context).colorScheme.primary,
                     ],
                   ),
@@ -149,7 +150,7 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
                 ElevatedButton(
                   onPressed: _loadData,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor: context.appColors.accent,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
@@ -263,21 +264,21 @@ class _PlaylistItemCard extends StatelessWidget {
                             width: double.infinity,
                             height: double.infinity,
                             placeholder: (context, url) => Container(
-                              color: Colors.grey[800],
-                              child: const Center(
+                              color: context.appColors.surface,
+                              child: Center(
                                 child: CircularProgressIndicator(
-                                  color: Colors.orange,
+                                  color: context.appColors.accent,
                                   strokeWidth: 2,
                                 ),
                               ),
                             ),
                             errorWidget: (context, url, error) => Container(
-                              color: Colors.grey[800],
+                              color: context.appColors.surface,
                               child: Icon(Icons.movie, color: Colors.grey[600], size: 40),
                             ),
                           )
                         : Container(
-                            color: Colors.grey[800],
+                            color: context.appColors.surface,
                             child: Icon(Icons.movie, color: Colors.grey[600], size: 40),
                           ),
                   ),
@@ -291,7 +292,7 @@ class _PlaylistItemCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isAvailable
                           ? Colors.green.withValues(alpha: 0.9)
-                          : (hasRentOrBuy ? Colors.orange.withValues(alpha: 0.9) : Colors.grey.withValues(alpha: 0.9)),
+                          : (hasRentOrBuy ? context.appColors.accent.withValues(alpha: 0.9) : Colors.grey.withValues(alpha: 0.9)),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

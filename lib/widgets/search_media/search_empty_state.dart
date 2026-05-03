@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class SearchEmptyState extends StatelessWidget {
   const SearchEmptyState({super.key});
@@ -14,7 +15,7 @@ class SearchEmptyState extends StatelessWidget {
           children: [
             Icon(
               Icons.search,
-              color: Colors.grey[700],
+              color: context.appColors.inactive,
               size: 40,
             ),
             const SizedBox(height: 16),
@@ -46,7 +47,7 @@ class SearchNoResultsState extends StatelessWidget {
           children: [
             Icon(
               Icons.search_off,
-              color: Colors.grey[700],
+              color: context.appColors.inactive,
               size: 64,
             ),
             const SizedBox(height: 16),
@@ -84,8 +85,8 @@ class SearchLoadingState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(context.appColors.accent),
           ),
           const SizedBox(height: 16),
           Text(

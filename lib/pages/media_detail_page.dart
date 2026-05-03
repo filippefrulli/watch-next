@@ -19,6 +19,7 @@ import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
 import 'package:watch_next/pages/person_detail_page.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class MediaDetailPage extends StatefulWidget {
   final int mediaId;
@@ -379,16 +380,16 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
                 border: Border(
-                  bottom: BorderSide(color: Colors.grey[800]!, width: 1),
+                  bottom: BorderSide(color: context.appColors.surface, width: 1),
                 ),
               ),
               child: TabBar(
                 controller: _tabController,
-                indicatorColor: Colors.orange,
+                indicatorColor: context.appColors.accent,
                 indicatorWeight: 3,
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
-                labelColor: Colors.orange,
+                labelColor: context.appColors.accent,
                 unselectedLabelColor: Colors.grey[500],
                 isScrollable: false,
                 tabAlignment: TabAlignment.fill,
@@ -499,7 +500,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
                       child: Icon(
                         _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
                         key: ValueKey(_isInWatchlist),
-                        color: _isInWatchlist ? Colors.orange : Colors.white,
+                        color: _isInWatchlist ? context.appColors.accent : Colors.white,
                         size: 18,
                       ),
                     ),
@@ -775,7 +776,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         ),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 13),
-          side: BorderSide(color: Colors.grey[700]!, width: 1.5),
+          side: BorderSide(color: context.appColors.border, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
@@ -864,7 +865,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[800]!, width: 1),
+                  border: Border.all(color: context.appColors.surface, width: 1),
                 ),
                 child: Text(
                   item,
@@ -883,9 +884,9 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           .map((g) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: context.appColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[700]!, width: 1),
+                  border: Border.all(color: context.appColors.border, width: 1),
                 ),
                 child: Text(
                   g,
@@ -1091,7 +1092,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
               ElevatedButton(
                 onPressed: _loadData,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: context.appColors.accent,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),

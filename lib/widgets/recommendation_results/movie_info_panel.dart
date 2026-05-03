@@ -16,6 +16,7 @@ import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:watch_next/widgets/shared/confirm_dialog.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class MovieInfoPanel extends StatefulWidget {
   final int mediaId;
@@ -259,7 +260,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                 width: 50,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey[700],
+                  color: context.appColors.border,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -305,11 +306,11 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                   decoration: BoxDecoration(
                                     color: _isInWatchlist
-                                        ? Colors.orange.withValues(alpha: 0.2)
+                                        ? context.appColors.accent.withValues(alpha: 0.2)
                                         : Theme.of(context).colorScheme.tertiary,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: _isInWatchlist ? Colors.orange : Colors.grey[700]!,
+                                      color: _isInWatchlist ? context.appColors.accent : context.appColors.border,
                                       width: 1,
                                     ),
                                   ),
@@ -318,7 +319,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                     children: [
                                       Icon(
                                         _isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                                        color: _isInWatchlist ? Colors.orange : Colors.white,
+                                        color: _isInWatchlist ? context.appColors.accent : Colors.white,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 6),
@@ -329,7 +330,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                           overflow: TextOverflow.ellipsis,
                                           style: Theme.of(context).textTheme.displaySmall?.copyWith(
                                                 fontSize: 13,
-                                                color: _isInWatchlist ? Colors.orange : Colors.white,
+                                                color: _isInWatchlist ? context.appColors.accent : Colors.white,
                                               ),
                                         ),
                                       ),
@@ -355,7 +356,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                         : Theme.of(context).colorScheme.tertiary,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: _isWatched ? Colors.green : Colors.grey[700]!,
+                                      color: _isWatched ? Colors.green : context.appColors.border,
                                       width: 1,
                                     ),
                                   ),
@@ -398,7 +399,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.tertiary,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[700]!, width: 1),
+                          border: Border.all(color: context.appColors.border, width: 1),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -436,11 +437,11 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                       const SizedBox(height: 16),
                       // Credits / season details
                       if (!_detailsLoaded)
-                        const Center(
+                        Center(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                              valueColor: AlwaysStoppedAnimation<Color>(context.appColors.accent),
                               strokeWidth: 2,
                             ),
                           ),
@@ -560,7 +561,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         gradient: LinearGradient(
           colors: [
             Colors.transparent,
-            Colors.grey[800]!,
+            context.appColors.surface,
             Colors.transparent,
           ],
         ),
@@ -687,9 +688,9 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.grey[800],
+                    color: context.appColors.surface,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[700]!, width: 1),
+                    border: Border.all(color: context.appColors.border, width: 1),
                   ),
                   child: Center(
                     child: Text(
@@ -724,11 +725,11 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         if (isExpanded) ...[
           const SizedBox(height: 4),
           if (isLoading)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                  valueColor: AlwaysStoppedAnimation<Color>(context.appColors.accent),
                   strokeWidth: 2,
                 ),
               ),
@@ -740,7 +741,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[800]!, width: 1),
+                border: Border.all(color: context.appColors.surface, width: 1),
               ),
               child: Column(
                 children: _buildEpisodeList(episodes),
@@ -760,7 +761,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         items.add(Divider(
           height: 1,
           thickness: 1,
-          color: Colors.grey[850],
+          color: context.appColors.surface,
         ));
       }
     }
@@ -812,9 +813,9 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
           .map((g) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: context.appColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[700]!, width: 1),
+                  border: Border.all(color: context.appColors.border, width: 1),
                 ),
                 child: Text(
                   g,

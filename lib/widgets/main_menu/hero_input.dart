@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class HeroInput extends StatelessWidget {
   final TextEditingController controller;
@@ -32,12 +33,12 @@ class HeroInput extends StatelessWidget {
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: hasText ? Colors.orange : Colors.orange.withValues(alpha: 0.35),
+          color: hasText ? context.appColors.accent : context.appColors.accent.withValues(alpha: 0.35),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withValues(alpha: hasText ? 0.2 : 0.08),
+            color: context.appColors.accent.withValues(alpha: hasText ? 0.2 : 0.08),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -52,7 +53,7 @@ class HeroInput extends StatelessWidget {
             maxLines: 4,
             minLines: 3,
             controller: controller,
-            cursorColor: Colors.orange,
+            cursorColor: context.appColors.accent,
             style: Theme.of(context).textTheme.displayMedium!.copyWith(
                   fontSize: 16,
                   height: 1.5,
@@ -113,7 +114,7 @@ class _FiltersButton extends StatelessWidget {
             color: Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: hasActiveFilters ? Colors.orange.withValues(alpha: 0.6) : Colors.grey[700]!,
+              color: hasActiveFilters ? context.appColors.accent.withValues(alpha: 0.6) : context.appColors.border,
             ),
           ),
           child: Stack(
@@ -122,12 +123,12 @@ class _FiltersButton extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.tune_rounded, color: hasActiveFilters ? Colors.orange : Colors.grey[400], size: 16),
+                  Icon(Icons.tune_rounded, color: hasActiveFilters ? context.appColors.accent : Colors.grey[400], size: 16),
                   const SizedBox(width: 6),
                   Text(
                     'filters'.tr(),
                     style: TextStyle(
-                      color: hasActiveFilters ? Colors.orange : Colors.grey[400],
+                      color: hasActiveFilters ? context.appColors.accent : Colors.grey[400],
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -141,7 +142,7 @@ class _FiltersButton extends StatelessWidget {
                   child: Container(
                     width: 7,
                     height: 7,
-                    decoration: const BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: context.appColors.accent, shape: BoxShape.circle),
                   ),
                 ),
             ],
@@ -173,17 +174,17 @@ class _GoButton extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: isReady
             ? LinearGradient(
-                colors: [Colors.orange, Colors.orange[700]!],
+                colors: [context.appColors.accent, context.appColors.accentDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
             : null,
-        color: isReady ? null : Colors.grey[700],
+        color: isReady ? null : context.appColors.inactive,
         borderRadius: BorderRadius.circular(14),
         boxShadow: isReady
             ? [
                 BoxShadow(
-                  color: Colors.orange.withValues(alpha: 0.3),
+                  color: context.appColors.accent.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/widgets/main_menu/examples_dialog.dart';
 import 'package:watch_next/widgets/main_menu/query_settings_panel.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class SecondaryActionsRow extends StatelessWidget {
   final QuerySettings querySettings;
@@ -99,8 +100,8 @@ class _ActionButton extends StatelessWidget {
                         child: Container(
                           width: 8,
                           height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.orange,
+                          decoration: BoxDecoration(
+                            color: context.appColors.accent,
                             shape: BoxShape.circle,
                           ),
                         ),

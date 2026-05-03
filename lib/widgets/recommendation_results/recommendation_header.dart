@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class RecommendationHeader extends StatelessWidget {
   final int currentIndex;
@@ -31,7 +32,7 @@ class RecommendationHeader extends StatelessWidget {
                   ? Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.grey[800],
+                        color: context.appColors.surface,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(

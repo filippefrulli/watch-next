@@ -3,6 +3,7 @@ import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/objects/streaming_service.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class StreamingInfoWidget extends StatelessWidget {
   final List<int>? watchProviders;
@@ -78,7 +79,7 @@ class StreamingInfoWidget extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[700]!, width: 2),
+                border: Border.all(color: context.appColors.border, width: 2),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),

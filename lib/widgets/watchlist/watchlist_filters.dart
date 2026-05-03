@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class WatchlistFilters extends StatelessWidget {
   final String mediaTypeFilter;
@@ -49,7 +50,7 @@ class WatchlistFilters extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey[700]!,
+              color: context.appColors.border,
               width: 1.5,
             ),
           ),
@@ -92,7 +93,7 @@ class WatchlistFilters extends StatelessWidget {
           Text(
             'available_only'.tr(),
             style: TextStyle(
-              color: showOnlyAvailable ? Colors.orange : Colors.grey[400],
+              color: showOnlyAvailable ? context.appColors.accent : Colors.grey[400],
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -101,7 +102,7 @@ class WatchlistFilters extends StatelessWidget {
           Switch(
             value: showOnlyAvailable,
             onChanged: (_) => onAvailabilityToggled(),
-            activeColor: Colors.orange,
+            activeColor: context.appColors.accent,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ],
@@ -138,12 +139,12 @@ class WatchlistFilters extends StatelessWidget {
       color: Theme.of(context).colorScheme.tertiary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[700]!, width: 1),
+        side: BorderSide(color: context.appColors.border, width: 1),
       ),
       items: [
-        _buildMenuItem('all', Icons.video_library, 'all'.tr()),
-        _buildMenuItem('movies', Icons.movie, 'movies'.tr()),
-        _buildMenuItem('tv', Icons.tv, 'tv_shows'.tr()),
+        _buildMenuItem(context, 'all', Icons.video_library, 'all'.tr()),
+        _buildMenuItem(context, 'movies', Icons.movie, 'movies'.tr()),
+        _buildMenuItem(context, 'tv', Icons.tv, 'tv_shows'.tr()),
       ],
     ).then((value) {
       if (value != null) {
@@ -152,7 +153,7 @@ class WatchlistFilters extends StatelessWidget {
     });
   }
 
-  PopupMenuItem<String> _buildMenuItem(String value, IconData icon, String label) {
+  PopupMenuItem<String> _buildMenuItem(BuildContext context, String value, IconData icon, String label) {
     final isSelected = mediaTypeFilter == value;
     return PopupMenuItem<String>(
       value: value,
@@ -161,23 +162,23 @@ class WatchlistFilters extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: isSelected ? Colors.orange : Colors.grey[400],
+            color: isSelected ? context.appColors.accent : Colors.grey[400],
           ),
           const SizedBox(width: 12),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.orange : Colors.grey[300],
+              color: isSelected ? context.appColors.accent : Colors.grey[300],
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               fontSize: 14,
             ),
           ),
           const Spacer(),
           if (isSelected)
-            const Icon(
+            Icon(
               Icons.check,
               size: 18,
-              color: Colors.orange,
+              color: context.appColors.accent,
             ),
         ],
       ),

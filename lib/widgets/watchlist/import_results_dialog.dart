@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class ImportResultsDialog extends StatelessWidget {
   final int successCount;
@@ -19,7 +20,7 @@ class ImportResultsDialog extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.tertiary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey[700]!, width: 1),
+        side: BorderSide(color: context.appColors.border, width: 1),
       ),
       title: Text(
         'import_complete'.tr(),
@@ -41,7 +42,7 @@ class ImportResultsDialog extends StatelessWidget {
           const SizedBox(height: 12),
           _buildResultRow(
             Icons.info,
-            Colors.orange,
+            context.appColors.accent,
             'import_skipped_items'.tr(namedArgs: {'count': skippedCount.toString()}),
           ),
           const SizedBox(height: 12),
@@ -59,7 +60,7 @@ class ImportResultsDialog extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange, Colors.orange[700]!],
+              colors: [context.appColors.accent, context.appColors.accentDark],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

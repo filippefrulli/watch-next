@@ -19,6 +19,7 @@ import 'package:watch_next/widgets/watchlist/watchlist_empty_state.dart';
 import 'package:watch_next/widgets/watchlist/watchlist_header.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class WatchlistPage extends StatefulWidget {
   final VoidCallback? onGetStarted;
@@ -275,7 +276,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: Text('remove'.tr(), style: const TextStyle(color: Colors.orange)),
+                            child: Text('remove'.tr(), style: TextStyle(color: context.appColors.accent)),
                           ),
                         ],
                       ),
@@ -403,7 +404,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
                   'ok'.tr(),
-                  style: const TextStyle(color: Colors.orange),
+                  style: TextStyle(color: context.appColors.accent),
                 ),
               ),
             ],
@@ -494,7 +495,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
                   'ok'.tr(),
-                  style: const TextStyle(color: Colors.orange),
+                  style: TextStyle(color: context.appColors.accent),
                 ),
               ),
             ],

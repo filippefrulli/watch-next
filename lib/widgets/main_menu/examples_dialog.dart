@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class ExamplesDialog extends StatelessWidget {
   final bool isMovie;
@@ -71,12 +72,12 @@ class ExamplesDialog extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.15),
+                        color: context.appColors.accent.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.lightbulb_rounded,
-                        color: Colors.orange,
+                        color: context.appColors.accent,
                         size: 22,
                       ),
                     ),
@@ -96,7 +97,7 @@ class ExamplesDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Divider(color: Colors.grey[800], height: 1),
+              Divider(color: context.appColors.surface, height: 1),
               // Examples list
               Expanded(
                 child: ListView.separated(
@@ -132,7 +133,7 @@ class _ExampleItem extends StatelessWidget {
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey[800]!,
+          color: context.appColors.surface,
           width: 1,
         ),
       ),
@@ -143,14 +144,14 @@ class _ExampleItem extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 0.15),
+              color: context.appColors.accent.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(
               child: Text(
                 '$number',
-                style: const TextStyle(
-                  color: Colors.orange,
+                style: TextStyle(
+                  color: context.appColors.accent,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),

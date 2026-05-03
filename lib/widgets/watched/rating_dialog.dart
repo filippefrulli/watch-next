@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 /// Shows a dialog to pick an integer rating 1–10 and an optional watch date.
 /// Returns a [RatingResult] if the user confirms, or null if cancelled.
@@ -56,7 +57,7 @@ class _RatingDialogState extends State<RatingDialog> {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: ColorScheme.dark(
-            primary: Colors.orange,
+            primary: context.appColors.accent,
             onPrimary: Colors.black,
             surface: Theme.of(context).colorScheme.tertiary,
             onSurface: Colors.white,
@@ -112,7 +113,7 @@ class _RatingDialogState extends State<RatingDialog> {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Icon(
                     filled ? Icons.star_rounded : Icons.star_outline_rounded,
-                    color: filled ? Colors.orange : Colors.grey[600],
+                    color: filled ? context.appColors.accent : Colors.grey[600],
                     size: 28,
                   ),
                 ),
@@ -132,8 +133,8 @@ class _RatingDialogState extends State<RatingDialog> {
                   : Text(
                       '$_rating / 10',
                       key: ValueKey(_rating),
-                      style: const TextStyle(
-                        color: Colors.orange,
+                      style: TextStyle(
+                        color: context.appColors.accent,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
@@ -154,7 +155,7 @@ class _RatingDialogState extends State<RatingDialog> {
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey[700]!, width: 1),
+                border: Border.all(color: context.appColors.border, width: 1),
               ),
               child: Row(
                 children: [
@@ -194,7 +195,7 @@ class _RatingDialogState extends State<RatingDialog> {
           child: Text(
             'confirm'.tr(),
             style: TextStyle(
-              color: _rating == null ? Colors.grey[600] : Colors.orange,
+              color: _rating == null ? Colors.grey[600] : context.appColors.accent,
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),

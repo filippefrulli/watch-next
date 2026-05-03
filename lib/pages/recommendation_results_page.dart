@@ -14,6 +14,7 @@ import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
+import 'package:watch_next/widgets/shared/confirm_dialog.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
@@ -107,24 +108,14 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   Future<void> _toggleWatched() async {
     if (selectedWatchObject.id == null) return;
     if (_isWatched) {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.tertiary,
-          title: Text('remove_from_watched'.tr(), style: const TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text('remove'.tr(), style: const TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmDialog(
+        context,
+        title: 'remove_from_watched'.tr(),
+        subtitle: selectedWatchObject.title,
+        confirmLabel: 'remove'.tr(),
+        cancelLabel: 'cancel'.tr(),
       );
-      if (confirmed != true) return;
+      if (!confirmed) return;
       await _watchedService.removeFromWatched(selectedWatchObject.id!);
       UserActionService.logWatchedRemove(
         mediaId: selectedWatchObject.id!,

@@ -7,6 +7,7 @@ import 'package:watch_next/pages/stats_page.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
+import 'package:watch_next/widgets/shared/confirm_dialog.dart';
 
 class WatchedPage extends StatefulWidget {
   const WatchedPage({super.key});
@@ -501,29 +502,14 @@ class _WatchedPageState extends State<WatchedPage> {
   }
 
   Future<void> _confirmDelete(WatchedItem item) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.tertiary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('remove_from_watched'.tr(), style: const TextStyle(color: Colors.white)),
-        content: Text(
-          item.title,
-          style: TextStyle(color: Colors.grey[400]),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('remove'.tr(), style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'remove_from_watched'.tr(),
+      subtitle: item.title,
+      confirmLabel: 'remove'.tr(),
+      cancelLabel: 'cancel'.tr(),
     );
-    if (confirmed == true) await _deleteItem(item);
+    if (confirmed) await _deleteItem(item);
   }
 
   Widget _buildEmptyState() {

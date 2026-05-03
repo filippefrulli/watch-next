@@ -247,7 +247,7 @@ class _BrowsePageState extends State<BrowsePage> {
           ),
         ),
         SizedBox(
-          height: 220,
+          height: 258,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -273,8 +273,9 @@ class _BrowsePageState extends State<BrowsePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Poster with availability badge
-            Expanded(
+            // Poster with availability badge — fixed 2:3 ratio for 140px width
+            SizedBox(
+              height: 210,
               child: Stack(
                 children: [
                   ClipRRect(

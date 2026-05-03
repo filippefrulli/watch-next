@@ -15,6 +15,7 @@ import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/widgets/recommendation_results/trailer_list_widget.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
+import 'package:watch_next/widgets/shared/confirm_dialog.dart';
 
 class MovieInfoPanel extends StatefulWidget {
   final int mediaId;
@@ -183,26 +184,14 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
   Future<void> _toggleWatched() async {
     if (_isWatched) {
       // Already watched — offer to remove
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.tertiary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text('remove_from_watched'.tr(), style: const TextStyle(color: Colors.white)),
-          content: Text(widget.title, style: TextStyle(color: Colors.grey[400])),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle(color: Colors.grey)),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text('remove'.tr(), style: const TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmDialog(
+        context,
+        title: 'remove_from_watched'.tr(),
+        subtitle: widget.title,
+        confirmLabel: 'remove'.tr(),
+        cancelLabel: 'cancel'.tr(),
       );
-      if (confirmed != true) return;
+      if (!confirmed) return;
       await _watchedService.removeFromWatched(widget.mediaId);
       if (mounted) {
         setState(() {

@@ -12,9 +12,9 @@ class NoInternet extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.cloud_off,
-            color: Colors.orange,
+            color: Colors.grey[400],
             size: 32,
           ),
           const SizedBox(height: 8),

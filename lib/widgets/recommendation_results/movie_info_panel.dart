@@ -398,12 +398,12 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.tertiary,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.orange.withValues(alpha: 0.3), width: 1),
+                          border: Border.all(color: Colors.grey[700]!, width: 1),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.star, color: Colors.orange, size: 20),
+                            Icon(Icons.star, color: Colors.grey[400], size: 20),
                             const SizedBox(width: 8),
                             Text(
                               'tmdb_score'.tr(),
@@ -413,7 +413,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                             Text(
                               widget.tmdbRating?.toStringAsFixed(1) ?? '',
                               style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                    color: Colors.orange,
+                                    color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -560,7 +560,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         gradient: LinearGradient(
           colors: [
             Colors.transparent,
-            Colors.orange.withValues(alpha: 0.3),
+            Colors.grey[800]!,
             Colors.transparent,
           ],
         ),
@@ -687,14 +687,14 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.15),
+                    color: Colors.grey[800],
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.withValues(alpha: 0.4), width: 1),
+                    border: Border.all(color: Colors.grey[700]!, width: 1),
                   ),
                   child: Center(
                     child: Text(
                       'S$seasonNum',
-                      style: const TextStyle(color: Colors.orange, fontSize: 11, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.grey[300], fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -812,13 +812,13 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
           .map((g) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.12),
+                  color: Colors.grey[800],
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3), width: 1),
+                  border: Border.all(color: Colors.grey[700]!, width: 1),
                 ),
                 child: Text(
                   g,
-                  style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: Colors.grey[300], fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ))
           .toList(),

@@ -125,7 +125,7 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
     if (_isLoading) {
       return const SliverFillRemaining(
         child: Center(
-          child: CircularProgressIndicator(color: Colors.orange),
+          child: CircularProgressIndicator(color: Colors.white),
         ),
       );
     }

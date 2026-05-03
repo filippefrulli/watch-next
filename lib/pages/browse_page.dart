@@ -100,7 +100,7 @@ class _BrowsePageState extends State<BrowsePage> {
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.orange))
+            ? const Center(child: CircularProgressIndicator(color: Colors.white))
             : _errorMessage.isNotEmpty
                 ? Center(
                     child: Padding(
@@ -133,7 +133,7 @@ class _BrowsePageState extends State<BrowsePage> {
                   )
                 : RefreshIndicator(
                     onRefresh: _loadData,
-                    color: Colors.orange,
+                    color: Colors.white,
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
@@ -316,7 +316,7 @@ class _BrowsePageState extends State<BrowsePage> {
                           color: isAvailable
                               ? Colors.green.withValues(alpha: 0.9)
                               : (hasRentOrBuy
-                                  ? Colors.orange.withValues(alpha: 0.9)
+                                  ? Colors.amber[600]!.withValues(alpha: 0.9)
                                   : Colors.grey.withValues(alpha: 0.9)),
                           borderRadius: BorderRadius.circular(6),
                         ),

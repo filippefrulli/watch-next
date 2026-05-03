@@ -158,7 +158,7 @@ class _RatingDialogState extends State<RatingDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today_outlined, color: Colors.orange, size: 18),
+                  Icon(Icons.calendar_today_outlined, color: Colors.grey[400], size: 18),
                   const SizedBox(width: 10),
                   Text(
                     DateFormat('d MMM yyyy').format(_date),

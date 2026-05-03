@@ -327,7 +327,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
             const SizedBox(height: 16),
             Text(
@@ -453,7 +453,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           color: Theme.of(context).colorScheme.tertiary,
           child: const Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           ),
         ),
@@ -582,7 +582,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     if (_isDetailsLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
       );
     }
@@ -766,16 +766,16 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
             ? const SizedBox(
                 width: 16,
                 height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.orange),
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
-            : const Icon(Icons.auto_awesome, size: 18, color: Colors.orange),
+            : Icon(Icons.auto_awesome, size: 18, color: Colors.grey[400]),
         label: Text(
           widget.isMovie ? 'suggest_similar_movies'.tr() : 'suggest_similar_shows'.tr(),
-          style: const TextStyle(color: Colors.orange, fontSize: 14, fontWeight: FontWeight.w600),
+          style: TextStyle(color: Colors.grey[300], fontSize: 14, fontWeight: FontWeight.w600),
         ),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 13),
-          side: const BorderSide(color: Colors.orange, width: 1.5),
+          side: BorderSide(color: Colors.grey[700]!, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
@@ -883,13 +883,13 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           .map((g) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.12),
+                  color: Colors.grey[800],
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3), width: 1),
+                  border: Border.all(color: Colors.grey[700]!, width: 1),
                 ),
                 child: Text(
                   g,
-                  style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: Colors.grey[300], fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ))
           .toList(),
@@ -907,7 +907,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: iconColor ?? Colors.orange, size: 18),
+        Icon(icon, color: iconColor ?? Colors.grey[400], size: 18),
         const SizedBox(width: 10),
         Expanded(
           child: RichText(
@@ -1068,7 +1068,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
       );
     }
@@ -1153,7 +1153,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           const SizedBox(height: 24),
         ],
         if (_rentProviders.isNotEmpty) ...[
-          _buildSectionHeader('rent'.tr(), Icons.schedule, Colors.orange),
+          _buildSectionHeader('rent'.tr(), Icons.schedule, Colors.grey[400]!),
           const SizedBox(height: 12),
           ..._rentProviders.map((p) => _buildProviderCard(p, false, showCheckmark: false)),
           const SizedBox(height: 24),

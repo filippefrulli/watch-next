@@ -172,7 +172,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.orange),
+            child: CircularProgressIndicator(color: Colors.white),
           );
         }
 

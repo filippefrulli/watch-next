@@ -34,6 +34,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   final GlobalKey textFieldKey = GlobalKey();
 
   bool isLongEnough = false;
+  bool hasText = false;
   bool isValidQuery = false;
   bool enableLoading = false;
   bool noInternet = false;
@@ -141,6 +142,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         final wasLongEnough = isLongEnough;
         setState(() {
           isLongEnough = _controller.text.length >= 5;
+          hasText = _controller.text.isNotEmpty;
         });
         // Preload the ad the moment the query is long enough
         if (!wasLongEnough && isLongEnough) {
@@ -208,6 +210,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 controller: _controller,
                 textFieldKey: textFieldKey,
                 isLongEnough: isLongEnough,
+                hasText: hasText,
                 enableLoading: enableLoading,
                 onGoPressed: _onGoPressed,
                 isMovie: typeIsMovie == 0,
@@ -289,9 +292,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
             children: [
               Icon(Icons.lightbulb_outline, color: Colors.grey[500], size: 13),
               const SizedBox(width: 5),
-              Text(
-                example,
-                style: TextStyle(color: Colors.grey[400], fontSize: 12),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width - 82,
+                ),
+                child: Text(
+                  example,
+                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  maxLines: 2,
+                ),
               ),
             ],
           ),
@@ -331,8 +340,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
         Container(
           width: 24,
           height: 24,
-          decoration: const BoxDecoration(
-            color: Colors.orange,
+          decoration: BoxDecoration(
+            color: Colors.grey[600],
             shape: BoxShape.circle,
           ),
           child: Center(

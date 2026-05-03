@@ -29,9 +29,9 @@ class TrailerListWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.play_circle_filled,
-                  color: Colors.orange,
+                  color: Colors.white,
                   size: 20,
                 ),
                 const SizedBox(width: 8),

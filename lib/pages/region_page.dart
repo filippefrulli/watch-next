@@ -89,7 +89,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: "search_country".tr(),
-                    prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.tertiary,
                     contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

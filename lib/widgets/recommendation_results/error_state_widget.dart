@@ -47,11 +47,7 @@ class ErrorStateWidget extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                gradient: const LinearGradient(
-                  colors: [Colors.orange, Color(0xFFFF8C00)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: Colors.grey[800],
               ),
               child: TextButton.icon(
                 onPressed: onRetry,

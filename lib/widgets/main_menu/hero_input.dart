@@ -5,6 +5,7 @@ class HeroInput extends StatelessWidget {
   final TextEditingController controller;
   final GlobalKey textFieldKey;
   final bool isLongEnough;
+  final bool hasText;
   final bool enableLoading;
   final VoidCallback? onGoPressed;
   final bool isMovie;
@@ -16,6 +17,7 @@ class HeroInput extends StatelessWidget {
     required this.controller,
     required this.textFieldKey,
     required this.isLongEnough,
+    required this.hasText,
     required this.enableLoading,
     required this.onGoPressed,
     required this.isMovie,
@@ -30,12 +32,12 @@ class HeroInput extends StatelessWidget {
         color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isLongEnough ? Colors.orange : Colors.orange.withValues(alpha: 0.3),
+          color: hasText ? Colors.orange : Colors.orange.withValues(alpha: 0.35),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange..withValues(alpha: isLongEnough ? 0.25 : 0.1),
+            color: Colors.orange.withValues(alpha: hasText ? 0.2 : 0.08),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),

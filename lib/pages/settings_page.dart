@@ -251,7 +251,7 @@ class _SettingsPageState extends State<SettingsPage> {
             color: Theme.of(context).colorScheme.tertiary,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.orange.withValues(alpha: 0.4),
+              color: Colors.grey[800]!,
               width: 1,
             ),
           ),
@@ -270,10 +270,10 @@ class _SettingsPageState extends State<SettingsPage> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 0.15),
+              color: Colors.grey[800],
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.star_rounded, color: Colors.orange, size: 22),
+            child: const Icon(Icons.star_rounded, color: Colors.white, size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -295,7 +295,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-          const Icon(Icons.check_circle_rounded, color: Colors.orange, size: 22),
+          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 22),
         ],
       ),
     );
@@ -314,10 +314,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.15),
+                  color: Colors.grey[800],
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.star_rounded, color: Colors.orange, size: 22),
+                child: const Icon(Icons.star_rounded, color: Colors.white, size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -432,12 +432,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.15),
+                  color: Colors.grey[800],
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   icon,
-                  color: Colors.orange,
+                  color: Colors.white,
                   size: 22,
                 ),
               ),

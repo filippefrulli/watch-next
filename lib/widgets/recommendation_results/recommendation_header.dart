@@ -31,13 +31,13 @@ class RecommendationHeader extends StatelessWidget {
                   ? Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.2),
+                        color: Colors.grey[800],
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         '${currentIndex + 1} / $totalCount',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.orange,
+                              color: Colors.grey[400],
                               fontWeight: FontWeight.bold,
                             ),
                       ),

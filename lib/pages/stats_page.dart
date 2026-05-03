@@ -92,7 +92,7 @@ class _StatsPageState extends State<StatsPage> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.orange))
+          ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : _totalCount == 0
               ? _buildEmptyState()
               : _buildContent(),
@@ -157,7 +157,7 @@ class _StatsPageState extends State<StatsPage> {
           if (_isChartLoading)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 40),
-              child: Center(child: CircularProgressIndicator(color: Colors.orange)),
+              child: Center(child: CircularProgressIndicator(color: Colors.white)),
             )
           else ...[
             // Genre breakdown

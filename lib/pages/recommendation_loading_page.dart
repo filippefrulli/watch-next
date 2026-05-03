@@ -176,7 +176,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  LoadingAnimationWidget.threeArchedCircle(color: Colors.orange, size: 36),
+                  LoadingAnimationWidget.threeArchedCircle(color: Colors.white, size: 36),
                   const SizedBox(height: 16),
                   // Step label
                   Text(

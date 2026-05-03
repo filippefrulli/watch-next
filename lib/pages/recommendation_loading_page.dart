@@ -17,6 +17,7 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
+import 'package:watch_next/services/watchlist_service.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:watch_next/utils/prompts.dart';
@@ -238,8 +239,14 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       final excludedTitlesStr = QueryCacheService.formatExcludedTitlesForPrompt(cachedTitles);
       // Also exclude any seed titles passed in (e.g. the movie we're finding similars for)
       final seedExclusion = widget.itemsToNotRecommend.isNotEmpty ? widget.itemsToNotRecommend : '';
-      final allExcluded =
-          [if (excludedTitlesStr.isNotEmpty) excludedTitlesStr, if (seedExclusion.isNotEmpty) seedExclusion].join(', ');
+      // Exclude titles already in the user's watchlist
+      final watchlistItems = await WatchlistService().getWatchlist().first;
+      final watchlistTitles = watchlistItems.take(50).map((i) => i.title).join(', ');
+      final allExcluded = [
+        if (excludedTitlesStr.isNotEmpty) excludedTitlesStr,
+        if (seedExclusion.isNotEmpty) seedExclusion,
+        if (watchlistTitles.isNotEmpty) watchlistTitles,
+      ].join(', ');
       String doNotRecommend = allExcluded.isNotEmpty ? doNotRecommendPrefix + allExcluded : '';
 
       // Check if user has limited streaming services (1-2) and add priority instruction

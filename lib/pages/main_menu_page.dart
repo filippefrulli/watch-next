@@ -18,7 +18,6 @@ import 'package:watch_next/widgets/feedback_dialog.dart';
 import 'package:watch_next/widgets/main_menu/hero_input.dart';
 import 'package:watch_next/widgets/main_menu/media_type_switch.dart';
 import 'package:watch_next/widgets/main_menu/query_settings_panel.dart';
-import 'package:watch_next/widgets/main_menu/secondary_actions_row.dart';
 import 'package:watch_next/widgets/shared/toast_widget.dart';
 import 'package:watch_next/pages/settings_page.dart';
 
@@ -40,6 +39,61 @@ class _MainMenuPageState extends State<MainMenuPage> {
   bool noInternet = false;
   int typeIsMovie = 0;
   QuerySettings _querySettings = const QuerySettings();
+  int _exampleIndex = 0;
+  Timer? _exampleTimer;
+
+  static const _movieExamples = [
+    'Something funny for tonight',
+    'A classic I might have missed',
+    'A thriller with a great twist',
+    'An action movie with stunning visuals',
+    'Something based on a true story',
+    'A feel-good movie for the weekend',
+    'An Oscar-winning drama',
+    'Something with a memorable soundtrack',
+    'A sci-fi with a thought-provoking concept',
+    'Something light to watch with friends',
+    'A romance set in a foreign country',
+    'A documentary about nature',
+    'A heist movie with a clever plot',
+    'Something scary but not too gory',
+    'A coming-of-age story',
+    'A movie with an unexpected ending',
+    'Something animated for all ages',
+    'A quiet, slow-burn drama',
+    'Something from the 90s',
+    'A film with a stunning visual style',
+    'A movie that is romantic and funny, ideal for a first date',
+    'A movie that will make me cry',
+    'A movie starring Tom Cruise and directed by Steven Spielberg',
+    'A documentary about sports',
+    'A movie about artificial intelligence, with good reviews',
+  ];
+
+  static const _showExamples = [
+    'Something critically acclaimed',
+    'Something with great writing',
+    'A crime thriller with complex characters',
+    'Something light to watch after work',
+    'A documentary series about a true story',
+    'A sci-fi show with a gripping plot',
+    'Something with fewer than 3 seasons',
+    'A comedy with quick episodes',
+    'A period drama set in another era',
+    'Something with an ensemble cast',
+    'A show that keeps me guessing',
+    'A slow-burn thriller',
+    'Something funny and easy to watch',
+    'A limited series I can binge',
+    'A show with an amazing first season',
+    'Something about food or travel',
+    'An animated series for adults',
+    'A show with a satisfying ending',
+    'A show with episodes shorter than 30 minutes',
+    'A show with less than 5 seasons',
+    'A show that is reality television',
+    'A short series I can binge this weekend',
+  ];
 
   @override
   void initState() {
@@ -47,6 +101,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
     openAI = OpenAIClient(apiKey: openAiKey);
     _controller.addListener(_checkLength);
     _loadQuerySettings();
+    _exampleTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      if (mounted) {
+        setState(() {
+          final list = typeIsMovie == 0 ? _movieExamples : _showExamples;
+          _exampleIndex = (_exampleIndex + 1) % list.length;
+        });
+      }
+    });
     // Reschedule notification with proper translations once context is available
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _rescheduleNotificationWithContext();
@@ -68,6 +130,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   void dispose() {
+    _exampleTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -134,7 +197,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
               // Media type toggle
               MediaTypeSwitch(
                 currentIndex: typeIsMovie,
-                onToggle: (index) => setState(() => typeIsMovie = index),
+                onToggle: (index) => setState(() {
+                  typeIsMovie = index;
+                  _exampleIndex = 0;
+                }),
               ),
               const SizedBox(height: 32),
               // Hero input
@@ -144,19 +210,22 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 isLongEnough: isLongEnough,
                 enableLoading: enableLoading,
                 onGoPressed: _onGoPressed,
+                isMovie: typeIsMovie == 0,
+                hasActiveFilters: _querySettings.hasActiveFilters,
+                onFiltersPressed: () {
+                  QuerySettingsPanel.show(
+                    context,
+                    initialSettings: _querySettings,
+                    onSettingsChanged: (settings) {
+                      setState(() => _querySettings = settings);
+                    },
+                    isMovie: typeIsMovie == 0,
+                  );
+                },
               ),
               const SizedBox(height: 20),
-              // Example prompt chips
+              // Rotating example chip
               _buildExampleChips(),
-              const SizedBox(height: 12),
-              // Secondary actions - text links
-              SecondaryActionsRow(
-                querySettings: _querySettings,
-                onSettingsChanged: (settings) {
-                  setState(() => _querySettings = settings);
-                },
-                isMovie: typeIsMovie == 0,
-              ),
               const Spacer(flex: 3),
             ],
           ),
@@ -196,44 +265,37 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   Widget _buildExampleChips() {
-    final examples = typeIsMovie == 0
-        ? ['example_movie_1'.tr(), 'example_movie_2'.tr()]
-        : ['example_show_1'.tr(), 'example_show_2'.tr()];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: examples.map((example) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () {
-                _controller.text = example;
-                _controller.selection = TextSelection.fromPosition(
-                  TextPosition(offset: example.length),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[700]!),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.lightbulb_outline, color: Colors.grey[500], size: 13),
-                    const SizedBox(width: 5),
-                    Text(
-                      example,
-                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+    final list = typeIsMovie == 0 ? _movieExamples : _showExamples;
+    final example = list[_exampleIndex % list.length];
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      child: GestureDetector(
+        key: ValueKey('$typeIsMovie-$_exampleIndex'),
+        onTap: () {
+          _controller.text = example;
+          _controller.selection = TextSelection.fromPosition(
+            TextPosition(offset: example.length),
           );
-        }).toList(),
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.grey[700]!),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lightbulb_outline, color: Colors.grey[500], size: 13),
+              const SizedBox(width: 5),
+              Text(
+                example,
+                style: TextStyle(color: Colors.grey[400], fontSize: 12),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

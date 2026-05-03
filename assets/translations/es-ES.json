@@ -30,7 +30,7 @@
   "example_3": "Una película protagonizada por Tom Cruise y dirigida por Steven Spielberg",
   "example_4": "Un documental sobre deportes.",
   "example_5": "Una película sobre inteligencia artificial, con buenas criticas",
-  "example_show_1": "Una serie corta para maratonear",
+  "example_show_1": "Algo muy bien valorado por la crítica",
   "example_show_2": "Algo con gran escritura",
   "example_show_3": "Una serie con episodios de menos de 30 minutos",
   "example_show_4": "Una serie con menos de 5 temporadas",
@@ -232,9 +232,11 @@
   "watchlist_empty_subtitle": "Guarda aquí películas y series mientras las descubres.",
   "get_recommendations": "Obtener recomendaciones",
   "example_movie_1": "Algo gracioso para esta noche",
-  "example_movie_2": "Un thriller para ver solo",
+  "example_movie_2": "Un clásico que quizás me perdí",
   "region_subtitle": "Para saber qué títulos están disponibles en streaming donde vives.",
   "search_country": "Buscar país...",
   "streaming_subtitle": "Solo sugeriremos películas y series que puedas ver con tus suscripciones.",
-  "services_selected": "{count} servicio(s) seleccionado(s)"
+  "services_selected": "{count} servicio(s) seleccionado(s)",
+  "hero_hint_movie": "ej. 'Un thriller con un gran giro argumental'",
+  "hero_hint_show": "ej. 'Una serie corta para ver del tirón'"
 }

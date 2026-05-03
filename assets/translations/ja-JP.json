@@ -30,7 +30,7 @@
   "example_3": "トム・クルーズ主演、スティーブン・スピルバーグ監督の映画",
   "example_4": "スポーツに関するドキュメンタリー",
   "example_5": "AIについての評価の高い映画",
-  "example_show_1": "一気見できる短いシリーズ",
+  "example_show_1": "批評家に高く評価された作品",
   "example_show_2": "脚本が素晴らしいもの",
   "example_show_3": "1話30分以内のドラマ",
   "example_show_4": "5シーズン以内のドラマ",
@@ -232,9 +232,11 @@
   "watchlist_empty_subtitle": "発見した映画やドラマをここに保存しよう。",
   "get_recommendations": "おすすめを見る",
   "example_movie_1": "今夜笑えるもの",
-  "example_movie_2": "一人で見るスリラー",
+  "example_movie_2": "見逃したかもしれない名作",
   "region_subtitle": "あなたの地域で視聴できるタイトルを把握するために必要です。",
   "search_country": "国を検索...",
   "streaming_subtitle": "あなたのサブスクで実際に視聴できる作品のみをおすすめします。",
-  "services_selected": "{count}件のサービスを選択中"
+  "services_selected": "{count}件のサービスを選択中",
+  "hero_hint_movie": "例: '予想外のどんでん返しがあるスリラー'",
+  "hero_hint_show": "例: '一気見できる短いドラマシリーズ'"
 }

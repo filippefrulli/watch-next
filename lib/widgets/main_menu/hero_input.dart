@@ -7,6 +7,9 @@ class HeroInput extends StatelessWidget {
   final bool isLongEnough;
   final bool enableLoading;
   final VoidCallback? onGoPressed;
+  final bool isMovie;
+  final bool hasActiveFilters;
+  final VoidCallback? onFiltersPressed;
 
   const HeroInput({
     super.key,
@@ -15,6 +18,9 @@ class HeroInput extends StatelessWidget {
     required this.isLongEnough,
     required this.enableLoading,
     required this.onGoPressed,
+    required this.isMovie,
+    required this.hasActiveFilters,
+    required this.onFiltersPressed,
   });
 
   @override
@@ -50,7 +56,7 @@ class HeroInput extends StatelessWidget {
                   height: 1.5,
                 ),
             decoration: InputDecoration(
-              hintText: "hero_hint".tr(),
+              hintText: isMovie ? "hero_hint_movie".tr() : "hero_hint_show".tr(),
               hintStyle: TextStyle(
                 fontSize: 15,
                 color: Colors.grey[500],
@@ -62,12 +68,16 @@ class HeroInput extends StatelessWidget {
               border: InputBorder.none,
             ),
           ),
-          // GO button row
+          // Filters + GO button row
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                _FiltersButton(
+                  hasActiveFilters: hasActiveFilters,
+                  onPressed: onFiltersPressed,
+                ),
+                const Spacer(),
                 _GoButton(
                   isLongEnough: isLongEnough,
                   enableLoading: enableLoading,
@@ -77,6 +87,64 @@ class HeroInput extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FiltersButton extends StatelessWidget {
+  final bool hasActiveFilters;
+  final VoidCallback? onPressed;
+
+  const _FiltersButton({required this.hasActiveFilters, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: hasActiveFilters ? Colors.orange.withValues(alpha: 0.6) : Colors.grey[700]!,
+            ),
+          ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.tune_rounded, color: hasActiveFilters ? Colors.orange : Colors.grey[400], size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    'filters'.tr(),
+                    style: TextStyle(
+                      color: hasActiveFilters ? Colors.orange : Colors.grey[400],
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              if (hasActiveFilters)
+                Positioned(
+                  top: -6,
+                  right: -6,
+                  child: Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

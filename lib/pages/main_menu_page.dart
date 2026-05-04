@@ -295,7 +295,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
               const SizedBox(width: 5),
               ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width - 82,
+                  maxWidth: MediaQuery.of(context).size.width - 104,
                 ),
                 child: Text(
                   example,

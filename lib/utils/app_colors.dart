@@ -23,14 +23,14 @@ class AppColors extends ThemeExtension<AppColors> {
   });
 
   static const defaults = AppColors(
-    accent:       Color(0xFFFF6B35), // lighter tomato-orange
-    accentDark:   Color(0xFFE05525), // darker shade
-    background:   Color(0xFF111111), // darker charcoal
-    surface:      Color(0xFF262626), // dark grey card
-    border:       Color(0xFF333333), // subtle grey border
-    borderSubtle: Color(0xFF2E2E2E),
-    inactive:     Color(0xFF2E2E2E),
-    chip:         Color(0xFF2E2E2E),
+    accent: Color(0xFFFB8221),
+    accentDark: Color(0xFFE06A10),
+    background: Color(0xFF1A1C20),
+    surface: Color(0xFF2C2D31),
+    border: Color(0xFF424242), // original border
+    borderSubtle: Color(0xFF616161),
+    inactive: Color(0xFF616161),
+    chip: Color(0xFF424242),
   );
 
   @override

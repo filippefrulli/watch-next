@@ -238,5 +238,10 @@
   "streaming_subtitle": "Solo sugeriremos películas y series que puedas ver con tus suscripciones.",
   "services_selected": "{count} servicio(s) seleccionado(s)",
   "hero_hint_movie": "ej. 'Un thriller con un gran giro argumental'",
-  "hero_hint_show": "ej. 'Una serie corta para ver del tirón'"
+  "hero_hint_show": "ej. 'Una serie corta para ver del tirón'",
+  "trending_this_week": "Tendencias esta semana",
+  "now_in_cinemas": "Ahora en cines",
+  "coming_soon": "Próximamente",
+  "hidden_gems": "Joyas ocultas",
+  "new_on": "Nuevo en"
 }

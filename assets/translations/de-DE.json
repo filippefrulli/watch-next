@@ -238,5 +238,10 @@
   "streaming_subtitle": "Wir empfehlen nur Filme & Serien, die du mit deinen Abos wirklich sehen kannst.",
   "services_selected": "{count} Dienst(e) ausgewählt",
   "hero_hint_movie": "z.B. 'Ein Thriller mit einer überraschenden Wendung'",
-  "hero_hint_show": "z.B. 'Eine kurze Serie zum Durchschauen'"
+  "hero_hint_show": "z.B. 'Eine kurze Serie zum Durchschauen'",
+  "trending_this_week": "Trending diese Woche",
+  "now_in_cinemas": "Jetzt im Kino",
+  "coming_soon": "Demnächst",
+  "hidden_gems": "Verborgene Schätze",
+  "new_on": "Neu bei"
 }

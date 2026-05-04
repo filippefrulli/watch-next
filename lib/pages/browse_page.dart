@@ -23,10 +23,32 @@ class _BrowsePageState extends State<BrowsePage> {
   final HttpService _httpService = HttpService();
   final PlaylistService _playlistService = PlaylistService();
 
+  // Priority-ordered list of well-known provider IDs
+  static const _providerPriority = [8, 9, 337, 350, 1899, 15, 531, 386, 283];
+  static const _providerNames = {
+    8: 'Netflix',
+    9: 'Prime Video',
+    337: 'Disney+',
+    350: 'Apple TV+',
+    1899: 'Max',
+    15: 'Hulu',
+    531: 'Paramount+',
+    386: 'Peacock',
+    283: 'Crunchyroll',
+  };
+
   List<BrowseItem> _popularMovies = [];
   List<BrowseItem> _popularShows = [];
   List<BrowseItem> _topRatedMovies = [];
   List<BrowseItem> _topRatedShows = [];
+  List<BrowseItem> _trending = [];
+  List<BrowseItem> _nowPlaying = [];
+  List<BrowseItem> _upcoming = [];
+  List<BrowseItem> _hiddenGems = [];
+  // provider id → items
+  Map<int, List<BrowseItem>> _providerCarousels = {};
+  List<int> _prioritisedUserServices = [];
+
   List<Playlist> _playlists = [];
   List<int> _userServiceIds = [];
 
@@ -40,34 +62,49 @@ class _BrowsePageState extends State<BrowsePage> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
 
     try {
       await _playlistService.initialize().timeout(const Duration(seconds: 10));
 
-      // Load user's streaming services and all data in parallel
       final results = await Future.wait([
         DatabaseService.getStreamingServicesIds(),
         _httpService.getPopularMovies(),
         _httpService.getPopularShows(),
         _httpService.getTopRatedMovies(),
         _httpService.getTopRatedShows(),
+        _httpService.getTrending(mediaType: 'all', timeWindow: 'week'),
+        _httpService.getNowPlayingMovies(),
+        _httpService.getUpcomingMovies(),
         _playlistService.getPlaylists(),
-      ]).timeout(const Duration(seconds: 20));
+      ]).timeout(const Duration(seconds: 25));
 
       if (mounted) {
+        final userIds = results[0] as List<int>;
+        // Pick up to 5 subscribed services in priority order
+        final prioritised = _providerPriority
+            .where((id) => userIds.contains(id))
+            .take(5)
+            .toList();
+
         setState(() {
-          _userServiceIds = results[0] as List<int>;
+          _userServiceIds = userIds;
+          _prioritisedUserServices = prioritised;
           _popularMovies = results[1] as List<BrowseItem>;
           _popularShows = results[2] as List<BrowseItem>;
           _topRatedMovies = results[3] as List<BrowseItem>;
           _topRatedShows = results[4] as List<BrowseItem>;
-          _playlists = results[5] as List<Playlist>;
+          _trending = results[5] as List<BrowseItem>;
+          _nowPlaying = results[6] as List<BrowseItem>;
+          _upcoming = results[7] as List<BrowseItem>;
+          _playlists = results[8] as List<Playlist>;
           _isLoading = false;
         });
 
-        // Load availability in the background
-        _loadAvailability();
+        _loadSecondaryData();
       }
     } catch (e) {
       if (mounted) {
@@ -79,20 +116,42 @@ class _BrowsePageState extends State<BrowsePage> {
     }
   }
 
-  Future<void> _loadAvailability() async {
+  Future<void> _loadSecondaryData() async {
+    // Load provider carousels and hidden gems in background
+    final futures = <Future>[];
+
+    for (final providerId in _prioritisedUserServices) {
+      futures.add(_httpService.getNewOnProvider(providerId).then((items) {
+        if (mounted) {
+          setState(() => _providerCarousels[providerId] = items);
+        }
+      }));
+    }
+
+    futures.add(_httpService.getHiddenGems().then((items) {
+      if (mounted) setState(() => _hiddenGems = items);
+    }));
+
+    await Future.wait(futures);
+
     // Load availability for all items
+    _loadAvailability();
+  }
+
+  Future<void> _loadAvailability() async {
     final allItems = [
       ..._popularMovies,
       ..._popularShows,
       ..._topRatedMovies,
       ..._topRatedShows,
+      ..._trending,
+      ..._nowPlaying,
+      ..._hiddenGems,
+      ..._providerCarousels.values.expand((l) => l),
     ];
 
     await _httpService.loadBrowseItemsAvailability(allItems);
-
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
   }
 
   @override
@@ -174,21 +233,51 @@ class _BrowsePageState extends State<BrowsePage> {
                             ),
                           ),
 
-                          // Popular Movies section
+                          // Trending This Week
+                          if (_trending.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'trending_this_week'.tr(),
+                              items: _trending,
+                            ),
+
+                          // Now in Cinemas
+                          if (_nowPlaying.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'now_in_cinemas'.tr(),
+                              items: _nowPlaying,
+                            ),
+
+                          // Coming Soon
+                          if (_upcoming.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'coming_soon'.tr(),
+                              items: _upcoming,
+                            ),
+
+                          // New on [Service] — one carousel per subscribed priority service
+                          for (final providerId in _prioritisedUserServices)
+                            if (_providerCarousels.containsKey(providerId) &&
+                                _providerCarousels[providerId]!.isNotEmpty)
+                              _buildCarouselSection(
+                                title: '${'new_on'.tr()} ${_providerNames[providerId] ?? ''}',
+                                items: _providerCarousels[providerId]!,
+                              ),
+
+                          // Popular Movies
                           if (_popularMovies.isNotEmpty)
                             _buildCarouselSection(
                               title: 'popular_movies'.tr(),
                               items: _popularMovies,
                             ),
 
-                          // Popular Shows section
+                          // Popular Shows
                           if (_popularShows.isNotEmpty)
                             _buildCarouselSection(
                               title: 'popular_shows'.tr(),
                               items: _popularShows,
                             ),
 
-                          // Curated Playlists section
+                          // Curated Playlists
                           if (_playlists.isNotEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
@@ -206,14 +295,21 @@ class _BrowsePageState extends State<BrowsePage> {
 
                           const NativeAdWidget(),
 
-                          // Top Rated Movies section
+                          // Hidden Gems
+                          if (_hiddenGems.isNotEmpty)
+                            _buildCarouselSection(
+                              title: 'hidden_gems'.tr(),
+                              items: _hiddenGems,
+                            ),
+
+                          // Top Rated Movies
                           if (_topRatedMovies.isNotEmpty)
                             _buildCarouselSection(
                               title: 'top_rated_movies'.tr(),
                               items: _topRatedMovies,
                             ),
 
-                          // Top Rated Shows section
+                          // Top Rated Shows
                           if (_topRatedShows.isNotEmpty)
                             _buildCarouselSection(
                               title: 'top_rated_shows'.tr(),
@@ -253,9 +349,7 @@ class _BrowsePageState extends State<BrowsePage> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: items.length,
-            itemBuilder: (context, index) {
-              return _buildCarouselItem(items[index]);
-            },
+            itemBuilder: (context, index) => _buildCarouselItem(items[index]),
           ),
         ),
       ],
@@ -274,7 +368,6 @@ class _BrowsePageState extends State<BrowsePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Poster with availability badge — fixed 2:3 ratio for 140px width
             SizedBox(
               height: 210,
               child: Stack(
@@ -306,7 +399,6 @@ class _BrowsePageState extends State<BrowsePage> {
                             child: const Icon(Icons.movie, color: Colors.grey),
                           ),
                   ),
-                  // Availability badge
                   if (item.availabilityLoaded)
                     Positioned(
                       top: 6,
@@ -335,7 +427,6 @@ class _BrowsePageState extends State<BrowsePage> {
               ),
             ),
             const SizedBox(height: 8),
-            // Title — fixed height so all posters are the same size
             SizedBox(
               height: 36,
               child: Text(
@@ -391,18 +482,12 @@ class _BrowsePageState extends State<BrowsePage> {
                             const SizedBox(height: 4),
                             Text(
                               '${playlist.items.length} ${'titles'.tr()}',
-                              style: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 12,
-                              ),
+                              style: TextStyle(color: Colors.grey[500], fontSize: 12),
                             ),
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: Colors.grey[600],
-                      ),
+                      Icon(Icons.chevron_right, color: Colors.grey[600]),
                     ],
                   ),
                 ),
@@ -428,7 +513,6 @@ class _BrowsePageState extends State<BrowsePage> {
   }
 
   void _openPlaylist(Playlist playlist) {
-    // Track playlist viewed
     UserActionService.logPlaylistViewed(
       playlistId: playlist.id,
       playlistTitle: playlist.title,

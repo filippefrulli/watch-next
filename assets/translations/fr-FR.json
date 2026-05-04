@@ -238,5 +238,10 @@
   "streaming_subtitle": "On ne suggérera que des films & séries disponibles sur tes abonnements.",
   "services_selected": "{count} service(s) sélectionné(s)",
   "hero_hint_movie": "ex. 'Un thriller avec un retournement inattendu'",
-  "hero_hint_show": "ex. 'Une courte série à binge-watcher'"
+  "hero_hint_show": "ex. 'Une courte série à binge-watcher'",
+  "trending_this_week": "Tendances cette semaine",
+  "now_in_cinemas": "En ce moment au cinéma",
+  "coming_soon": "Prochainement",
+  "hidden_gems": "Pépites cachées",
+  "new_on": "Nouveau sur"
 }

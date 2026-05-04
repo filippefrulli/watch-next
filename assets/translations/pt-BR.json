@@ -238,5 +238,10 @@
   "streaming_subtitle": "Só sugeriremos filmes e séries que você pode assistir com suas assinaturas.",
   "services_selected": "{count} serviço(s) selecionado(s)",
   "hero_hint_movie": "ex. 'Um thriller com uma reviravolta surpreendente'",
-  "hero_hint_show": "ex. 'Uma série curta para maratonar'"
+  "hero_hint_show": "ex. 'Uma série curta para maratonar'",
+  "trending_this_week": "Em alta esta semana",
+  "now_in_cinemas": "Nos cinemas agora",
+  "coming_soon": "Em breve",
+  "hidden_gems": "Joias escondidas",
+  "new_on": "Novo no"
 }

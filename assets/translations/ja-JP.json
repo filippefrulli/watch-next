@@ -238,5 +238,10 @@
   "streaming_subtitle": "あなたのサブスクで実際に視聴できる作品のみをおすすめします。",
   "services_selected": "{count}件のサービスを選択中",
   "hero_hint_movie": "例: '予想外のどんでん返しがあるスリラー'",
-  "hero_hint_show": "例: '一気見できる短いドラマシリーズ'"
+  "hero_hint_show": "例: '一気見できる短いドラマシリーズ'",
+  "trending_this_week": "今週のトレンド",
+  "now_in_cinemas": "現在上映中",
+  "coming_soon": "まもなく公開",
+  "hidden_gems": "隠れた名作",
+  "new_on": "新着："
 }

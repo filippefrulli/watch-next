@@ -747,6 +747,106 @@ class HttpService {
   }
 
   /// Fetch similar movies or TV shows for a given id
+  Future<List<BrowseItem>> getNowPlayingMovies() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+      String region = prefs.getString('region') ?? 'US';
+
+      final response = await _client
+          .get(Uri.https('api.themoviedb.org', '/3/movie/now_playing', {
+            'api_key': apiKey,
+            'language': lang,
+            'region': region,
+          }))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return [];
+      final results = jsonDecode(response.body)['results'] as List;
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: true)).toList();
+    } catch (e) {
+      log('Error getting now playing: $e');
+      return [];
+    }
+  }
+
+  Future<List<BrowseItem>> getUpcomingMovies() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+      String region = prefs.getString('region') ?? 'US';
+
+      final response = await _client
+          .get(Uri.https('api.themoviedb.org', '/3/movie/upcoming', {
+            'api_key': apiKey,
+            'language': lang,
+            'region': region,
+          }))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return [];
+      final results = jsonDecode(response.body)['results'] as List;
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: true)).toList();
+    } catch (e) {
+      log('Error getting upcoming: $e');
+      return [];
+    }
+  }
+
+  Future<List<BrowseItem>> getHiddenGems({bool isMovie = true}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+      final type = isMovie ? 'movie' : 'tv';
+
+      final response = await _client
+          .get(Uri.https('api.themoviedb.org', '/3/discover/$type', {
+            'api_key': apiKey,
+            'language': lang,
+            'sort_by': 'vote_average.desc',
+            'vote_count.gte': '300',
+            'vote_count.lte': '3000',
+            'vote_average.gte': '7.5',
+            'without_genres': '99,10755', // exclude documentary, kids
+          }))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return [];
+      final results = jsonDecode(response.body)['results'] as List;
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: isMovie)).toList();
+    } catch (e) {
+      log('Error getting hidden gems: $e');
+      return [];
+    }
+  }
+
+  Future<List<BrowseItem>> getNewOnProvider(int providerId, {bool isMovie = true}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String lang = prefs.getString('lang') ?? 'en-US';
+      String region = prefs.getString('region') ?? 'US';
+      final type = isMovie ? 'movie' : 'tv';
+
+      final response = await _client
+          .get(Uri.https('api.themoviedb.org', '/3/discover/$type', {
+            'api_key': apiKey,
+            'language': lang,
+            'watch_region': region,
+            'with_watch_providers': '$providerId',
+            'with_watch_monetization_types': 'flatrate',
+            'sort_by': 'popularity.desc',
+          }))
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return [];
+      final results = jsonDecode(response.body)['results'] as List;
+      return results.map((item) => BrowseItem.fromJson(item, isMovie: isMovie)).toList();
+    } catch (e) {
+      log('Error getting new on provider $providerId: $e');
+      return [];
+    }
+  }
+
   Future<List<BrowseItem>> fetchSimilar(int id, {required bool isMovie}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

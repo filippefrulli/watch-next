@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/region_page.dart';
+import 'package:watch_next/pages/home_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
@@ -75,7 +75,7 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
             ),
           ),
           const SizedBox(height: 20),
-          _stepDots(1),
+          _stepDots(2),
           const SizedBox(height: 20),
           Expanded(child: streamingGrid()),
           const SizedBox(height: 8),
@@ -246,12 +246,12 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
                   UserActionService.logStreamingServicesUpdated();
 
                   if (mounted && seen) {
-                    prefs.setBool('skip_intro', true);
                     Navigator.of(context).pop();
                   } else if (mounted && !seen) {
+                    prefs.setBool('skip_intro', true);
                     Navigator.of(context).pushReplacement(
                       PageRouteBuilder(
-                        pageBuilder: (context, animation, _) => const RegionIntroPage(),
+                        pageBuilder: (context, animation, _) => const TabNavigationPage(),
                         transitionsBuilder: (context, animation, _, child) => SlideTransition(
                           position: Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
                               .chain(CurveTween(curve: Curves.easeInOut))

@@ -337,11 +337,14 @@ class HttpService {
   }
 
   Future<MovieCredits> fetchMovieCredits(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/movie/$id/credits',
-        {'api_key': apiKey},
+        {'api_key': apiKey, 'language': lang},
       ),
     );
 
@@ -351,11 +354,14 @@ class HttpService {
   }
 
   Future<MovieCredits> fetchSeriesCredits(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/tv/$id/credits',
-        {'api_key': apiKey},
+        {'api_key': apiKey, 'language': lang},
       ),
     );
 
@@ -412,11 +418,14 @@ class HttpService {
   Future<List<TrailerResults>> fetchTrailer(int id) async {
     List<TrailerResults> trailerList = [];
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/movie/$id/videos',
-        {'api_key': apiKey, 'language': 'en-US'},
+        {'api_key': apiKey, 'language': lang},
       ),
     );
 
@@ -438,11 +447,14 @@ class HttpService {
   Future<List<TrailerResults>> fetchTrailerSeries(int id) async {
     List<TrailerResults> trailerList = [];
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lang = prefs.getString('lang') ?? 'en-US';
+
     final response = await _client.get(
       Uri.https(
         'api.themoviedb.org',
         '/3/tv/$id/videos',
-        {'api_key': apiKey, 'language': 'en-US'},
+        {'api_key': apiKey, 'language': lang},
       ),
     );
 

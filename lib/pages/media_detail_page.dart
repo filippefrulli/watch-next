@@ -300,13 +300,18 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
       buttonName: widget.isMovie ? 'suggest_similar_movies' : 'suggest_similar_shows',
     );
     final typeLabel = widget.isMovie ? 'Movies' : 'TV shows';
-    final requestString = '$typeLabel similar to ${widget.title}';
+    // Use original title so the English-language prompt receives the most
+    // recognisable form of the title regardless of the user's language.
+    final originalTitle = widget.isMovie
+        ? (_movieDetails?.originalTitle ?? widget.title)
+        : (_seriesDetails?.originalName ?? widget.title);
+    final requestString = '$typeLabel similar to $originalTitle';
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => RecommendationLoadingPage(
           requestString: requestString,
           type: widget.isMovie ? 0 : 1,
-          itemsToNotRecommend: widget.title,
+          itemsToNotRecommend: originalTitle,
         ),
       ),
     );

@@ -2,7 +2,7 @@ import 'package:delayed_display/delayed_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:watch_next/pages/streaming_services_page.dart';
+import 'package:watch_next/pages/region_page.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/utils/app_colors.dart';
 
@@ -153,7 +153,7 @@ class _LanguagePageState extends State<LanguagePage> {
                 } else if (mounted && !seen) {
                   Navigator.of(context).pushReplacement(
                     PageRouteBuilder(
-                      pageBuilder: (context, animation, _) => const StreamingServicesPage(),
+                      pageBuilder: (context, animation, _) => const RegionIntroPage(),
                       transitionsBuilder: (context, animation, _, child) => SlideTransition(
                         position: Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
                             .chain(CurveTween(curve: Curves.easeInOut))

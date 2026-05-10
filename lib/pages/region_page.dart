@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/services/user_action_service.dart';
-import 'package:watch_next/pages/home_page.dart';
+import 'package:watch_next/pages/streaming_services_page.dart';
 import 'package:watch_next/utils/app_colors.dart';
 
 class RegionIntroPage extends StatefulWidget {
@@ -83,7 +83,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              _stepDots(2),
+              _stepDots(1),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -281,12 +281,10 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
                       );
                     }
 
-                    prefs.setBool('skip_intro', true);
-
                     if (mounted) {
                       Navigator.of(context).pushReplacement(
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, _) => const TabNavigationPage(),
+                          pageBuilder: (context, animation, _) => const StreamingServicesPage(),
                           transitionsBuilder: (context, animation, _, child) => SlideTransition(
                             position: Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
                                 .chain(CurveTween(curve: Curves.easeInOut))

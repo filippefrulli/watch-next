@@ -3,7 +3,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -113,7 +112,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
 
   Future<void> _initHints() async {
     final prefs = await SharedPreferences.getInstance();
-    if (kDebugMode) await prefs.remove('swipe_hints_completed');
     final completed = prefs.getBool('swipe_hints_completed') ?? false;
     if (!completed && mounted) setState(() => _hintStep = 1);
   }

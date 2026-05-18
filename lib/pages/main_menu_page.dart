@@ -486,6 +486,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
           type: typeIsMovie,
           includeRentals: _querySettings.includeRentals,
           includePurchases: _querySettings.includePurchases,
+          excludeWatchlist: _querySettings.excludeWatchlist,
+          excludeWatched: _querySettings.excludeWatched,
         ),
       ),
     );

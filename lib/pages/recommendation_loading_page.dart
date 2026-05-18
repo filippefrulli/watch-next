@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -16,6 +17,7 @@ import 'package:watch_next/services/purchase_service.dart';
 import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/query_cache_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/services/not_interested_service.dart';
 import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -29,6 +31,8 @@ class RecommendationLoadingPage extends StatefulWidget {
   final int type;
   final bool includeRentals;
   final bool includePurchases;
+  final bool excludeWatchlist;
+  final bool excludeWatched;
   final String itemsToNotRecommend;
 
   const RecommendationLoadingPage({
@@ -37,6 +41,8 @@ class RecommendationLoadingPage extends StatefulWidget {
     required this.type,
     this.includeRentals = false,
     this.includePurchases = false,
+    this.excludeWatchlist = true,
+    this.excludeWatched = true,
     this.itemsToNotRecommend = '',
   });
 
@@ -59,6 +65,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
   bool filtering = false;
   late String itemsToNotRecommend;
   bool _adLoaded = false;
+  bool _noStreamingMatch = false;
 
   @override
   void initState() {
@@ -72,7 +79,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     super.didChangeDependencies();
     if (!_adLoaded) {
       _adLoaded = true;
-      if (PurchaseService.adsRemoved) return;
+      if (kDebugMode || PurchaseService.adsRemoved) return;
       final preloaded = AdPreloadService.instance.consume();
       if (preloaded != null) {
         // Ad was preloaded while user was typing — show immediately
@@ -131,12 +138,22 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
               itemsToNotRecommend: itemsToNotRecommend,
               includeRentals: widget.includeRentals,
               includePurchases: widget.includePurchases,
+              excludeWatchlist: widget.excludeWatchlist,
+              excludeWatched: widget.excludeWatched,
             ),
           ),
         );
       } else {
-        // If results are empty but no error was thrown, navigate back
         if (mounted) {
+          Fluttertoast.showToast(
+            msg: _noStreamingMatch ? 'no_movies'.tr() : 'no_titles_found'.tr(),
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 4,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
           Navigator.of(context).pop();
         }
       }
@@ -240,13 +257,20 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       final excludedTitlesStr = QueryCacheService.formatExcludedTitlesForPrompt(cachedTitles);
       // Also exclude any seed titles passed in (e.g. the movie we're finding similars for)
       final seedExclusion = widget.itemsToNotRecommend.isNotEmpty ? widget.itemsToNotRecommend : '';
-      // Exclude titles already in the user's watchlist
-      final watchlistItems = await WatchlistService().getWatchlist().first;
+      // Exclude titles already in the user's watchlist or watched history
+      final watchlistItems =
+          widget.excludeWatchlist ? await WatchlistService().getWatchlist().first : <WatchlistItem>[];
       final watchlistTitles = watchlistItems.take(50).map((i) => i.title).join(', ');
+      final watchedItems = widget.excludeWatched ? await WatchedService().getWatchedList() : <WatchedItem>[];
+      final watchedTitles = watchedItems.take(50).map((i) => i.title).join(', ');
+      final notInterestedTitles = await NotInterestedService.getTitles();
+      final notInterestedStr = notInterestedTitles.join(', ');
       final allExcluded = [
         if (excludedTitlesStr.isNotEmpty) excludedTitlesStr,
         if (seedExclusion.isNotEmpty) seedExclusion,
         if (watchlistTitles.isNotEmpty) watchlistTitles,
+        if (watchedTitles.isNotEmpty) watchedTitles,
+        if (notInterestedStr.isNotEmpty) notInterestedStr,
       ].join(', ');
       String doNotRecommend = allExcluded.isNotEmpty ? doNotRecommendPrefix + allExcluded : '';
 
@@ -339,7 +363,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
         final openAI = OpenAIClient(apiKey: openAiKey);
         final openAiResponse = await openAI.createChatCompletion(
           request: CreateChatCompletionRequest(
-            model: ChatCompletionModel.modelId('gpt-5.4-mini'),
+            model: ChatCompletionModel.modelId('gpt-5-mini'),
             messages: [
               ChatCompletionMessage.user(
                 content: ChatCompletionUserMessageContent.string(queryContent),
@@ -371,7 +395,14 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       });
 
       final parsed = await parseResponse(responseContent);
-      return await filterProviders(parsed);
+      if (parsed.isEmpty) return [];
+      final filtered = await filterProviders(parsed);
+
+      // Hard filter: remove any result the user already has in their watchlist or watched history
+      final watchlistIds = watchlistItems.map((i) => i.mediaId).toSet();
+      final watchedIds = watchedItems.map((i) => i.mediaId).toSet();
+      final excludedIds = watchlistIds.union(watchedIds);
+      return filtered.where((w) => w.id == null || !excludedIds.contains(w.id)).toList();
     } catch (e) {
       // Log error to Firebase Analytics
       FirebaseAnalytics.instance.logEvent(
@@ -418,16 +449,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           'query': widget.requestString,
         },
       );
-      Navigator.pop(context);
-      Fluttertoast.showToast(
-        msg: "prompt_issue".tr(),
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      return [];
     }
 
     // Parallelize HTTP requests using Future.wait
@@ -443,6 +465,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
               tmdbRating: movieResult.voteAverage,
               id: movieResult.id,
               title: movieResult.title,
+              genreIds: movieResult.genreIds,
             );
           }
         } else {
@@ -454,6 +477,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
               tmdbRating: seriesResult.voteAverage,
               id: seriesResult.id,
               title: seriesResult.name,
+              genreIds: seriesResult.genreIds,
             );
           }
         }
@@ -513,17 +537,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       filtering = false;
     });
 
-    if (watchObjectsWithProviders.isEmpty && mounted) {
-      Navigator.of(context).pop();
-      Fluttertoast.showToast(
-        msg: "no_movies".tr(),
-        timeInSecForIosWeb: 4,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+    if (watchObjectsWithProviders.isEmpty) {
+      _noStreamingMatch = true;
       return [];
     }
 

@@ -325,7 +325,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                       const SizedBox(width: 6),
                                       Flexible(
                                         child: Text(
-                                          _isInWatchlist ? 'remove_from_watchlist'.tr() : 'add_to_watchlist'.tr(),
+                                          'watchlist'.tr(),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -371,9 +371,9 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                                       const SizedBox(width: 6),
                                       Flexible(
                                         child: Text(
-                                          _isWatched
-                                              ? '${"watched_rating".tr()} $_watchedRating/10'
-                                              : 'mark_watched'.tr(),
+                                          _isWatched && _watchedRating != null
+                                              ? '${'watched'.tr()} · $_watchedRating/10'
+                                              : 'watched'.tr(),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: Theme.of(context).textTheme.displaySmall?.copyWith(

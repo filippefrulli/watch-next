@@ -553,7 +553,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
                       duration: const Duration(milliseconds: 200),
                       transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
                       child: Icon(
-                        _isWatched ? Icons.check_circle : Icons.check_circle_outline,
+                        Icons.check,
                         key: ValueKey(_isWatched),
                         color: _isWatched ? Colors.green[400] : Colors.white,
                         size: 18,

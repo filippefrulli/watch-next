@@ -12,6 +12,8 @@ class ActionButtons extends StatelessWidget {
   final bool isWatched;
   final int? watchedRating;
   final int mediaType;
+  final VoidCallback? onNotInterestedPressed;
+  final bool isNotInterested;
 
   const ActionButtons({
     super.key,
@@ -23,16 +25,26 @@ class ActionButtons extends StatelessWidget {
     this.isWatched = false,
     this.watchedRating,
     required this.mediaType,
+    this.onNotInterestedPressed,
+    this.isNotInterested = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        if (onWatchlistPressed != null) _buildWatchlistButton(context),
-        if (onWatchlistPressed != null && onWatchedPressed != null) const SizedBox(height: 8),
-        if (onWatchedPressed != null) _buildWatchedButton(context),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (onWatchlistPressed != null) _buildWatchlistButton(context),
+            if (onWatchlistPressed != null && onWatchedPressed != null) const SizedBox(width: 8),
+            if (onWatchedPressed != null) _buildWatchedButton(context),
+            if (onWatchedPressed != null && onNotInterestedPressed != null) const SizedBox(width: 8),
+            if (onNotInterestedPressed != null) _buildNotInterestedButton(context),
+          ],
+        ),
         if ((onWatchlistPressed != null || onWatchedPressed != null) && showReloadButton) const SizedBox(height: 8),
         if (showReloadButton) _buildReloadButton(context),
       ],
@@ -41,6 +53,7 @@ class ActionButtons extends StatelessWidget {
 
   Widget _buildWatchlistButton(BuildContext context) {
     return Container(
+      width: 48,
       height: 48,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
@@ -51,35 +64,18 @@ class ActionButtons extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: onWatchlistPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
-                    return ScaleTransition(
-                      scale: animation,
-                      child: child,
-                    );
-                  },
-                  child: Icon(
-                    isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                    key: ValueKey<bool>(isInWatchlist),
-                    color: isInWatchlist ? Theme.of(context).colorScheme.secondary : Colors.white,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'watchlist'.tr(),
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                ),
-              ],
+          child: Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: Icon(
+                isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
+                key: ValueKey<bool>(isInWatchlist),
+                color: isInWatchlist ? Theme.of(context).colorScheme.secondary : Colors.white,
+                size: 22,
+              ),
             ),
           ),
         ),
@@ -89,6 +85,7 @@ class ActionButtons extends StatelessWidget {
 
   Widget _buildWatchedButton(BuildContext context) {
     return Container(
+      width: 48,
       height: 48,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.tertiary,
@@ -99,30 +96,46 @@ class ActionButtons extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: onWatchedPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                  child: Icon(
-                    isWatched ? Icons.check_circle : Icons.check_circle_outline,
-                    key: ValueKey<bool>(isWatched),
-                    color: isWatched ? Colors.green[400] : Colors.white,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  isWatched && watchedRating != null ? '${'watched'.tr()} · $watchedRating/10' : 'watched'.tr(),
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                ),
-              ],
+          child: Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+              child: Icon(
+                Icons.check,
+                key: ValueKey<bool>(isWatched),
+                color: isWatched ? Colors.green[400] : Colors.white,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotInterestedButton(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.tertiary,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onNotInterestedPressed,
+          child: Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+              child: Icon(
+                Icons.close,
+                key: ValueKey<bool>(isNotInterested),
+                color: isNotInterested ? Theme.of(context).colorScheme.secondary : Colors.white,
+                size: 22,
+              ),
             ),
           ),
         ),

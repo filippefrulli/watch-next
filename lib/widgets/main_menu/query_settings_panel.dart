@@ -29,6 +29,9 @@ class QuerySettings {
   // Availability options
   final bool includeRentals;
   final bool includePurchases;
+  // Exclusion options
+  final bool excludeWatchlist;
+  final bool excludeWatched;
 
   const QuerySettings({
     this.releaseFilter = ReleaseFilter.any,
@@ -39,6 +42,8 @@ class QuerySettings {
     this.seasonCountFilter = SeasonCountFilter.any,
     this.includeRentals = false,
     this.includePurchases = false,
+    this.excludeWatchlist = true,
+    this.excludeWatched = true,
   });
 
   QuerySettings copyWith({
@@ -50,6 +55,8 @@ class QuerySettings {
     SeasonCountFilter? seasonCountFilter,
     bool? includeRentals,
     bool? includePurchases,
+    bool? excludeWatchlist,
+    bool? excludeWatched,
   }) {
     return QuerySettings(
       releaseFilter: releaseFilter ?? this.releaseFilter,
@@ -60,6 +67,8 @@ class QuerySettings {
       seasonCountFilter: seasonCountFilter ?? this.seasonCountFilter,
       includeRentals: includeRentals ?? this.includeRentals,
       includePurchases: includePurchases ?? this.includePurchases,
+      excludeWatchlist: excludeWatchlist ?? this.excludeWatchlist,
+      excludeWatched: excludeWatched ?? this.excludeWatched,
     );
   }
 
@@ -150,7 +159,9 @@ class QuerySettings {
       completionFilter != CompletionFilter.any ||
       seasonCountFilter != SeasonCountFilter.any ||
       includeRentals ||
-      includePurchases;
+      includePurchases ||
+      !excludeWatchlist ||
+      !excludeWatched;
 }
 
 class QuerySettingsService {
@@ -162,6 +173,8 @@ class QuerySettingsService {
   static const String _seasonCountFilterKey = 'query_season_count_filter';
   static const String _includeRentalsKey = 'query_include_rentals';
   static const String _includePurchasesKey = 'query_include_purchases';
+  static const String _excludeWatchlistKey = 'query_exclude_watchlist';
+  static const String _excludeWatchedKey = 'query_exclude_watched';
 
   static Future<QuerySettings> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -173,6 +186,8 @@ class QuerySettingsService {
     final seasonCountIndex = prefs.getInt(_seasonCountFilterKey) ?? 0;
     final includeRentals = prefs.getBool(_includeRentalsKey) ?? false;
     final includePurchases = prefs.getBool(_includePurchasesKey) ?? false;
+    final excludeWatchlist = prefs.getBool(_excludeWatchlistKey) ?? true;
+    final excludeWatched = prefs.getBool(_excludeWatchedKey) ?? true;
 
     return QuerySettings(
       releaseFilter: ReleaseFilter.values[releaseIndex],
@@ -183,6 +198,8 @@ class QuerySettingsService {
       seasonCountFilter: SeasonCountFilter.values[seasonCountIndex],
       includeRentals: includeRentals,
       includePurchases: includePurchases,
+      excludeWatchlist: excludeWatchlist,
+      excludeWatched: excludeWatched,
     );
   }
 
@@ -196,6 +213,8 @@ class QuerySettingsService {
     await prefs.setInt(_seasonCountFilterKey, settings.seasonCountFilter.index);
     await prefs.setBool(_includeRentalsKey, settings.includeRentals);
     await prefs.setBool(_includePurchasesKey, settings.includePurchases);
+    await prefs.setBool(_excludeWatchlistKey, settings.excludeWatchlist);
+    await prefs.setBool(_excludeWatchedKey, settings.excludeWatched);
   }
 }
 
@@ -289,6 +308,8 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
                   ],
                   const SizedBox(height: 24),
                   _buildAvailabilitySection(context),
+                  const SizedBox(height: 24),
+                  _buildExclusionSection(context),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -642,6 +663,38 @@ class _QuerySettingsPanelState extends State<QuerySettingsPanel> {
           value: _settings.includePurchases,
           onChanged: (value) => _updateSettings(
             _settings.copyWith(includePurchases: value),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExclusionSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'exclude_from_results'.tr(),
+          style: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildCheckboxTile(
+          label: 'exclude_watchlist'.tr(),
+          value: _settings.excludeWatchlist,
+          onChanged: (value) => _updateSettings(
+            _settings.copyWith(excludeWatchlist: value),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildCheckboxTile(
+          label: 'exclude_watched'.tr(),
+          value: _settings.excludeWatched,
+          onChanged: (value) => _updateSettings(
+            _settings.copyWith(excludeWatched: value),
           ),
         ),
       ],

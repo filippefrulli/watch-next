@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:watch_next/utils/secrets.dart';
@@ -22,7 +23,7 @@ class AdPreloadService {
   /// Call this as early as possible (e.g. when user starts typing).
   /// Safe to call multiple times — will no-op if already loading/loaded.
   void preload(BuildContext context) {
-    if (_isLoaded || _isLoading) return;
+    if (kDebugMode || _isLoaded || _isLoading) return;
     _isLoading = true;
     _bgColor = Theme.of(context).colorScheme.primary;
     _buildAndLoad();

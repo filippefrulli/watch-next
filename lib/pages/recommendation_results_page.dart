@@ -3,13 +3,16 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/objects/movie_credits.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/not_interested_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
@@ -18,6 +21,7 @@ import 'package:watch_next/widgets/shared/confirm_dialog.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_content.dart';
 import 'package:watch_next/widgets/recommendation_results/movie_info_panel.dart';
+import 'package:watch_next/widgets/recommendation_results/swipe_hint_overlay.dart';
 
 class RecommendationResultsPage extends StatefulWidget {
   final List<WatchObject> watchObjects;
@@ -26,6 +30,8 @@ class RecommendationResultsPage extends StatefulWidget {
   final String itemsToNotRecommend;
   final bool includeRentals;
   final bool includePurchases;
+  final bool excludeWatchlist;
+  final bool excludeWatched;
 
   const RecommendationResultsPage({
     super.key,
@@ -35,6 +41,8 @@ class RecommendationResultsPage extends StatefulWidget {
     required this.itemsToNotRecommend,
     this.includeRentals = false,
     this.includePurchases = false,
+    this.excludeWatchlist = true,
+    this.excludeWatched = true,
   });
 
   @override
@@ -54,6 +62,8 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   bool _isInWatchlist = false;
   bool _isWatched = false;
   int? _watchedRating;
+  bool _isNotInterested = false;
+  int _hintStep = 0; // 0=none, 1=swipe to browse, 2=swipe up for details
 
   Future<MovieCredits> movieCredits = Future.value(MovieCredits());
 
@@ -75,11 +85,47 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
     selectedWatchObject = watchObjectsList[index];
     _checkIfInWatchlist();
     _checkIfWatched();
+    _checkIfNotInterested();
 
     // Preload the first poster
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadNextPoster();
     });
+
+    _initHints();
+  }
+
+  void _openPanel() {
+    movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
+    if (widget.type == 0) {
+      HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
+        setState(() => trailerList = value);
+        waitForImages();
+      });
+    } else {
+      HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
+        setState(() => trailerList = value);
+        waitForImages();
+      });
+    }
+    pc.open();
+  }
+
+  Future<void> _initHints() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (kDebugMode) await prefs.remove('swipe_hints_completed');
+    final completed = prefs.getBool('swipe_hints_completed') ?? false;
+    if (!completed && mounted) setState(() => _hintStep = 1);
+  }
+
+  void _advanceHint(int fromStep) {
+    if (_hintStep != fromStep) return;
+    if (fromStep == 2) {
+      setState(() => _hintStep = 0);
+      SharedPreferences.getInstance().then((p) => p.setBool('swipe_hints_completed', true));
+    } else {
+      setState(() => _hintStep = fromStep + 1);
+    }
   }
 
   Future<void> _checkIfInWatchlist() async {
@@ -156,6 +202,35 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
     }
   }
 
+  Future<void> _checkIfNotInterested() async {
+    final title = selectedWatchObject.title;
+    if (title == null) return;
+    final result = await NotInterestedService.contains(title);
+    if (mounted) setState(() => _isNotInterested = result);
+  }
+
+  Future<void> _markNotInterested() async {
+    final title = selectedWatchObject.title;
+    if (title == null || title.isEmpty) return;
+    await NotInterestedService.addTitle(title);
+    if (mounted) {
+      setState(() => _isNotInterested = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'not_interested_toast'.tr(),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: Colors.red[700],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   Future<void> _toggleWatchlist() async {
     if (selectedWatchObject.id == null) return;
 
@@ -222,30 +297,42 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: SlidingUpPanel(
-        controller: pc,
-        margin: const EdgeInsets.all(8.0),
-        panel: MovieInfoPanel(
-          mediaId: selectedWatchObject.id!,
-          title: selectedWatchObject.title ?? '',
-          overview: selectedWatchObject.overview ?? '',
-          tmdbRating: selectedWatchObject.tmdbRating,
-          isMovie: widget.type == 0,
-          posterPath: selectedWatchObject.posterPath,
-          trailerList: trailerList,
-          trailerImages: trailerImages,
-          onTrailerTap: _launchURL,
-        ),
-        borderRadius: const BorderRadius.all(
-          Radius.circular(25),
-        ),
-        collapsed: Container(),
-        minHeight: 0,
-        maxHeight: MediaQuery.of(context).size.height * 0.90,
-        backdropEnabled: true,
-        backdropOpacity: 0.55,
-        color: Theme.of(context).colorScheme.primary,
-        body: pageBody(),
+      body: Stack(
+        children: [
+          SlidingUpPanel(
+            controller: pc,
+            margin: const EdgeInsets.all(8.0),
+            panel: MovieInfoPanel(
+              mediaId: selectedWatchObject.id!,
+              title: selectedWatchObject.title ?? '',
+              overview: selectedWatchObject.overview ?? '',
+              tmdbRating: selectedWatchObject.tmdbRating,
+              isMovie: widget.type == 0,
+              posterPath: selectedWatchObject.posterPath,
+              trailerList: trailerList,
+              trailerImages: trailerImages,
+              onTrailerTap: _launchURL,
+            ),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(25),
+            ),
+            collapsed: Container(),
+            minHeight: 0,
+            maxHeight: MediaQuery.of(context).size.height * 0.90,
+            backdropEnabled: true,
+            backdropOpacity: 0.55,
+            color: Theme.of(context).colorScheme.primary,
+            body: pageBody(),
+          ),
+          if (_hintStep > 0)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Center(
+                  child: SwipeHintOverlay(key: ValueKey(_hintStep), step: _hintStep, isFirstItem: index == 0),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -266,30 +353,42 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
           const SizedBox(height: 8),
           Expanded(
             child: GestureDetector(
-              onHorizontalDragEnd: (details) {
-                final velocity = details.primaryVelocity ?? 0;
-                if (velocity < -300 && index < length - 1) {
-                  // Swipe left → next
-                  setState(() {
-                    index++;
-                    selectedWatchObject = watchObjectsList[index];
-                  });
-                  _checkIfInWatchlist();
-                  _checkIfWatched();
-                  _preloadNextPoster();
-                } else if (velocity > 300 && index > 0) {
-                  // Swipe right → previous
-                  setState(() {
-                    index--;
-                    selectedWatchObject = watchObjectsList[index];
-                  });
-                  _checkIfInWatchlist();
-                  _checkIfWatched();
-                  _preloadNextPoster();
+              onPanEnd: (details) {
+                final dx = details.velocity.pixelsPerSecond.dx;
+                final dy = details.velocity.pixelsPerSecond.dy;
+                if (dy.abs() > dx.abs()) {
+                  if (dy < -300) {
+                    _advanceHint(2);
+                    _openPanel();
+                  }
+                } else {
+                  if (dx < -300 && index < length - 1) {
+                    _advanceHint(1);
+                    setState(() {
+                      index++;
+                      selectedWatchObject = watchObjectsList[index];
+                    });
+                    _checkIfInWatchlist();
+                    _checkIfWatched();
+                    _checkIfNotInterested();
+                    _preloadNextPoster();
+                  } else if (dx > 300 && index > 0) {
+                    _advanceHint(1);
+                    setState(() {
+                      index--;
+                      selectedWatchObject = watchObjectsList[index];
+                    });
+                    _checkIfInWatchlist();
+                    _checkIfWatched();
+                    _checkIfNotInterested();
+                    _preloadNextPoster();
+                  }
                 }
               },
               child: RecommendationContent(
               posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
+              overview: selectedWatchObject.overview,
+              genreIds: selectedWatchObject.genreIds,
               watchProviders: selectedWatchObject.watchProviders,
               servicesList: servicesList,
               currentIndex: index,
@@ -298,51 +397,12 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               isInWatchlist: _isInWatchlist,
               isWatched: _isWatched,
               watchedRating: _watchedRating,
+              isNotInterested: _isNotInterested,
               isRentOnly: selectedWatchObject.isRentOnly,
               isBuyOnly: selectedWatchObject.isBuyOnly,
               onWatchlistPressed: _toggleWatchlist,
               onWatchedPressed: _toggleWatched,
-              onPrevious: () {
-                setState(() {
-                  if (index > 0) {
-                    index--;
-                    selectedWatchObject = watchObjectsList[index];
-                  }
-                });
-                _checkIfInWatchlist();
-                _checkIfWatched();
-                _preloadNextPoster();
-              },
-              onNext: () {
-                setState(() {
-                  if (index < length - 1) {
-                    index++;
-                    selectedWatchObject = watchObjectsList[index];
-                  }
-                });
-                _checkIfInWatchlist();
-                _checkIfWatched();
-                _preloadNextPoster();
-              },
-              onInfoPressed: () async {
-                movieCredits = HttpService().fetchMovieCredits(selectedWatchObject.id!);
-                if (widget.type == 0) {
-                  HttpService().fetchTrailer(selectedWatchObject.id!).then((value) {
-                    setState(() {
-                      trailerList = value;
-                    });
-                    waitForImages();
-                  });
-                } else {
-                  HttpService().fetchTrailerSeries(selectedWatchObject.id!).then((value) {
-                    setState(() {
-                      trailerList = value;
-                    });
-                    waitForImages();
-                  });
-                }
-                pc.open();
-              },
+              onNotInterestedPressed: _markNotInterested,
               onReloadPressed: () {
                 // Navigate back to loading page for new recommendations
                 Navigator.of(context).pushReplacement(
@@ -352,6 +412,8 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                       type: widget.type,
                       includeRentals: widget.includeRentals,
                       includePurchases: widget.includePurchases,
+                      excludeWatchlist: widget.excludeWatchlist,
+                      excludeWatched: widget.excludeWatched,
                       itemsToNotRecommend: widget.itemsToNotRecommend,
                     ),
                   ),
@@ -423,6 +485,7 @@ class WatchObject {
   int? id;
   String? title;
   List<int>? watchProviders;
+  List<int>? genreIds;
   bool isRentOnly;
   bool isBuyOnly;
 
@@ -433,6 +496,7 @@ class WatchObject {
     this.id,
     this.title,
     this.watchProviders,
+    this.genreIds,
     this.isRentOnly = false,
     this.isBuyOnly = false,
   });

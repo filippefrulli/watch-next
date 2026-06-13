@@ -108,8 +108,8 @@ class LoadedPlaylistItem {
   final String title;
   final String? posterPath;
   final String? overview;
-  final double? voteAverage;
   final String? releaseDate;
+  final String? imdbId;
   final List<int> streamingProviderIds;
   final List<int> rentProviderIds;
   final List<int> buyProviderIds;
@@ -120,8 +120,8 @@ class LoadedPlaylistItem {
     required this.title,
     this.posterPath,
     this.overview,
-    this.voteAverage,
     this.releaseDate,
+    this.imdbId,
     this.streamingProviderIds = const [],
     this.rentProviderIds = const [],
     this.buyProviderIds = const [],

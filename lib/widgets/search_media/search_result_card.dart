@@ -279,27 +279,6 @@ class _SearchResultCardState extends State<SearchResultCard> {
             ],
           ],
         ),
-        if (result.voteAverage != null && result.voteAverage! > 0) ...[
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(
-                Icons.star,
-                color: context.appColors.accent,
-                size: 16,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                result.voteAverage!.toStringAsFixed(1),
-                style: TextStyle(
-                  color: Colors.grey[300],
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ],
       ],
     );
   }

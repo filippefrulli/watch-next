@@ -15,6 +15,7 @@ import 'package:watch_next/services/not_interested_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
+import 'package:watch_next/services/share_service.dart';
 import 'package:watch_next/widgets/watched/rating_dialog.dart';
 import 'package:watch_next/widgets/shared/confirm_dialog.dart';
 import 'package:watch_next/widgets/recommendation_results/recommendation_header.dart';
@@ -280,6 +281,30 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
     }
   }
 
+  Future<void> _shareSelected() async {
+    UserActionService.logButtonPressed(buttonName: 'share_media');
+    await ShareService.shareMedia(
+      title: selectedWatchObject.title ?? '',
+      posterPath: selectedWatchObject.posterPath,
+      message: 'share_message'.tr(args: [selectedWatchObject.title ?? '', ShareService.storeUrl]),
+    );
+  }
+
+  Future<void> _openWatchLink() async {
+    if (selectedWatchObject.id == null) return;
+    UserActionService.logButtonPressed(buttonName: 'watch_now_provider');
+    final link = await HttpService().getWatchLink(selectedWatchObject.id!, widget.type == 0);
+    if (link == null || link.isEmpty) return;
+    final uri = Uri.parse(link);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('could_not_open_link'.tr())),
+      );
+    }
+  }
+
   // Preload next poster image to cache
   void _preloadNextPoster() {
     if (index < length - 1 && watchObjectsList.isNotEmpty) {
@@ -304,7 +329,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               mediaId: selectedWatchObject.id!,
               title: selectedWatchObject.title ?? '',
               overview: selectedWatchObject.overview ?? '',
-              tmdbRating: selectedWatchObject.tmdbRating,
               isMovie: widget.type == 0,
               posterPath: selectedWatchObject.posterPath,
               trailerList: trailerList,
@@ -344,6 +368,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
             currentIndex: index,
             totalCount: length,
             isLoading: false,
+            onShare: _shareSelected,
             onClose: () {
               Navigator.of(context).pop();
             },
@@ -398,6 +423,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               isNotInterested: _isNotInterested,
               isRentOnly: selectedWatchObject.isRentOnly,
               isBuyOnly: selectedWatchObject.isBuyOnly,
+              onProviderTap: _openWatchLink,
               onWatchlistPressed: _toggleWatchlist,
               onWatchedPressed: _toggleWatched,
               onNotInterestedPressed: _markNotInterested,
@@ -479,7 +505,6 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
 class WatchObject {
   String? posterPath;
   String? overview;
-  double? tmdbRating;
   int? id;
   String? title;
   List<int>? watchProviders;
@@ -490,7 +515,6 @@ class WatchObject {
   WatchObject({
     this.posterPath,
     this.overview,
-    this.tmdbRating,
     this.id,
     this.title,
     this.watchProviders,

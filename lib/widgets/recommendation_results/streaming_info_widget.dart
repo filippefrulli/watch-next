@@ -10,6 +10,7 @@ class StreamingInfoWidget extends StatelessWidget {
   final Future<dynamic> servicesList;
   final bool isRentOnly;
   final bool isBuyOnly;
+  final VoidCallback? onTap;
 
   const StreamingInfoWidget({
     super.key,
@@ -17,6 +18,7 @@ class StreamingInfoWidget extends StatelessWidget {
     required this.servicesList,
     this.isRentOnly = false,
     this.isBuyOnly = false,
+    this.onTap,
   });
 
   String _getAvailabilityLabel() {
@@ -36,28 +38,53 @@ class StreamingInfoWidget extends StatelessWidget {
       return Container();
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            _getAvailabilityLabel(),
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1),
           ),
-          const SizedBox(height: 6),
-          _streamingLogo(),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                _getAvailabilityLabel(),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 6),
+              _streamingLogo(),
+              if (onTap != null) ...[
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'watch_now'.tr(),
+                      style: TextStyle(
+                        color: context.appColors.accent,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(Icons.open_in_new, color: context.appColors.accent, size: 12),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }

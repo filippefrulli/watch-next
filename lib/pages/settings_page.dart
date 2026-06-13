@@ -290,7 +290,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Purchased — thank you!',
+                  'Purchased, thank you!',
                   style: TextStyle(color: Colors.grey[500], fontSize: 13),
                 ),
               ],
@@ -356,7 +356,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               child: Text(
-                price != null ? 'Remove Ads — $price' : 'Remove Ads',
+                price != null ? 'Remove Ads: $price' : 'Remove Ads',
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
               ),
             ),
@@ -560,7 +560,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Container(
                         height: 48,
                         decoration: BoxDecoration(
-                          color: isSubmitting ? context.appColors.accent.withValues(alpha: 0.7) : context.appColors.accent,
+                          color:
+                              isSubmitting ? context.appColors.accent.withValues(alpha: 0.7) : context.appColors.accent,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Material(

@@ -535,7 +535,53 @@ class HttpService {
       streaming: getServicesByIds(provider.flatrate),
       rent: getServicesByIds(provider.rent),
       buy: getServicesByIds(provider.buy),
+      link: provider.link,
     );
+  }
+
+  /// Returns the TMDB-provided JustWatch deep link for a title in the user's
+  /// region, or null if unavailable. Used by the "Play on" / "Where to watch"
+  /// actions to send the user straight to a page where they can start watching.
+  Future<String?> getWatchLink(int id, bool isMovie) async {
+    try {
+      final endpoint = isMovie ? '/3/movie/$id/watch/providers' : '/3/tv/$id/watch/providers';
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', endpoint, {'api_key': apiKey, 'language': 'en-US'}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return null;
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String region = prefs.getString('region') ?? 'DE';
+
+      final results = jsonDecode(response.body)["results"];
+      if (results == null || !results.keys.toList().contains(region)) return null;
+
+      return ProviderRegion.fromJson(results[region]).link;
+    } catch (e) {
+      log('Error getting watch link: $e');
+      return null;
+    }
+  }
+
+  /// Fetches the IMDb id for a TV series (movies already include it in their
+  /// details payload). Returns null on any failure.
+  Future<String?> fetchSeriesImdbId(int id) async {
+    try {
+      final response = await _client
+          .get(
+            Uri.https('api.themoviedb.org', '/3/tv/$id/external_ids', {'api_key': apiKey}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return null;
+      return jsonDecode(response.body)['imdb_id'] as String?;
+    } catch (e) {
+      log('Error getting series IMDb id: $e');
+      return null;
+    }
   }
 
   Future<List<MultiSearchResult>> multiSearch(String query) async {
@@ -1011,10 +1057,15 @@ class CategorizedWatchProviders {
   final List<StreamingService> rent;
   final List<StreamingService> buy;
 
+  /// JustWatch deep link (provided by TMDB) for the title in the user's region.
+  /// Opens a page where the user can jump into the streaming service.
+  final String? link;
+
   CategorizedWatchProviders({
     required this.streaming,
     required this.rent,
     required this.buy,
+    this.link,
   });
 
   bool get isEmpty => streaming.isEmpty && rent.isEmpty && buy.isEmpty;

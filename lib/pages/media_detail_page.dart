@@ -7,6 +7,8 @@ import 'package:watch_next/services/http_service.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/services/ratings_service.dart';
+import 'package:watch_next/services/share_service.dart';
 import 'package:watch_next/widgets/shared/native_ad_widget.dart';
 import 'package:watch_next/widgets/shared/confirm_dialog.dart';
 import 'package:watch_next/services/watched_service.dart';
@@ -53,6 +55,10 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
   List<StreamingService> _buyProviders = [];
   List<int> _userServiceIds = [];
   String _errorMessage = '';
+  String? _watchLink;
+
+  // External ratings (IMDb / Rotten Tomatoes / Metacritic) from OMDb
+  ExternalRatings _ratings = const ExternalRatings();
 
   // Details state
   bool _isDetailsLoading = true;
@@ -105,6 +111,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         _streamingProviders = categorizedProviders.streaming;
         _rentProviders = categorizedProviders.rent;
         _buyProviders = categorizedProviders.buy;
+        _watchLink = categorizedProviders.link;
         _isLoading = false;
       });
     } catch (e) {
@@ -135,6 +142,7 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
             _isDetailsLoading = false;
           });
         }
+        _loadExternalRatings(details.imdbId);
       } else {
         final detailsFuture = HttpService().fetchSeriesDetails(widget.mediaId);
         final creditsFuture = HttpService().fetchSeriesCredits(widget.mediaId);
@@ -153,6 +161,9 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
             _isDetailsLoading = false;
           });
         }
+        // Series details don't include the IMDb id — look it up separately.
+        final imdbId = await HttpService().fetchSeriesImdbId(widget.mediaId);
+        _loadExternalRatings(imdbId);
       }
       // Load thumbnail images for trailers
       await _loadTrailerImages();
@@ -318,6 +329,34 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
     if (mounted) setState(() => _isGenerating = false);
   }
 
+  Future<void> _loadExternalRatings(String? imdbId) async {
+    final ratings = await RatingsService.fetchByImdbId(imdbId);
+    if (mounted && ratings.hasAny) setState(() => _ratings = ratings);
+  }
+
+  Future<void> _openWatchLink() async {
+    final link = _watchLink;
+    if (link == null || link.isEmpty) return;
+    UserActionService.logButtonPressed(buttonName: 'watch_now_provider');
+    final uri = Uri.parse(link);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('could_not_open_link'.tr())),
+      );
+    }
+  }
+
+  Future<void> _shareMedia() async {
+    UserActionService.logButtonPressed(buttonName: 'share_media');
+    await ShareService.shareMedia(
+      title: widget.title,
+      posterPath: widget.posterPath,
+      message: 'share_message'.tr(args: [widget.title, ShareService.storeUrl]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -360,6 +399,13 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.ios_share, color: Colors.white),
+              tooltip: 'share'.tr(),
+              onPressed: _shareMedia,
+            ),
+          ],
           title: Text(
             widget.title,
             style: const TextStyle(
@@ -622,8 +668,11 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
         _buildMetaRow([
           if (movie.releaseDate != null && movie.releaseDate!.length >= 4) movie.releaseDate!.substring(0, 4),
           if (movie.runtime != null && movie.runtime! > 0) '${movie.runtime} min',
-          if (movie.voteAverage != null && movie.voteAverage! > 0) '⭐ ${movie.voteAverage!.toStringAsFixed(1)}',
         ]),
+        if (_ratings.hasAny) ...[
+          const SizedBox(height: 14),
+          _buildRatingsRow(),
+        ],
         const SizedBox(height: 16),
         // Genres
         if (movie.genres != null && movie.genres!.isNotEmpty) ...[
@@ -697,8 +746,11 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
           if (series.firstAirDate != null && series.firstAirDate!.length >= 4) series.firstAirDate!.substring(0, 4),
           if (series.numberOfSeasons != null) '${series.numberOfSeasons} ${'seasons'.tr()}',
           if (series.numberOfEpisodes != null) '${series.numberOfEpisodes} ep.',
-          if (series.voteAverage != null && series.voteAverage! > 0) '⭐ ${series.voteAverage!.toStringAsFixed(1)}',
         ]),
+        if (_ratings.hasAny) ...[
+          const SizedBox(height: 14),
+          _buildRatingsRow(),
+        ],
         const SizedBox(height: 16),
         // Genres
         if (series.genres != null && series.genres!.isNotEmpty) ...[
@@ -878,6 +930,47 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
                 ),
               ))
           .toList(),
+    );
+  }
+
+  Widget _buildRatingsRow() {
+    final chips = <Widget>[
+      if (_ratings.imdb != null) _ratingChip('IMDb', '${_ratings.imdb}', const Color(0xFFF5C518), Colors.black),
+      if (_ratings.rottenTomatoes != null)
+        _ratingChip('🍅', _ratings.rottenTomatoes!, const Color(0xFFFA320A), Colors.white),
+      if (_ratings.metacritic != null)
+        _ratingChip('Metacritic', _ratings.metacritic!, const Color(0xFF00CE7A), Colors.black),
+    ];
+    return Wrap(spacing: 8, runSpacing: 6, children: chips);
+  }
+
+  Widget _ratingChip(String label, String value, Color badgeColor, Color labelTextColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.tertiary,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: context.appColors.surface, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(color: badgeColor, borderRadius: BorderRadius.circular(4)),
+            child: Text(
+              label,
+              style: TextStyle(color: labelTextColor, fontSize: 11, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            value,
+            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(width: 2),
+        ],
+      ),
     );
   }
 
@@ -1184,19 +1277,25 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
   }
 
   Widget _buildProviderCard(StreamingService provider, bool isSubscribed, {bool showCheckmark = true}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
+    final canOpen = _watchLink != null && _watchLink!.isNotEmpty;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: canOpen ? _openWatchLink : null,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSubscribed ? Colors.green : Theme.of(context).colorScheme.outline,
-          width: isSubscribed ? 2 : 1,
-        ),
-      ),
-      child: Row(
-        children: [
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSubscribed ? Colors.green : Theme.of(context).colorScheme.outline,
+              width: isSubscribed ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: provider.logoPath != null
@@ -1237,7 +1336,13 @@ class _MediaDetailPageState extends State<MediaDetailPage> with SingleTickerProv
               decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
               child: const Icon(Icons.check, color: Colors.white, size: 20),
             ),
-        ],
+          if (canOpen) ...[
+            const SizedBox(width: 8),
+            Icon(Icons.open_in_new, color: Colors.grey[500], size: 18),
+          ],
+            ],
+          ),
+        ),
       ),
     );
   }

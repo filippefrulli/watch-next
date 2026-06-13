@@ -5,6 +5,7 @@ import 'package:watch_next/objects/playlist.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/database_service.dart';
 import 'package:watch_next/services/playlist_service.dart';
+import 'package:watch_next/services/ratings_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/utils/app_colors.dart';
 
@@ -24,6 +25,8 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
   final PlaylistService _playlistService = PlaylistService();
   List<LoadedPlaylistItem> _items = [];
   List<int> _userServiceIds = [];
+  // tmdbId → IMDb rating string (e.g. "8.7")
+  final Map<int, String?> _imdbRatings = {};
   bool _isLoading = true;
   String? _error;
 
@@ -51,6 +54,16 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
           _items = items;
           _isLoading = false;
         });
+      }
+
+      // Fetch IMDb ratings lazily after items are visible
+      for (final item in items) {
+        if (item.imdbId != null) {
+          final ratings = await RatingsService.fetchByImdbId(item.imdbId);
+          if (mounted && ratings.imdb != null) {
+            setState(() => _imdbRatings[item.tmdbId] = ratings.imdb);
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -188,6 +201,7 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
           (context, index) => _PlaylistItemCard(
             item: _items[index],
             userServiceIds: _userServiceIds,
+            imdbRating: _imdbRatings[_items[index].tmdbId],
             onTap: () => _openItem(_items[index]),
           ),
           childCount: _items.length,
@@ -222,12 +236,14 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
 class _PlaylistItemCard extends StatelessWidget {
   final LoadedPlaylistItem item;
   final List<int> userServiceIds;
+  final String? imdbRating;
   final VoidCallback onTap;
 
   const _PlaylistItemCard({
     required this.item,
     required this.userServiceIds,
     required this.onTap,
+    this.imdbRating,
   });
 
   @override
@@ -320,19 +336,25 @@ class _PlaylistItemCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          // Rating
-          if (item.voteAverage != null && item.voteAverage! > 0) ...[
+          if (imdbRating != null) ...[
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.star, color: Colors.amber, size: 14),
-                const SizedBox(width: 4),
-                Text(
-                  item.voteAverage!.toStringAsFixed(1),
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5C518),
+                    borderRadius: BorderRadius.circular(3),
                   ),
+                  child: const Text(
+                    'IMDb',
+                    style: TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  imdbRating!,
+                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
                 ),
               ],
             ),

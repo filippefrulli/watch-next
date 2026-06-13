@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
@@ -67,10 +68,25 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
   bool _adLoaded = false;
   bool _noStreamingMatch = false;
 
+  // Rotating tips shown under the progress indicator to reduce perceived wait.
+  Timer? _tipTimer;
+  int _tipIndex = 0;
+  static const List<String> _tips = [
+    'loading_tip_1',
+    'loading_tip_2',
+    'loading_tip_3',
+    'loading_tip_4',
+    'loading_tip_5',
+  ];
+
   @override
   void initState() {
     super.initState();
     itemsToNotRecommend = widget.itemsToNotRecommend;
+    _tipIndex = DateTime.now().millisecondsSinceEpoch % _tips.length;
+    _tipTimer = Timer.periodic(const Duration(milliseconds: 3500), (_) {
+      if (mounted) setState(() => _tipIndex = (_tipIndex + 1) % _tips.length);
+    });
     _loadRecommendations();
   }
 
@@ -99,6 +115,7 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
 
   @override
   void dispose() {
+    _tipTimer?.cancel();
     nativeAd?.dispose();
     super.dispose();
   }
@@ -170,15 +187,30 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Ad fills all available space
+            // Cancel affordance so the user is never trapped on a slow load
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 4, 8, 0),
+                child: TextButton.icon(
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  icon: Icon(Icons.close, color: Colors.grey[400], size: 18),
+                  label: Text(
+                    'cancel_search'.tr(),
+                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  ),
+                ),
+              ),
+            ),
+            // Ad fills all available space (or a skeleton placeholder for ad-free users)
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: ValueListenableBuilder<bool>(
                   valueListenable: PurchaseService.adsRemovedNotifier,
                   builder: (context, adsRemoved, _) {
                     if (adsRemoved || !_nativeAdIsLoaded || nativeAd == null) {
-                      return const SizedBox.shrink();
+                      return _buildSkeleton();
                     }
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -220,11 +252,67 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
                       _stepDot(active: filtering),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  // Rotating tip to reduce perceived wait
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    child: SizedBox(
+                      key: ValueKey(_tipIndex),
+                      height: 36,
+                      child: Center(
+                        child: Text(
+                          _tips[_tipIndex].tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey[500], fontSize: 13, height: 1.4),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// A simple poster-shaped placeholder shown to ad-free users while the
+  /// recommendations are being assembled, so the screen isn't blank.
+  Widget _buildSkeleton() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 180,
+            height: 270,
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: context.appColors.border, width: 1),
+            ),
+            child: Icon(Icons.movie_outlined, color: context.appColors.inactive, size: 56),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            width: 140,
+            height: 14,
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(7),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: 90,
+            height: 12,
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -462,7 +550,6 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             return WatchObject(
               posterPath: movieResult.posterPath,
               overview: movieResult.overview,
-              tmdbRating: movieResult.voteAverage,
               id: movieResult.id,
               title: movieResult.title,
               genreIds: movieResult.genreIds,
@@ -474,7 +561,6 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             return WatchObject(
               posterPath: seriesResult.posterPath,
               overview: seriesResult.overview,
-              tmdbRating: seriesResult.voteAverage,
               id: seriesResult.id,
               title: seriesResult.name,
               genreIds: seriesResult.genreIds,

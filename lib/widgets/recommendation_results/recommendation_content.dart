@@ -23,6 +23,7 @@ class RecommendationContent extends StatelessWidget {
   final bool isNotInterested;
   final bool isRentOnly;
   final bool isBuyOnly;
+  final VoidCallback? onProviderTap;
 
   const RecommendationContent({
     super.key,
@@ -44,6 +45,7 @@ class RecommendationContent extends StatelessWidget {
     this.isNotInterested = false,
     this.isRentOnly = false,
     this.isBuyOnly = false,
+    this.onProviderTap,
   });
 
   @override
@@ -93,6 +95,7 @@ class RecommendationContent extends StatelessWidget {
                 servicesList: servicesList,
                 isRentOnly: isRentOnly,
                 isBuyOnly: isBuyOnly,
+                onTap: onProviderTap,
               ),
               const SizedBox(width: 8),
               ActionButtons(

@@ -17,14 +17,14 @@ flutter clean            # Clean build artifacts
 
 ## Architecture Overview
 
-**Watch Next** is a Flutter app (v2.6.4, Dart SDK >=3.3.0) that uses an LLM to generate personalized movie/TV show recommendations, then enriches results via TMDB API and shows streaming availability.
+**Watch Next** is a Flutter app (v2.7.3+46, Dart SDK >=3.3.0) that uses an LLM to generate personalized movie/TV show recommendations, then enriches results via TMDB API and shows streaming availability.
 
 ### Core Flow
 1. User enters a natural-language prompt in `main_menu_page.dart`
 2. `recommendation_loading_page.dart` sends the prompt to OpenAI (or Gemini fallback) using system prompts from `lib/utils/prompts.dart` — response format is `title y:year,, title y:year,,`
-3. `http_service.dart` (909 lines) looks up each title on TMDB and fetches streaming availability for the user's region
-4. Results are displayed as swipeable cards in `recommandation_results_page.dart` (note the typo in the filename)
-5. Users can save items to their Firestore watchlist or mark them watched
+3. `http_service.dart` (~1021 lines) looks up each title on TMDB and fetches streaming availability for the user's region
+4. Results are displayed as swipeable cards in `recommendation_results_page.dart`
+5. Users can save items to their Firestore watchlist, organize them into playlists, or mark them watched
 
 ### State Management
 No state management framework — the app uses a **service-based architecture** with direct `setState` calls. Services in `lib/services/` handle all business logic and are instantiated directly in pages.
@@ -40,9 +40,15 @@ No state management framework — the app uses a **service-based architecture** 
 | `http_service.dart` | All TMDB API calls (search, details, watch providers, trailers, people) |
 | `watchlist_service.dart` | Firestore watchlist CRUD with 24h availability cache |
 | `watched_service.dart` | Firestore watched history |
+| `playlist_service.dart` | User-created playlists of saved items |
+| `not_interested_service.dart` | Tracks items the user dismissed so they aren't re-recommended |
+| `imdb_import_service.dart` / `letterboxd_import_service.dart` | Bulk-import watched history from IMDB / Letterboxd CSV exports |
+| `purchase_service.dart` | In-app purchase to remove ads (`watch_next_remove_ads`); exposes `adsRemovedNotifier` |
+| `notification_service.dart` | Local/push notifications |
+| `feedback_service.dart` | Submits user feedback to Firestore |
 | `user_action_service.dart` | Analytics event logging (disabled in debug mode) |
 | `query_cache_service.dart` | Deduplicates LLM queries within 24h |
-| `ad_preload_service.dart` | Preloads AdMob native ads during user input |
+| `ad_preload_service.dart` / `native_ad_pool.dart` | Preloads + pools AdMob native ads during user input |
 | `database_service.dart` | SQLite helpers (schema v4) |
 
 ### Key Configuration Files
@@ -58,10 +64,13 @@ No state management framework — the app uses a **service-based architecture** 
 `easy_localization` with 8 languages (EN, IT, DE, FR, ES, PT-BR, JA, HI). Translation JSONs in `assets/translations/`. Language and region settings directly affect both UI language and TMDB watch provider queries.
 
 ### Theme
-Dark-only theme. Primary background `#0E0E0E`, accent orange `#FFA500`. Custom Raleway font. Portrait orientation locked.
+Dark-only theme. Primary background `#0E0E0E`, accent orange `#FFA500`. Colors are centralized in `lib/utils/app_colors.dart`. Custom Raleway font. Portrait orientation locked.
 
 ### Analytics & Ads
-Firebase Analytics and user action logging are **disabled in debug mode** (`kDebugMode` checks). AdMob native ads are preloaded 200ms before navigating to the loading page to minimize wait time.
+Firebase Analytics and user action logging are **disabled in debug mode** (`kDebugMode` checks). AdMob native ads are preloaded 200ms before navigating to the loading page to minimize wait time. Ads are suppressed entirely once the user buys the remove-ads IAP (gate on `PurchaseService.adsRemoved`).
+
+### Models
+Plain Dart data classes live in `lib/objects/` (e.g. `movie_details.dart`, `series_details.dart`, `watch_providers.dart`, `playlist.dart`) — TMDB response wrappers, not framework models.
 
 ### LLM Switching
 The app supports switching between OpenAI and Gemini at runtime (settings toggle). Both use the same prompt format and response parsing logic.

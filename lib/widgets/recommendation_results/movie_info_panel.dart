@@ -10,6 +10,7 @@ import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/pages/person_detail_page.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/ratings_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
@@ -22,7 +23,6 @@ class MovieInfoPanel extends StatefulWidget {
   final int mediaId;
   final String title;
   final String overview;
-  final double? tmdbRating;
   final bool isMovie;
   final String? posterPath;
   final List<TrailerResults> trailerList;
@@ -34,7 +34,6 @@ class MovieInfoPanel extends StatefulWidget {
     required this.mediaId,
     required this.title,
     required this.overview,
-    required this.tmdbRating,
     required this.isMovie,
     this.posterPath,
     required this.trailerList,
@@ -67,6 +66,9 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
   // Similar titles
   List<BrowseItem> _similarItems = [];
 
+  // External ratings (IMDb / Rotten Tomatoes / Metacritic)
+  ExternalRatings _ratings = const ExternalRatings();
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +88,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
       _movieDetails = null;
       _seriesDetails = null;
       _similarItems = [];
+      _ratings = const ExternalRatings();
       _episodeCache.clear();
       _loadingSeasons.clear();
       _expandedSeasons.clear();
@@ -109,6 +112,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
             _detailsLoaded = true;
           });
         }
+        _loadRatings((results[1] as MovieDetails).imdbId);
       } else {
         final results = await Future.wait([
           HttpService().fetchSeriesCredits(widget.mediaId),
@@ -123,10 +127,17 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
             _detailsLoaded = true;
           });
         }
+        final imdbId = await HttpService().fetchSeriesImdbId(widget.mediaId);
+        _loadRatings(imdbId);
       }
     } catch (_) {
       if (mounted) setState(() => _detailsLoaded = true);
     }
+  }
+
+  Future<void> _loadRatings(String? imdbId) async {
+    final ratings = await RatingsService.fetchByImdbId(imdbId);
+    if (mounted && ratings.hasAny) setState(() => _ratings = ratings);
   }
 
   Future<void> _checkIfInWatchlist() async {
@@ -393,35 +404,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
                       const SizedBox(height: 20),
                       _buildDivider(),
                       const SizedBox(height: 16),
-                      // TMDB score
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: context.appColors.border, width: 1),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.star, color: Colors.grey[400], size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'tmdb_score'.tr(),
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(fontSize: 14),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.tmdbRating?.toStringAsFixed(1) ?? '',
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      if (_ratings.hasAny) _buildRatingChips(),
                       const SizedBox(height: 20),
                       _buildDivider(),
                       const SizedBox(height: 16),
@@ -551,6 +534,41 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
         ),
         const SizedBox(height: 8),
       ],
+    );
+  }
+
+  Widget _buildRatingChips() {
+    final chips = <Widget>[
+      if (_ratings.imdb != null) _ratingChip('IMDb', _ratings.imdb!, const Color(0xFFF5C518), Colors.black),
+      if (_ratings.rottenTomatoes != null)
+        _ratingChip('🍅', _ratings.rottenTomatoes!, const Color(0xFFFA320A), Colors.white),
+      if (_ratings.metacritic != null)
+        _ratingChip('Metacritic', _ratings.metacritic!, const Color(0xFF00CE7A), Colors.black),
+    ];
+    return Wrap(spacing: 8, runSpacing: 6, children: chips);
+  }
+
+  Widget _ratingChip(String label, String value, Color badgeColor, Color labelTextColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.tertiary,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: context.appColors.border, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(color: badgeColor, borderRadius: BorderRadius.circular(4)),
+            child: Text(label, style: TextStyle(color: labelTextColor, fontSize: 11, fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(width: 6),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 2),
+        ],
+      ),
     );
   }
 

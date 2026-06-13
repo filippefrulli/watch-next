@@ -8,7 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
-import 'package:watch_next/pages/language_page.dart';
+import 'package:watch_next/pages/intro_page.dart';
 import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
 import 'pages/home_page.dart';
@@ -190,7 +190,7 @@ class SplashState extends State<Splash> {
     } else if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const LanguagePage(),
+          builder: (context) => const IntroPage(),
         ),
       );
     }

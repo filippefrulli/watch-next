@@ -166,8 +166,8 @@ class PlaylistService {
           title: details.title ?? 'Unknown',
           posterPath: details.posterPath,
           overview: details.overview,
-          voteAverage: details.voteAverage,
           releaseDate: details.releaseDate,
+          imdbId: details.imdbId,
           streamingProviderIds: availability.streaming.map((s) => s.providerId ?? 0).toList(),
           rentProviderIds: availability.rent.map((s) => s.providerId ?? 0).toList(),
           buyProviderIds: availability.buy.map((s) => s.providerId ?? 0).toList(),
@@ -175,12 +175,8 @@ class PlaylistService {
       } else {
         // Fetch TV show details
         final details = await _httpService.fetchSeriesDetails(item.tmdbId);
-
-        // Fetch availability
-        final availability = await _httpService.getCategorizedWatchProviders(
-          item.tmdbId,
-          false, // isMovie
-        );
+        final availability = await _httpService.getCategorizedWatchProviders(item.tmdbId, false);
+        final imdbId = await _httpService.fetchSeriesImdbId(item.tmdbId);
 
         return LoadedPlaylistItem(
           tmdbId: item.tmdbId,
@@ -188,8 +184,8 @@ class PlaylistService {
           title: details.name ?? 'Unknown',
           posterPath: details.posterPath,
           overview: details.overview,
-          voteAverage: details.voteAverage,
           releaseDate: details.firstAirDate,
+          imdbId: imdbId,
           streamingProviderIds: availability.streaming.map((s) => s.providerId ?? 0).toList(),
           rentProviderIds: availability.rent.map((s) => s.providerId ?? 0).toList(),
           buyProviderIds: availability.buy.map((s) => s.providerId ?? 0).toList(),

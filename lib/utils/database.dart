@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDi
 
 class DatabaseHelper {
   static const _databaseName = "movies.db";
-  static const _databaseVersion = 4;
+  static const _databaseVersion = 5;
 
   static const streamingServicesTable = 'streaming_services';
   static const streamingId = 'streaming_id';
@@ -19,6 +19,15 @@ class DatabaseHelper {
   static const watchlistDateAdded = 'date_added';
 
   static const watchedTable = 'watched';
+
+  // Persistent cache for OMDb external ratings, keyed by IMDb id, to stay under
+  // OMDb's daily request quota across app restarts.
+  static const ratingsCacheTable = 'ratings_cache';
+  static const ratingsImdbId = 'imdb_id';
+  static const ratingsImdb = 'imdb';
+  static const ratingsRottenTomatoes = 'rotten_tomatoes';
+  static const ratingsMetacritic = 'metacritic';
+  static const ratingsCachedAt = 'cached_at';
 
   // make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -79,6 +88,19 @@ class DatabaseHelper {
         genre_names TEXT
       )
     ''');
+    await _createRatingsCacheTable(db);
+  }
+
+  static Future _createRatingsCacheTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $ratingsCacheTable (
+        $ratingsImdbId TEXT PRIMARY KEY,
+        $ratingsImdb TEXT,
+        $ratingsRottenTomatoes TEXT,
+        $ratingsMetacritic TEXT,
+        $ratingsCachedAt INTEGER NOT NULL
+      )
+    ''');
   }
 
   // Migration for upgrades
@@ -121,6 +143,9 @@ class DatabaseHelper {
           'ALTER TABLE $watchedTable ADD COLUMN genre_names TEXT',
         );
       }
+    }
+    if (oldVersion < 5) {
+      await _createRatingsCacheTable(db);
     }
   }
 }

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:watch_next/services/watchlist_service.dart';
+import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/ratings_service.dart';
 import 'package:watch_next/pages/media_detail_page.dart';
 import 'package:watch_next/utils/app_colors.dart';
 
-class WatchlistItemCard extends StatelessWidget {
+class WatchlistItemCard extends StatefulWidget {
   final WatchlistItem item;
   final List<int> userServiceIds;
   final Map<int, String> userServicesMap;
@@ -22,7 +24,40 @@ class WatchlistItemCard extends StatelessWidget {
   });
 
   @override
+  State<WatchlistItemCard> createState() => _WatchlistItemCardState();
+}
+
+class _WatchlistItemCardState extends State<WatchlistItemCard> {
+  String? _imdbRating;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRating();
+  }
+
+  Future<void> _loadRating() async {
+    try {
+      String? imdbId;
+      if (widget.item.isMovie) {
+        imdbId = (await HttpService().fetchMovieDetails(widget.item.mediaId)).imdbId;
+      } else {
+        imdbId = await HttpService().fetchSeriesImdbId(widget.item.mediaId);
+      }
+      final ratings = await RatingsService.fetchByImdbId(imdbId);
+      if (mounted && ratings.imdb != null) {
+        setState(() => _imdbRating = ratings.imdb);
+      }
+    } catch (_) {
+      // Rating is optional — leave it hidden on any failure.
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+    final userServicesMap = widget.userServicesMap;
+    final onMarkWatched = widget.onMarkWatched;
     final streamingIds = item.availability['streaming'] ?? [];
     final matchedLogos =
         streamingIds.where((id) => userServicesMap.containsKey(id)).map((id) => userServicesMap[id]!).toList();
@@ -31,12 +66,18 @@ class WatchlistItemCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16),
       child: Dismissible(
         key: ValueKey(item.mediaId),
-        direction: DismissDirection.startToEnd,
-        confirmDismiss: (_) async {
-          if (onMarkWatched != null) {
-            onMarkWatched!();
+        direction: DismissDirection.horizontal,
+        confirmDismiss: (direction) async {
+          if (direction == DismissDirection.startToEnd) {
+            // Swipe right → mark watched.
+            if (onMarkWatched != null) {
+              onMarkWatched();
+            }
+          } else {
+            // Swipe left → remove. The Firestore deletion drives the stream,
+            // which animates the card out, so we don't auto-dismiss here.
+            widget.onRemove();
           }
-          // Don't auto-dismiss — we handle removal in the callback after rating
           return false;
         },
         background: Container(
@@ -57,16 +98,32 @@ class WatchlistItemCard extends StatelessWidget {
             ],
           ),
         ),
+        secondaryBackground: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 24),
+          decoration: BoxDecoration(
+            color: Colors.red.withValues(alpha: 0.25),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'remove'.tr(),
+                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.delete_outline, color: Colors.red, size: 28),
+            ],
+          ),
+        ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxHeight: 150),
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.tertiary,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline,
-                width: 1,
-              ),
+              border: Border.all(color: context.appColors.border, width: 1),
             ),
             child: Material(
               color: Colors.transparent,
@@ -121,17 +178,17 @@ class WatchlistItemCard extends StatelessWidget {
       ),
       child: AspectRatio(
         aspectRatio: 2 / 3,
-        child: item.posterPath != null
+        child: widget.item.posterPath != null
             ? CachedNetworkImage(
-                imageUrl: 'https://image.tmdb.org/t/p/w200${item.posterPath}',
+                imageUrl: 'https://image.tmdb.org/t/p/w200${widget.item.posterPath}',
                 fit: BoxFit.fill,
                 placeholder: (context, url) => Container(
                   color: Theme.of(context).colorScheme.primary,
-                  child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 24),
+                  child: Icon(Icons.movie_outlined, color: context.appColors.textTertiary, size: 24),
                 ),
                 errorWidget: (context, url, error) => Container(
                   color: Theme.of(context).colorScheme.primary,
-                  child: Icon(Icons.movie_outlined, color: Colors.grey[600], size: 24),
+                  child: Icon(Icons.movie_outlined, color: context.appColors.textTertiary, size: 24),
                 ),
               )
             : Container(
@@ -150,7 +207,7 @@ class WatchlistItemCard extends StatelessWidget {
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
           child: Text(
-            item.title,
+            widget.item.title,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 17,
@@ -160,56 +217,84 @@ class WatchlistItemCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-          decoration: BoxDecoration(
-            color: Colors.black26,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            item.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
-            style: TextStyle(color: Colors.grey[400], fontSize: 11),
-          ),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                color: context.appColors.surface2,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                widget.item.isMovie ? 'movie'.tr() : 'tv_show'.tr(),
+                style: TextStyle(color: context.appColors.textSecondary, fontSize: 11),
+              ),
+            ),
+            if (_imdbRating != null) ...[
+              const SizedBox(width: 6),
+              _buildImdbBadge(_imdbRating!),
+            ],
+          ],
         ),
         const Spacer(),
         Row(
           children: [
             ..._buildStreamingLogos(matchedLogos),
-            const Spacer(),
-            GestureDetector(
-              onTap: onRemove,
-              child: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
-            ),
           ],
         ),
       ],
     );
   }
 
+  Widget _buildImdbBadge(String rating) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5C518),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'IMDb',
+            style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            rating,
+            style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> _buildStreamingLogos(List<String> logoPaths) {
     if (logoPaths.isEmpty) {
       return [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.grey.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.grey[600]!, width: 1),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.info, size: 14, color: Colors.grey[400]),
-              const SizedBox(width: 4),
-              Text(
-                'not_available'.tr(),
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+        Builder(
+          builder: (context) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: context.appColors.surface2,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.info_outline, size: 14, color: context.appColors.textTertiary),
+                const SizedBox(width: 4),
+                Text(
+                  'not_available'.tr(),
+                  style: TextStyle(
+                    color: context.appColors.textTertiary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ];

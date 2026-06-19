@@ -12,17 +12,17 @@ class WatchlistEmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.bookmark_border, size: 40, color: Colors.grey[600]),
+          Icon(Icons.bookmark_border, size: 40, color: context.appColors.textTertiary),
           const SizedBox(height: 16),
           Text(
             'watchlist_empty'.tr(),
-            style: TextStyle(color: Colors.grey[400], fontSize: 18, fontWeight: FontWeight.w500),
+            style: TextStyle(color: context.appColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Text(
             'watchlist_empty_subtitle'.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: TextStyle(color: context.appColors.textTertiary, fontSize: 14),
           ),
           if (onGetStarted != null) ...[
             const SizedBox(height: 24),
@@ -33,6 +33,13 @@ class WatchlistEmptyState extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: context.appColors.accent,
                   borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: context.appColors.accent.withValues(alpha: 0.3),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Text(
                   'get_recommendations'.tr(),
@@ -59,13 +66,13 @@ class WatchlistNoResultsState extends StatelessWidget {
           Icon(
             Icons.filter_list_off,
             size: 80,
-            color: Colors.grey[600],
+            color: context.appColors.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
             'no_filter_results'.tr(),
             style: TextStyle(
-              color: Colors.grey[400],
+              color: context.appColors.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),

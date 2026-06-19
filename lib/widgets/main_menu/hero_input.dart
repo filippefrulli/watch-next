@@ -62,7 +62,7 @@ class HeroInput extends StatelessWidget {
               hintText: isMovie ? "hero_hint_movie".tr() : "hero_hint_show".tr(),
               hintStyle: TextStyle(
                 fontSize: 15,
-                color: Colors.grey[500],
+                color: context.appColors.textTertiary,
                 height: 1.5,
               ),
               filled: true,
@@ -214,7 +214,7 @@ class _GoButton extends StatelessWidget {
                         Text(
                           "go".tr(),
                           style: TextStyle(
-                            color: isReady ? Colors.white : Colors.grey[400],
+                            color: isReady ? Colors.white : context.appColors.textTertiary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1,
@@ -223,7 +223,7 @@ class _GoButton extends StatelessWidget {
                         const SizedBox(width: 8),
                         Icon(
                           Icons.arrow_forward_rounded,
-                          color: isReady ? Colors.white : Colors.grey[400],
+                          color: isReady ? Colors.white : context.appColors.textTertiary,
                           size: 20,
                         ),
                       ],

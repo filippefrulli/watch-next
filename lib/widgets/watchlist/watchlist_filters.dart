@@ -49,24 +49,21 @@ class WatchlistFilters extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: context.appColors.border,
-              width: 1.5,
-            ),
+            border: Border.all(color: context.appColors.border, width: 1),
           ),
           child: Row(
             children: [
               Icon(
                 _getMediaTypeIcon(),
                 size: 16,
-                color: Colors.grey[300],
+                color: context.appColors.textSecondary,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   _getMediaTypeLabel(),
                   style: TextStyle(
-                    color: Colors.grey[300],
+                    color: context.appColors.textPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -74,7 +71,7 @@ class WatchlistFilters extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_drop_down,
-                color: Colors.grey[400],
+                color: context.appColors.textSecondary,
                 size: 20,
               ),
             ],
@@ -93,7 +90,7 @@ class WatchlistFilters extends StatelessWidget {
           Text(
             'available_only'.tr(),
             style: TextStyle(
-              color: showOnlyAvailable ? context.appColors.accent : Colors.grey[400],
+              color: showOnlyAvailable ? context.appColors.accent : context.appColors.textSecondary,
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -162,13 +159,13 @@ class WatchlistFilters extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: isSelected ? context.appColors.accent : Colors.grey[400],
+            color: isSelected ? context.appColors.accent : context.appColors.textSecondary,
           ),
           const SizedBox(width: 12),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? context.appColors.accent : Colors.grey[300],
+              color: isSelected ? context.appColors.accent : context.appColors.textPrimary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               fontSize: 14,
             ),

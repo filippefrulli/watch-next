@@ -110,43 +110,43 @@ class MyApp extends StatelessWidget {
           textTheme: TextTheme(
             displayLarge: TextStyle(
               fontSize: 24.0,
-              color: Colors.grey[200],
+              color: AppColors.defaults.textPrimary,
               fontWeight: FontWeight.w400,
               letterSpacing: 1.2,
             ),
             displayMedium: TextStyle(
               fontSize: 20.0,
-              color: Colors.grey[200],
+              color: AppColors.defaults.textPrimary,
               fontWeight: FontWeight.w400,
               letterSpacing: 1.2,
             ),
             displaySmall: TextStyle(
               fontSize: 16.0,
-              color: Colors.grey[200],
+              color: AppColors.defaults.textPrimary,
               fontWeight: FontWeight.w400,
               letterSpacing: 1.2,
             ),
             labelLarge: TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.w400,
-              color: Colors.grey[900],
+              color: AppColors.defaults.background,
               letterSpacing: 1.2,
             ),
             labelMedium: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.w400,
-              color: Colors.grey[900],
+              color: AppColors.defaults.background,
               letterSpacing: 1.2,
             ),
             labelSmall: TextStyle(
               fontSize: 16.0,
-              color: Colors.grey[900],
+              color: AppColors.defaults.background,
               fontWeight: FontWeight.w400,
               letterSpacing: 1.2,
             ),
             bodyLarge: TextStyle(
               fontSize: 16.0,
-              color: Colors.grey[400],
+              color: AppColors.defaults.textSecondary,
               fontWeight: FontWeight.w400,
             ),
             bodyMedium: TextStyle(
@@ -157,12 +157,12 @@ class MyApp extends StatelessWidget {
             ),
             bodySmall: TextStyle(
               fontSize: 15.0,
-              color: Colors.grey[600],
+              color: AppColors.defaults.textTertiary,
               fontWeight: FontWeight.w400,
             ),
             headlineSmall: TextStyle(
               fontSize: 16.0,
-              color: Colors.grey[400],
+              color: AppColors.defaults.textSecondary,
               fontWeight: FontWeight.w400,
             ),
           ),

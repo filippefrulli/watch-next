@@ -34,7 +34,7 @@ class MediaTypeSwitch extends StatelessWidget {
         animationDuration: 300,
         activeFgColor: Colors.white,
         inactiveBgColor: Colors.transparent,
-        inactiveFgColor: Colors.grey[400],
+        inactiveFgColor: context.appColors.textSecondary,
         totalSwitches: 2,
         labels: ['movie'.tr(), 'tv_show'.tr()],
         customTextStyles: const [

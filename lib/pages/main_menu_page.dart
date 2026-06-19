@@ -284,14 +284,13 @@ class _MainMenuPageState extends State<MainMenuPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.tertiary,
+            color: context.appColors.surface2,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: context.appColors.border),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.lightbulb_outline, color: Colors.grey[500], size: 13),
+              Icon(Icons.lightbulb_outline, color: context.appColors.accent.withValues(alpha: 0.8), size: 13),
               const SizedBox(width: 5),
               ConstrainedBox(
                 constraints: BoxConstraints(
@@ -299,7 +298,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 ),
                 child: Text(
                   example,
-                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  style: TextStyle(color: context.appColors.textSecondary, fontSize: 12),
                   maxLines: 2,
                 ),
               ),
@@ -342,14 +341,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: Colors.grey[600],
+            color: context.appColors.accent.withValues(alpha: 0.15),
             shape: BoxShape.circle,
+            border: Border.all(color: context.appColors.accent.withValues(alpha: 0.5)),
           ),
           child: Center(
             child: Text(
               '$number',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: context.appColors.accent,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
@@ -360,7 +360,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey[400],
+            color: context.appColors.textSecondary,
             fontSize: 13,
             height: 1.3,
           ),

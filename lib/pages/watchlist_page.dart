@@ -172,8 +172,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
       stream: _watchlistService.getWatchlist(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
+          return Center(
+            child: CircularProgressIndicator(color: context.appColors.accent),
           );
         }
 
@@ -268,11 +268,11 @@ class _WatchlistPageState extends State<WatchlistPage> {
                         backgroundColor: Theme.of(context).colorScheme.tertiary,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: Text('remove_from_watchlist_prompt'.tr(), style: const TextStyle(color: Colors.white)),
-                        content: Text(item.title, style: TextStyle(color: Colors.grey[400])),
+                        content: Text(item.title, style: TextStyle(color: context.appColors.textSecondary)),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: Text('keep'.tr(), style: const TextStyle(color: Colors.grey)),
+                            child: Text('keep'.tr(), style: TextStyle(color: context.appColors.textSecondary)),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, true),

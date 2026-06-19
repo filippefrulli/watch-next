@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/pages/settings_page.dart';
+import 'package:watch_next/utils/app_colors.dart';
 
 class WatchlistHeader extends StatelessWidget {
   final bool isImporting;
@@ -20,119 +21,79 @@ class WatchlistHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'watchlist'.tr(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+          Expanded(
+            child: Text(
+              'watchlist'.tr(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
               ),
-              _buildSettingsButton(context),
-            ],
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _buildImportButton(context),
-              const SizedBox(width: 12),
-              _buildRefreshButton(context),
-            ],
+          _IconButton(
+            icon: Icons.arrow_upward_rounded,
+            isLoading: isImporting,
+            onTap: isImporting ? null : onImportTap,
+          ),
+          const SizedBox(width: 8),
+          _IconButton(
+            icon: Icons.refresh_rounded,
+            isLoading: isRefreshing,
+            onTap: isRefreshing ? null : onRefreshTap,
+          ),
+          const SizedBox(width: 8),
+          _IconButton(
+            icon: Icons.settings_rounded,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsPage()),
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildSettingsButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const SettingsPage()),
-      ),
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.tertiary,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Icon(Icons.settings_rounded, color: Colors.white, size: 18),
-      ),
-    );
-  }
+class _IconButton extends StatelessWidget {
+  final IconData icon;
+  final bool isLoading;
+  final VoidCallback? onTap;
 
-  Widget _buildImportButton(BuildContext context) {
+  const _IconButton({
+    required this.icon,
+    this.isLoading = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: context.appColors.surface2,
+      borderRadius: BorderRadius.circular(11),
       child: InkWell(
-        onTap: isImporting ? null : onImportTap,
-        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(11),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.tertiary,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(color: context.appColors.border, width: 1),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isImporting)
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                )
-              else
-                const Icon(Icons.arrow_upward_outlined, color: Colors.white, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                'import'.tr(),
-                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRefreshButton(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: isRefreshing ? null : onRefreshTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.tertiary,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isRefreshing)
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                )
-              else
-                const Icon(Icons.refresh, color: Colors.white, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                'refresh'.tr(),
-                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
-              ),
-            ],
+          child: Center(
+            child: isLoading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  )
+                : Icon(icon, color: Colors.white, size: 19),
           ),
         ),
       ),

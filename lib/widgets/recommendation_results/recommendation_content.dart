@@ -8,6 +8,7 @@ class RecommendationContent extends StatelessWidget {
   final String posterPath;
   final String? overview;
   final List<int>? genreIds;
+  final String? imdbRating;
   final List<int>? watchProviders;
   final Future<dynamic> servicesList;
   final int currentIndex;
@@ -30,6 +31,7 @@ class RecommendationContent extends StatelessWidget {
     required this.posterPath,
     this.overview,
     this.genreIds,
+    this.imdbRating,
     required this.watchProviders,
     required this.servicesList,
     required this.currentIndex,
@@ -60,16 +62,20 @@ class RecommendationContent extends StatelessWidget {
           child: MoviePosterWidget(poster: posterPath),
         ),
         const SizedBox(height: 12),
-        if (genres.isNotEmpty)
+        if (imdbRating != null || genres.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
               spacing: 6,
               runSpacing: 6,
-              children: genres.map((g) => _GenreChip(label: g)).toList(),
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (imdbRating != null) _ImdbBadge(rating: imdbRating!),
+                ...genres.map((g) => _GenreChip(label: g)),
+              ],
             ),
           ),
-        if (genres.isNotEmpty) const SizedBox(height: 8),
+        if (imdbRating != null || genres.isNotEmpty) const SizedBox(height: 8),
         if (overview != null && overview!.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -115,6 +121,36 @@ class RecommendationContent extends StatelessWidget {
         ),
         const SizedBox(height: 16),
       ],
+    );
+  }
+}
+
+class _ImdbBadge extends StatelessWidget {
+  final String rating;
+  const _ImdbBadge({required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5C518),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'IMDb',
+            style: TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            rating,
+            style: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 }

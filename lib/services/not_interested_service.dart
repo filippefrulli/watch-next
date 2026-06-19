@@ -24,4 +24,12 @@ class NotInterestedService {
     if (titles.length > _maxSize) titles.removeAt(0);
     await prefs.setString(_key, jsonEncode(titles));
   }
+
+  /// Removes a title so it can be recommended again (undo).
+  static Future<void> removeTitle(String title) async {
+    final prefs = await SharedPreferences.getInstance();
+    final titles = await getTitles();
+    titles.removeWhere((t) => t == title);
+    await prefs.setString(_key, jsonEncode(titles));
+  }
 }

@@ -51,10 +51,7 @@ class HeroInput extends StatelessWidget {
           if (modeSelector != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: modeSelector,
-              ),
+              child: modeSelector,
             ),
           TextField(
             key: textFieldKey,

@@ -10,7 +10,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/objects/movie_credits.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
+import 'package:watch_next/objects/streaming_service.dart';
 import 'package:watch_next/services/http_service.dart';
+import 'package:watch_next/services/ratings_service.dart';
+import 'package:watch_next/services/streaming_link_service.dart';
 import 'package:watch_next/services/not_interested_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
@@ -63,6 +66,10 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   bool _isWatched = false;
   int? _watchedRating;
   bool _isNotInterested = false;
+  String? _imdbRating;
+  // mediaId → IMDb score (null = looked up, no score). Lets us preload ahead
+  // and reuse the (otherwise repeated) IMDb-id + ratings lookups on swipe.
+  final Map<int, String?> _ratingCache = {};
   int _hintStep = 0; // 0=none, 1=swipe to browse, 2=swipe up for details
 
   Future<MovieCredits> movieCredits = Future.value(MovieCredits());
@@ -86,6 +93,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
     _checkIfInWatchlist();
     _checkIfWatched();
     _checkIfNotInterested();
+    _loadRating();
 
     // Preload the first poster
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -208,19 +216,63 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
     if (mounted) setState(() => _isNotInterested = result);
   }
 
+  /// Resolves the IMDb score for a single result, memoised in [_ratingCache]
+  /// so each title's IMDb-id + ratings lookup happens at most once.
+  Future<String?> _fetchRatingFor(WatchObject obj) async {
+    final id = obj.id;
+    if (id == null) return null;
+    if (_ratingCache.containsKey(id)) return _ratingCache[id];
+    try {
+      final String? imdbId = widget.type == 0
+          ? (await HttpService().fetchMovieDetails(id)).imdbId
+          : await HttpService().fetchSeriesImdbId(id);
+      final ratings = await RatingsService.fetchByImdbId(imdbId);
+      return _ratingCache[id] = ratings.imdb;
+    } catch (_) {
+      return null; // Score is optional — leave it hidden on failure.
+    }
+  }
+
+  /// Loads the score for the current result (instant when already cached), then
+  /// preloads the next result so the badge is ready by the time you swipe.
+  Future<void> _loadRating() async {
+    final id = selectedWatchObject.id;
+    if (id == null) return;
+    final rating = await _fetchRatingFor(selectedWatchObject);
+    if (mounted && selectedWatchObject.id == id) {
+      setState(() => _imdbRating = rating);
+    }
+    _preloadNextRating();
+  }
+
+  /// Warms the cache for the next result without touching the UI.
+  void _preloadNextRating() {
+    final next = index + 1;
+    if (next < length) _fetchRatingFor(watchObjectsList[next]);
+  }
+
   Future<void> _markNotInterested() async {
     final title = selectedWatchObject.title;
     if (title == null || title.isEmpty) return;
-    await NotInterestedService.addTitle(title);
+
+    // Tapping again undoes it, so the title can be recommended once more.
+    final undo = _isNotInterested;
+    if (undo) {
+      await NotInterestedService.removeTitle(title);
+    } else {
+      await NotInterestedService.addTitle(title);
+    }
+
     if (mounted) {
-      setState(() => _isNotInterested = true);
+      setState(() => _isNotInterested = !undo);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'not_interested_toast'.tr(),
+            undo ? 'not_interested_undo_toast'.tr() : 'not_interested_toast'.tr(),
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
           ),
-          backgroundColor: Colors.red[700],
+          backgroundColor: undo ? Colors.green[700] : Colors.red[700],
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(16),
@@ -291,11 +343,32 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
   }
 
   Future<void> _openWatchLink() async {
-    if (selectedWatchObject.id == null) return;
+    final providers = selectedWatchObject.watchProviders;
+    final title = selectedWatchObject.title;
+    if (providers == null || providers.isEmpty || title == null || title.isEmpty) return;
     UserActionService.logButtonPressed(buttonName: 'watch_now_provider');
-    final link = await HttpService().getWatchLink(selectedWatchObject.id!, widget.type == 0);
-    if (link == null || link.isEmpty) return;
-    final uri = Uri.parse(link);
+
+    // Resolve the name of the provider shown in the widget (the first one).
+    String? providerName;
+    try {
+      final services = await servicesList;
+      for (final StreamingService s in services) {
+        if (s.providerId == providers.first) {
+          providerName = s.providerName;
+          break;
+        }
+      }
+    } catch (_) {}
+
+    final prefs = await SharedPreferences.getInstance();
+    final region = prefs.getString('region') ?? 'DE';
+
+    final uri = StreamingLinkService.searchUrl(
+      providerName: providerName,
+      title: title,
+      region: region,
+    );
+
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (mounted) {
@@ -390,20 +463,24 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
                     setState(() {
                       index++;
                       selectedWatchObject = watchObjectsList[index];
+                      _imdbRating = null;
                     });
                     _checkIfInWatchlist();
                     _checkIfWatched();
                     _checkIfNotInterested();
+                    _loadRating();
                     _preloadNextPoster();
                   } else if (dx > 300 && index > 0) {
                     _advanceHint(1);
                     setState(() {
                       index--;
                       selectedWatchObject = watchObjectsList[index];
+                      _imdbRating = null;
                     });
                     _checkIfInWatchlist();
                     _checkIfWatched();
                     _checkIfNotInterested();
+                    _loadRating();
                     _preloadNextPoster();
                   }
                 }
@@ -412,6 +489,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               posterPath: selectedWatchObject.posterPath ?? '/h5hVeCfYSb8gIO0F41gqidtb0AI.jpg',
               overview: selectedWatchObject.overview,
               genreIds: selectedWatchObject.genreIds,
+              imdbRating: _imdbRating,
               watchProviders: selectedWatchObject.watchProviders,
               servicesList: servicesList,
               currentIndex: index,

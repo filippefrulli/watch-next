@@ -100,6 +100,18 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
           ),
           extensions: const [AppColors.defaults],
+          // Keep all SnackBars at a compact, consistent size — otherwise they
+          // inherit the large bodyMedium (20px) default.
+          snackBarTheme: SnackBarThemeData(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.defaults.surface2,
+            contentTextStyle: const TextStyle(
+              color: Colors.white,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w500,
+            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,

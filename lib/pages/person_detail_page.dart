@@ -57,9 +57,14 @@ class _PersonDetailPageState extends State<PersonDetailPage> with SingleTickerPr
       final castCredits = credits.cast.where((c) => c.posterPath != null && seenCastIds.add(c.id ?? -1)).toList()
         ..sort((a, b) => (b.displayDate).compareTo(a.displayDate));
 
-      // Deduplicate and sort crew credits (directing only for directors) by date descending
+      // Deduplicate and sort crew credits by date descending. Only keep
+      // directing credits so directors don't surface producer/writer/etc. work.
+      // The job check must precede the dedup add() so a non-directing credit
+      // doesn't consume the slot for the same title's directing credit.
       final seenCrewIds = <int>{};
-      final crewCredits = credits.crew.where((c) => c.posterPath != null && seenCrewIds.add(c.id ?? -1)).toList()
+      final crewCredits = credits.crew
+          .where((c) => c.job == 'Director' && c.posterPath != null && seenCrewIds.add(c.id ?? -1))
+          .toList()
         ..sort((a, b) => (b.displayDate).compareTo(a.displayDate));
 
       // If known for directing, show directing credits; otherwise use cast credits

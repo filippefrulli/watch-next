@@ -17,17 +17,13 @@ class MediaTypeSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-          width: 1,
-        ),
+        color: context.appColors.background,
+        borderRadius: BorderRadius.circular(14),
       ),
       padding: const EdgeInsets.all(4),
       child: ToggleSwitch(
-        minWidth: 110.0,
-        minHeight: 38.0,
+        minWidth: 104.0,
+        minHeight: 34.0,
         initialLabelIndex: currentIndex,
         cornerRadius: 10.0,
         animate: true,

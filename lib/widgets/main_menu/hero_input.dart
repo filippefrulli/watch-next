@@ -12,6 +12,7 @@ class HeroInput extends StatelessWidget {
   final bool isMovie;
   final bool hasActiveFilters;
   final VoidCallback? onFiltersPressed;
+  final Widget? modeSelector;
 
   const HeroInput({
     super.key,
@@ -24,6 +25,7 @@ class HeroInput extends StatelessWidget {
     required this.isMovie,
     required this.hasActiveFilters,
     required this.onFiltersPressed,
+    this.modeSelector,
   });
 
   @override
@@ -46,6 +48,14 @@ class HeroInput extends StatelessWidget {
       ),
       child: Column(
         children: [
+          if (modeSelector != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: modeSelector,
+              ),
+            ),
           TextField(
             key: textFieldKey,
             autofocus: false,
@@ -168,66 +178,69 @@ class _GoButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isReady = isLongEnough && !enableLoading;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      height: 48,
-      decoration: BoxDecoration(
-        gradient: isReady
-            ? LinearGradient(
-                colors: [context.appColors.accent, context.appColors.accentDark],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        color: isReady ? null : context.appColors.inactive,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: isReady
-            ? [
-                BoxShadow(
-                  color: context.appColors.accent.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    // The send button stays accent-colored at all times and simply dims while
+    // idle — like a chat composer's send button — so the primary action never
+    // looks dead or disabled.
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 250),
+      opacity: isReady ? 1.0 : 0.5,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [context.appColors.accent, context.appColors.accentDark],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(14),
-          onTap: isReady ? onPressed : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Center(
-              child: enableLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "go".tr(),
-                          style: TextStyle(
-                            color: isReady ? Colors.white : context.appColors.textTertiary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
+          boxShadow: isReady
+              ? [
+                  BoxShadow(
+                    color: context.appColors.accent.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: isReady ? onPressed : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Center(
+                child: enableLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "go".tr(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          color: isReady ? Colors.white : context.appColors.textTertiary,
-                          size: 20,
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
         ),

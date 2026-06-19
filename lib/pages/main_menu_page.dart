@@ -44,58 +44,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
   int _exampleIndex = 0;
   Timer? _exampleTimer;
 
-  static const _movieExamples = [
-    'Something funny for tonight',
-    'A classic I might have missed',
-    'A thriller with a great twist',
-    'An action movie with stunning visuals',
-    'Something based on a true story',
-    'A feel-good movie for the weekend',
-    'An Oscar-winning drama',
-    'Something with a memorable soundtrack',
-    'A sci-fi with a thought-provoking concept',
-    'Something light to watch with friends',
-    'A romance set in a foreign country',
-    'A documentary about nature',
-    'A heist movie with a clever plot',
-    'Something scary but not too gory',
-    'A coming-of-age story',
-    'A movie with an unexpected ending',
-    'Something animated for all ages',
-    'A quiet, slow-burn drama',
-    'Something from the 90s',
-    'A film with a stunning visual style',
-    'A movie that is romantic and funny, ideal for a first date',
-    'A movie that will make me cry',
-    'A movie starring Tom Cruise and directed by Steven Spielberg',
-    'A documentary about sports',
-    'A movie about artificial intelligence, with good reviews',
-  ];
+  // Localized example prompts. Counts are fixed (18 movies / 16 shows) so the
+  // rotation index math stays valid across locales.
+  List<String> get _movieExamples => List.generate(18, (i) => 'example_movie_${i + 1}'.tr());
 
-  static const _showExamples = [
-    'Something critically acclaimed',
-    'Something with great writing',
-    'A crime thriller with complex characters',
-    'Something light to watch after work',
-    'A documentary series about a true story',
-    'A sci-fi show with a gripping plot',
-    'Something with fewer than 3 seasons',
-    'A comedy with quick episodes',
-    'A period drama set in another era',
-    'Something with an ensemble cast',
-    'A show that keeps me guessing',
-    'A slow-burn thriller',
-    'Something funny and easy to watch',
-    'A limited series I can binge',
-    'A show with an amazing first season',
-    'Something about food or travel',
-    'An animated series for adults',
-    'A show with a satisfying ending',
-    'A show with episodes shorter than 30 minutes',
-    'A show with less than 5 seasons',
-    'A show that is reality television',
-    'A short series I can binge this weekend',
-  ];
+  List<String> get _showExamples => List.generate(16, (i) => 'example_show_${i + 1}'.tr());
 
   @override
   void initState() {
@@ -103,11 +56,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
     openAI = OpenAIClient(apiKey: openAiKey);
     _controller.addListener(_checkLength);
     _loadQuerySettings();
-    _exampleTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+    _exampleTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       if (mounted) {
         setState(() {
           final list = typeIsMovie == 0 ? _movieExamples : _showExamples;
-          _exampleIndex = (_exampleIndex + 1) % list.length;
+          // Advance by 2 so the whole pair refreshes each cycle.
+          _exampleIndex = (_exampleIndex + 2) % list.length;
         });
       }
     });
@@ -193,20 +147,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
               const Spacer(flex: 2),
               // Hero headline + subtitle
               _buildHeroHeadline(),
-              const SizedBox(height: 28),
-              // Step guide
-              _buildStepGuide(),
-              const SizedBox(height: 28),
-              // Media type toggle
-              MediaTypeSwitch(
-                currentIndex: typeIsMovie,
-                onToggle: (index) => setState(() {
-                  typeIsMovie = index;
-                  _exampleIndex = 0;
-                }),
-              ),
-              const SizedBox(height: 32),
-              // Hero input
+              const SizedBox(height: 10),
+              _buildSubtitle(),
+              const SizedBox(height: 40),
+              // Hero input — the single focal point, with the Movie/TV mode
+              // selector and filters living on it as tools.
               HeroInput(
                 controller: _controller,
                 textFieldKey: textFieldKey,
@@ -226,10 +171,17 @@ class _MainMenuPageState extends State<MainMenuPage> {
                     isMovie: typeIsMovie == 0,
                   );
                 },
+                modeSelector: MediaTypeSwitch(
+                  currentIndex: typeIsMovie,
+                  onToggle: (index) => setState(() {
+                    typeIsMovie = index;
+                    _exampleIndex = 0;
+                  }),
+                ),
               ),
-              const SizedBox(height: 20),
-              // Rotating example chip
-              _buildExampleChips(),
+              const SizedBox(height: 36),
+              // Tappable suggestion launchpad (replaces the step guide)
+              _buildSuggestionChips(),
               const Spacer(flex: 3),
             ],
           ),
@@ -268,47 +220,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
-  Widget _buildExampleChips() {
-    final list = typeIsMovie == 0 ? _movieExamples : _showExamples;
-    final example = list[_exampleIndex % list.length];
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 400),
-      child: GestureDetector(
-        key: ValueKey('$typeIsMovie-$_exampleIndex'),
-        onTap: () {
-          _controller.text = example;
-          _controller.selection = TextSelection.fromPosition(
-            TextPosition(offset: example.length),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          decoration: BoxDecoration(
-            color: context.appColors.surface2,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.lightbulb_outline, color: context.appColors.accent.withValues(alpha: 0.8), size: 13),
-              const SizedBox(width: 5),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width - 104,
-                ),
-                child: Text(
-                  example,
-                  style: TextStyle(color: context.appColors.textSecondary, fontSize: 12),
-                  maxLines: 2,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildHeroHeadline() {
     return Text(
       "main_headline".tr(),
@@ -321,58 +232,83 @@ class _MainMenuPageState extends State<MainMenuPage> {
     );
   }
 
-  Widget _buildStepGuide() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildStep(1, 'step_1'.tr()),
-        _buildStepArrow(),
-        _buildStep(2, 'step_2'.tr()),
-        _buildStepArrow(),
-        _buildStep(3, 'step_3'.tr()),
-      ],
+  Widget _buildSubtitle() {
+    return Text(
+      'step_2'.tr(),
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: context.appColors.textSecondary,
+        fontSize: 14,
+        height: 1.3,
+      ),
     );
   }
 
-  Widget _buildStep(int number, String label) {
-    return Row(
-      children: [
-        Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: context.appColors.accent.withValues(alpha: 0.15),
-            shape: BoxShape.circle,
-            border: Border.all(color: context.appColors.accent.withValues(alpha: 0.5)),
-          ),
-          child: Center(
+  /// A small launchpad of tappable example prompts. They teach by example and
+  /// double as one-tap actions, replacing the old numbered step guide.
+  Widget _buildSuggestionChips() {
+    final list = typeIsMovie == 0 ? _movieExamples : _showExamples;
+    final picks = List.generate(2, (i) => list[(_exampleIndex + i) % list.length]);
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      child: Column(
+        key: ValueKey('$typeIsMovie-$_exampleIndex'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 10),
             child: Text(
-              '$number',
+              'examples'.tr(),
               style: TextStyle(
-                color: context.appColors.accent,
+                color: context.appColors.textTertiary,
                 fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Text(
-          label,
-          style: TextStyle(
-            color: context.appColors.textSecondary,
-            fontSize: 13,
-            height: 1.3,
-          ),
-        ),
-      ],
+          for (final ex in picks) _buildSuggestionRow(ex),
+        ],
+      ),
     );
   }
 
-  Widget _buildStepArrow() {
+  Widget _buildSuggestionRow(String example) {
     return Padding(
-      padding: const EdgeInsets.only(left: 5, top: 4, bottom: 4),
-      child: Icon(Icons.arrow_downward_rounded, color: context.appColors.inactive, size: 14),
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: context.appColors.surface2,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            _controller.text = example;
+            _controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: example.length),
+            );
+          },
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Icon(Icons.auto_awesome_outlined, color: context.appColors.accent.withValues(alpha: 0.85), size: 15),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    example,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: context.appColors.textPrimary, fontSize: 13, height: 1.3),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.north_east_rounded, color: context.appColors.textTertiary, size: 14),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 

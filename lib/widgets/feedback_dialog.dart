@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:watch_next/services/feedback_service.dart';
+import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/utils/app_colors.dart';
 
 class FeedbackDialog extends StatefulWidget {
@@ -11,9 +12,15 @@ class FeedbackDialog extends StatefulWidget {
 }
 
 class _FeedbackDialogState extends State<FeedbackDialog> {
-  int _step = 0; // 0: initial question, 1: review prompt, 2: feedback form
+  int _step = 0; // 0: initial question, 1: feedback form
   final TextEditingController _feedbackController = TextEditingController();
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    UserActionService.logReviewPrompt(outcome: 'shown');
+  }
 
   @override
   void dispose() {
@@ -40,8 +47,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
       case 0:
         return _buildInitialQuestion();
       case 1:
-        return _buildReviewPrompt();
-      case 2:
         return _buildFeedbackForm();
       default:
         return const SizedBox();
@@ -68,9 +73,11 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
               child: _buildButton(
                 text: 'yes'.tr(),
                 color: Colors.green,
-                onPressed: () {
-                  setState(() => _step = 1);
+                onPressed: () async {
                   FeedbackService.markFeedbackDialogShown();
+                  UserActionService.logReviewPrompt(outcome: 'accepted');
+                  Navigator.pop(context);
+                  await FeedbackService.requestReview();
                 },
               ),
             ),
@@ -80,57 +87,9 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                 text: 'not_really'.tr(),
                 color: context.appColors.border,
                 onPressed: () {
-                  setState(() => _step = 2);
+                  setState(() => _step = 1);
                   FeedbackService.markFeedbackDialogShown();
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildReviewPrompt() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'leave_review_title'.tr(),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'leave_review_message'.tr(),
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 14,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            Expanded(
-              child: _buildButton(
-                text: 'maybe_later'.tr(),
-                color: context.appColors.border,
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildButton(
-                text: 'leave_review'.tr(),
-                color: context.appColors.accent,
-                onPressed: () async {
-                  await FeedbackService.requestReview();
-                  if (mounted) Navigator.pop(context);
+                  UserActionService.logReviewPrompt(outcome: 'declined');
                 },
               ),
             ),

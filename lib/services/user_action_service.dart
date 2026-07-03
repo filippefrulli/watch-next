@@ -314,6 +314,15 @@ class UserActionService {
     await logAction('stats_viewed');
   }
 
+  /// Log review prompt interactions
+  static Future<void> logReviewPrompt({
+    required String outcome, // 'shown', 'accepted', 'declined'
+  }) async {
+    await logAction('review_prompt', details: {
+      'outcome': outcome,
+    });
+  }
+
   /// Mark user as premium in Firestore and log the purchase
   static Future<void> markPremium() async {
     try {

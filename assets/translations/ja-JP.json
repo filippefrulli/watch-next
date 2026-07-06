@@ -1,4 +1,7 @@
 {
+  "force_upgrade_title": "アップデートが必要です",
+  "force_upgrade_message": "このバージョンのWatch Nextはサポートされなくなりました。おすすめを受け取り続けるには、最新バージョンに更新してください。",
+  "force_upgrade_button": "今すぐ更新",
   "no_internet": "インターネット接続がありません",
   "hey_there": "こんにちは！",
   "find_something": "次に観るものを見つけよう",

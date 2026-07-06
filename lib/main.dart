@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,11 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
+import 'package:watch_next/pages/force_upgrade_page.dart';
 import 'package:watch_next/pages/intro_page.dart';
 import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/services/user_action_service.dart';
+import 'package:watch_next/services/version_gate_service.dart';
 import 'pages/home_page.dart';
 import 'package:watch_next/utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -21,6 +24,20 @@ void main() async {
   MobileAds.instance.initialize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // App Check attests that requests to our Cloud Functions come from a genuine,
+  // unmodified build of this app, so the API-key proxy can't be abused by
+  // scripts that scraped a function URL. Debug builds use the debug provider
+  // (register the printed debug token in the Firebase console); release builds
+  // use Play Integrity (Android) and App Attest (iOS).
+  await FirebaseAppCheck.instance.activate(
+    providerAndroid: kDebugMode
+        ? AndroidDebugProvider()
+        : AndroidPlayIntegrityProvider(),
+    providerApple: kDebugMode
+        ? AppleDebugProvider()
+        : AppleAppAttestProvider(),
   );
 
   // Disable analytics in debug mode
@@ -194,6 +211,19 @@ class Splash extends StatefulWidget {
 
 class SplashState extends State<Splash> {
   Future checkFirstSeen() async {
+    // Force-upgrade gate: builds older than the Remote Config minimum (e.g.
+    // ones that still call the third-party APIs directly with rotated keys) are
+    // sent to a blocking update screen. Fails open, so a config/network error
+    // never locks anyone out.
+    if (await VersionGateService.isUpdateRequired()) {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const ForceUpgradePage()),
+        );
+      }
+      return;
+    }
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool seen = (prefs.getBool('skip_intro') ?? false);
 

@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
@@ -21,8 +19,7 @@ import 'package:watch_next/services/user_action_service.dart';
 import 'package:watch_next/services/not_interested_service.dart';
 import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:openai_dart/openai_dart.dart';
+import 'package:watch_next/services/backend_service.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/utils/app_colors.dart';
@@ -406,65 +403,12 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           ? '${moviePrompt1(countryName)} ${widget.requestString}. $moviePrompt2 $tasteSignals$priorityInstruction$doNotRecommend'
           : '${seriesPrompt1(countryName)} ${widget.requestString}. $seriesPrompt2 $tasteSignals$priorityInstruction$doNotRecommend';
 
-      // Determine which LLM provider to use via Remote Config
-      final remoteConfig = FirebaseRemoteConfig.instance;
-      final llmProvider = remoteConfig.getString('llm_provider');
+      // Called through the App Check-gated backend proxy so the OpenAI key
+      // never ships in the app; the backend applies the model and settings.
+      final responseContent = await BackendService.llm(user: queryContent);
 
-      String responseContent;
-      if (llmProvider == 'gemini') {
-        // Gemini API call
-        final url =
-            Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent');
-
-        final response = await http.post(
-          url,
-          headers: {
-            'x-goog-api-key': geminiApiKey,
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'contents': [
-              {
-                'parts': [
-                  {'text': queryContent}
-                ]
-              }
-            ],
-            'generationConfig': {
-              'thinkingConfig': {'thinkingLevel': 'low'}
-            }
-          }),
-        );
-
-        if (response.statusCode != 200) {
-          throw Exception('Gemini API request failed: ${response.statusCode} - ${response.body}');
-        }
-
-        final responseData = jsonDecode(response.body);
-        responseContent = responseData['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '';
-
-        if (responseContent.isEmpty) {
-          throw Exception('Empty response from Gemini API');
-        }
-      } else {
-        // OpenAI API call (default)
-        final openAI = OpenAIClient(apiKey: openAiKey);
-        final openAiResponse = await openAI.createChatCompletion(
-          request: CreateChatCompletionRequest(
-            model: ChatCompletionModel.modelId('gpt-5-mini'),
-            messages: [
-              ChatCompletionMessage.user(
-                content: ChatCompletionUserMessageContent.string(queryContent),
-              ),
-            ],
-            reasoningEffort: ReasoningEffort.low,
-          ),
-        );
-        responseContent = openAiResponse.choices.first.message.content ?? '';
-
-        if (responseContent.isEmpty) {
-          throw Exception('Empty response from OpenAI API');
-        }
+      if (responseContent.isEmpty) {
+        throw Exception('Empty response from LLM');
       }
 
       // Parse titles from response and add to cache

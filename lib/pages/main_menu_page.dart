@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:openai_dart/openai_dart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -12,7 +11,7 @@ import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/services/ad_preload_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
-import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/services/backend_service.dart';
 import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/app_colors.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
@@ -30,7 +29,6 @@ class MainMenuPage extends StatefulWidget {
 }
 
 class _MainMenuPageState extends State<MainMenuPage> {
-  late final OpenAIClient openAI;
   final _controller = TextEditingController();
   final GlobalKey textFieldKey = GlobalKey();
 
@@ -53,7 +51,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   void initState() {
     super.initState();
-    openAI = OpenAIClient(apiKey: openAiKey);
     _controller.addListener(_checkLength);
     _loadQuerySettings();
     _exampleTimer = Timer.periodic(const Duration(seconds: 30), (_) {
@@ -325,24 +322,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   Future<void> _validateQuery() async {
     try {
-      final response = await openAI.createChatCompletion(
-        request: CreateChatCompletionRequest(
-          model: ChatCompletionModel.modelId('gpt-5-mini'),
-          messages: [
-            ChatCompletionMessage.system(
-              content: typeIsMovie == 0 ? validationPromptMovie : validationPromptSeries,
-            ),
-            ChatCompletionMessage.user(
-              content: ChatCompletionUserMessageContent.string(_controller.text),
-            ),
-          ],
-          reasoningEffort: ReasoningEffort.low,
-        ),
+      final content = await BackendService.llm(
+        system: typeIsMovie == 0 ? validationPromptMovie : validationPromptSeries,
+        user: _controller.text,
       );
 
       if (mounted) {
         setState(() {
-          isValidQuery = response.choices.first.message.content == "YES";
+          isValidQuery = content == "YES";
           enableLoading = false;
         });
       }

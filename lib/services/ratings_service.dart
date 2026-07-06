@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
+import 'package:watch_next/services/backend_service.dart';
 import 'package:watch_next/utils/database.dart';
-import 'package:watch_next/utils/secrets.dart';
 
 /// Aggregated external ratings for a title, sourced from OMDb.
 class ExternalRatings {
@@ -23,8 +22,9 @@ class ExternalRatings {
 
 /// Fetches IMDb / Rotten Tomatoes / Metacritic scores from OMDb.
 ///
-/// Requires an [omdbApiKey] in secrets.dart. If the key is empty (or any error
-/// occurs) it returns empty ratings so the UI simply hides the extra scores.
+/// Fetched via the App Check-gated OMDb proxy (the key lives server-side). If
+/// any error occurs it returns empty ratings so the UI simply hides the extra
+/// scores.
 ///
 /// OMDb caps free keys at 1000 requests/day, so results are cached in two
 /// layers to stay well under quota:
@@ -35,8 +35,6 @@ class ExternalRatings {
 /// re-request them within the TTL; only transient failures (network/non-200)
 /// are left uncached so they can be retried.
 class RatingsService {
-  static final http.Client _client = http.Client();
-
   // In-memory cache so swiping back and forth doesn't even hit SQLite.
   static final Map<String, ExternalRatings> _cache = {};
 
@@ -44,7 +42,7 @@ class RatingsService {
   static const Duration _ttl = Duration(days: 30);
 
   static Future<ExternalRatings> fetchByImdbId(String? imdbId) async {
-    if (omdbApiKey.isEmpty || imdbId == null || imdbId.isEmpty) {
+    if (imdbId == null || imdbId.isEmpty) {
       return const ExternalRatings();
     }
 
@@ -61,9 +59,7 @@ class RatingsService {
 
     // 3. Fetch from OMDb.
     try {
-      final response = await _client
-          .get(Uri.https('www.omdbapi.com', '/', {'apikey': omdbApiKey, 'i': imdbId}))
-          .timeout(const Duration(seconds: 8));
+      final response = await BackendService.omdbGet({'i': imdbId}).timeout(const Duration(seconds: 8));
 
       // Transient failure — don't cache so the next visit retries.
       if (response.statusCode != 200) return const ExternalRatings();

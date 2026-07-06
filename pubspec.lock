@@ -257,6 +257,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0+3"
+  firebase_app_check:
+    dependency: "direct main"
+    description:
+      name: firebase_app_check
+      sha256: "45f0d279ea7ae4eac1867a4c85aa225761e3ac0ccf646386a860b2bc16581f76"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1+4"
+  firebase_app_check_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_app_check_platform_interface
+      sha256: e32b4e6adeaac207a6f7afe0906d97c0811de42fb200d9b6317a09155de65e2b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1+4"
+  firebase_app_check_web:
+    dependency: transitive
+    description:
+      name: firebase_app_check_web
+      sha256: "2cbc8a18a34813a7e31d7b30f989973087421cd5d0e397b4dd88a90289aa2bed"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2+2"
   firebase_core:
     dependency: "direct main"
     description:
@@ -429,14 +453,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.0.0"
-  freezed_annotation:
-    dependency: transitive
-    description:
-      name: freezed_annotation
-      sha256: "7294967ff0a6d98638e7acb774aac3af2550777accd8149c90af5b014e6d44d8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
   google_mobile_ads:
     dependency: "direct main"
     description:
@@ -621,14 +637,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.0"
-  openai_dart:
-    dependency: "direct main"
-    description:
-      name: openai_dart
-      sha256: "9c74e1ff38243c8987890d9fe4d03f5298352576d4db3a90402625f3f21e2164"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.0+1"
   package_info_plus:
     dependency: "direct main"
     description:

@@ -1,4 +1,7 @@
 {
+  "force_upgrade_title": "Update erforderlich",
+  "force_upgrade_message": "Diese Version von Watch Next wird nicht mehr unterstützt. Bitte aktualisiere auf die neueste Version, um weiterhin Empfehlungen zu erhalten.",
+  "force_upgrade_button": "Jetzt aktualisieren",
   "no_internet": "Keine Internetverbindung",
   "hey_there": "Hey!",
   "find_something": "Finde etwas zum Schauen",

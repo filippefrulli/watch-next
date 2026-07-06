@@ -1,4 +1,7 @@
 {
+  "force_upgrade_title": "Update required",
+  "force_upgrade_message": "This version of Watch Next is no longer supported. Please update to the latest version to keep getting recommendations.",
+  "force_upgrade_button": "Update now",
   "no_internet": "Sorry, no internet connection",
   "hey_there": "Hey There!",
   "find_something": "Find something to watch next",

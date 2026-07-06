@@ -10,7 +10,7 @@ import 'package:watch_next/objects/series_search_results.dart';
 import 'package:watch_next/objects/streaming_service.dart';
 import 'package:watch_next/objects/trailer.dart';
 import 'package:watch_next/objects/watch_providers.dart';
-import 'package:watch_next/utils/secrets.dart';
+import 'package:watch_next/services/backend_service.dart';
 import '../objects/search_results.dart';
 import '../objects/movie_details.dart';
 import 'database_service.dart';
@@ -37,14 +37,19 @@ class WatchProvidersResult {
 }
 
 class HttpService {
-  final String apiKey = tmdbApiKey;
+  // Intentionally empty: the real TMDB key lives server-side in the Cloud
+  // Functions proxy and never ships in the app. Calls below still pass this as
+  // `api_key` for readability, but `_TmdbProxyClient` strips it and the backend
+  // injects the genuine key. See [backend_service.dart].
+  final String apiKey = '';
 
   String thumbnail = "https://i.ytimg.com//vi//d_m5csmrf7I//hqdefault.jpg";
 
   final String baseUrl = 'https://www.youtube.com/watch?v=';
 
-  // Singleton HTTP client for connection reuse
-  static final http.Client _client = http.Client();
+  // Singleton HTTP client for connection reuse. Transparently reroutes any
+  // request to api.themoviedb.org through the App Check-gated backend proxy.
+  static final http.Client _client = _TmdbProxyClient();
 
   // Getter to access the shared client
   static http.Client get client => _client;
@@ -1069,4 +1074,38 @@ class CategorizedWatchProviders {
   });
 
   bool get isEmpty => streaming.isEmpty && rent.isEmpty && buy.isEmpty;
+}
+
+/// An [http.Client] that transparently routes any request bound for
+/// `api.themoviedb.org` through the App Check-gated Cloud Functions TMDB proxy,
+/// keeping the real TMDB key server-side. Requests to any other host pass
+/// through untouched. Centralising this here means no TMDB call site can
+/// accidentally hit TMDB directly or forget the App Check token.
+class _TmdbProxyClient extends http.BaseClient {
+  final http.Client _inner = http.Client();
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    if (request.url.host != 'api.themoviedb.org') {
+      return _inner.send(request);
+    }
+
+    // Rebuild the URL against the proxy, dropping the (empty) api_key param the
+    // backend injects itself, and attach the App Check token.
+    final params = Map<String, String>.from(request.url.queryParameters)..remove('api_key');
+    final proxied = Uri.parse('${BackendService.base}/tmdb${request.url.path}')
+        .replace(queryParameters: params.isEmpty ? null : params);
+
+    final forwarded = http.Request(request.method, proxied)
+      ..headers.addAll(request.headers)
+      ..followRedirects = request.followRedirects
+      ..maxRedirects = request.maxRedirects;
+    if (request is http.Request) {
+      forwarded.bodyBytes = request.bodyBytes;
+    }
+    final token = await BackendService.appCheckToken();
+    if (token != null) forwarded.headers['X-Firebase-AppCheck'] = token;
+
+    return _inner.send(forwarded);
+  }
 }

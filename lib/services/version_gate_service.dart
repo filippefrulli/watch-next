@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -19,7 +20,9 @@ class VersionGateService {
       final rc = FirebaseRemoteConfig.instance;
       await rc.setConfigSettings(RemoteConfigSettings(
         fetchTimeout: const Duration(seconds: 8),
-        minimumFetchInterval: const Duration(hours: 6),
+        // Debug builds refetch every launch so config changes (e.g. bumping
+        // min_required_build to test the gate) take effect without a reinstall.
+        minimumFetchInterval: kDebugMode ? Duration.zero : const Duration(hours: 6),
       ));
       // Default 0 means "no minimum" until we set a value in the console.
       await rc.setDefaults({_minBuildKey: 0});

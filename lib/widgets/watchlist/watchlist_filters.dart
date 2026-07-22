@@ -90,7 +90,9 @@ class WatchlistFilters extends StatelessWidget {
           Text(
             'available_only'.tr(),
             style: TextStyle(
-              color: showOnlyAvailable ? context.appColors.accent : context.appColors.textSecondary,
+              color: showOnlyAvailable
+                  ? context.appColors.accent
+                  : context.appColors.textSecondary,
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -99,7 +101,7 @@ class WatchlistFilters extends StatelessWidget {
           Switch(
             value: showOnlyAvailable,
             onChanged: (_) => onAvailabilityToggled(),
-            activeColor: context.appColors.accent,
+            activeThumbColor: context.appColors.accent,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ],
@@ -150,7 +152,8 @@ class WatchlistFilters extends StatelessWidget {
     });
   }
 
-  PopupMenuItem<String> _buildMenuItem(BuildContext context, String value, IconData icon, String label) {
+  PopupMenuItem<String> _buildMenuItem(
+      BuildContext context, String value, IconData icon, String label) {
     final isSelected = mediaTypeFilter == value;
     return PopupMenuItem<String>(
       value: value,
@@ -159,13 +162,17 @@ class WatchlistFilters extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: isSelected ? context.appColors.accent : context.appColors.textSecondary,
+            color: isSelected
+                ? context.appColors.accent
+                : context.appColors.textSecondary,
           ),
           const SizedBox(width: 12),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? context.appColors.accent : context.appColors.textPrimary,
+              color: isSelected
+                  ? context.appColors.accent
+                  : context.appColors.textPrimary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               fontSize: 14,
             ),

@@ -46,7 +46,7 @@ class _BrowsePageState extends State<BrowsePage> {
   List<BrowseItem> _upcoming = [];
   List<BrowseItem> _hiddenGems = [];
   // provider id → items
-  Map<int, List<BrowseItem>> _providerCarousels = {};
+  final Map<int, List<BrowseItem>> _providerCarousels = {};
   List<int> _prioritisedUserServices = [];
 
   List<Playlist> _playlists = [];
@@ -160,7 +160,8 @@ class _BrowsePageState extends State<BrowsePage> {
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.white))
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.white))
             : _errorMessage.isNotEmpty
                 ? Center(
                     child: Padding(
@@ -168,12 +169,14 @@ class _BrowsePageState extends State<BrowsePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                          const Icon(Icons.error_outline,
+                              color: Colors.red, size: 64),
                           const SizedBox(height: 16),
                           SelectableText(
                             _errorMessage,
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                            style: TextStyle(
+                                color: Colors.grey[400], fontSize: 13),
                           ),
                           const SizedBox(height: 24),
                           ElevatedButton(
@@ -217,16 +220,20 @@ class _BrowsePageState extends State<BrowsePage> {
                                 GestureDetector(
                                   onTap: () => Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                                    MaterialPageRoute(
+                                        builder: (_) => const SettingsPage()),
                                   ),
                                   child: Container(
                                     width: 36,
                                     height: 36,
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.tertiary,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: const Icon(Icons.settings_rounded, color: Colors.white, size: 18),
+                                    child: const Icon(Icons.settings_rounded,
+                                        color: Colors.white, size: 18),
                                   ),
                                 ),
                               ],
@@ -259,7 +266,8 @@ class _BrowsePageState extends State<BrowsePage> {
                             if (_providerCarousels.containsKey(providerId) &&
                                 _providerCarousels[providerId]!.isNotEmpty)
                               _buildCarouselSection(
-                                title: '${'new_on'.tr()} ${_providerNames[providerId] ?? ''}',
+                                title:
+                                    '${'new_on'.tr()} ${_providerNames[providerId] ?? ''}',
                                 items: _providerCarousels[providerId]!,
                               ),
 
@@ -280,7 +288,8 @@ class _BrowsePageState extends State<BrowsePage> {
                           // Curated Playlists
                           if (_playlists.isNotEmpty) ...[
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                              padding:
+                                  const EdgeInsets.fromLTRB(20, 24, 20, 12),
                               child: Text(
                                 'curated_playlists'.tr(),
                                 style: const TextStyle(
@@ -357,7 +366,8 @@ class _BrowsePageState extends State<BrowsePage> {
   }
 
   Widget _buildCarouselItem(BrowseItem item) {
-    final isAvailable = item.availabilityLoaded && item.isAvailableOnStreaming(_userServiceIds);
+    final isAvailable =
+        item.availabilityLoaded && item.isAvailableOnStreaming(_userServiceIds);
     final hasRentOrBuy = item.availabilityLoaded && item.hasRentOrBuy;
 
     return GestureDetector(
@@ -376,7 +386,8 @@ class _BrowsePageState extends State<BrowsePage> {
                     borderRadius: BorderRadius.circular(8),
                     child: item.posterPath != null
                         ? CachedNetworkImage(
-                            imageUrl: 'https://image.tmdb.org/t/p/w342${item.posterPath}',
+                            imageUrl:
+                                'https://image.tmdb.org/t/p/w342${item.posterPath}',
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,
@@ -391,7 +402,8 @@ class _BrowsePageState extends State<BrowsePage> {
                             ),
                             errorWidget: (context, url, error) => Container(
                               color: context.appColors.surface,
-                              child: const Icon(Icons.movie, color: Colors.grey),
+                              child:
+                                  const Icon(Icons.movie, color: Colors.grey),
                             ),
                           )
                         : Container(
@@ -404,7 +416,8 @@ class _BrowsePageState extends State<BrowsePage> {
                       top: 6,
                       right: 6,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
                           color: isAvailable
                               ? Colors.green.withValues(alpha: 0.9)
@@ -414,7 +427,9 @@ class _BrowsePageState extends State<BrowsePage> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          isAvailable ? 'stream'.tr() : (hasRentOrBuy ? 'rent_buy'.tr() : 'N/A'),
+                          isAvailable
+                              ? 'stream'.tr()
+                              : (hasRentOrBuy ? 'rent_buy'.tr() : 'N/A'),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -482,7 +497,8 @@ class _BrowsePageState extends State<BrowsePage> {
                             const SizedBox(height: 4),
                             Text(
                               '${playlist.items.length} ${'titles'.tr()}',
-                              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                              style: TextStyle(
+                                  color: Colors.grey[500], fontSize: 12),
                             ),
                           ],
                         ),

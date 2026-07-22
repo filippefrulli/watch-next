@@ -331,7 +331,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
 
   Future<void> _importFromImdb() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['csv'],
       );
@@ -350,7 +350,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         );
       }
 
-      final file = result.files.single;
+      final file = result.files.first;
       final (successCount, skippedCount, failedCount) = await _importService.importFromCsv(File(file.path!));
 
       if (mounted) {
@@ -422,7 +422,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
 
   Future<void> _importFromLetterboxd() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['csv'],
       );
@@ -441,7 +441,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
         );
       }
 
-      final file = result.files.single;
+      final file = result.files.first;
       final (successCount, skippedCount, failedCount) = await _letterboxdImportService.importFromCsv(File(file.path!));
 
       if (mounted) {

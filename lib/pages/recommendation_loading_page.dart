@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/objects/region.dart';
 import 'package:watch_next/pages/recommendation_results_page.dart';
 import 'package:watch_next/services/database_service.dart';
+import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/services/ad_preload_service.dart';
 import 'package:watch_next/services/purchase_service.dart';
 import 'package:watch_next/services/http_service.dart';
@@ -21,7 +22,6 @@ import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/backend_service.dart';
 import 'package:watch_next/utils/prompts.dart';
-import 'package:watch_next/utils/secrets.dart';
 import 'package:watch_next/utils/app_colors.dart';
 
 class RecommendationLoadingPage extends StatefulWidget {
@@ -45,7 +45,8 @@ class RecommendationLoadingPage extends StatefulWidget {
   });
 
   @override
-  State<RecommendationLoadingPage> createState() => _RecommendationLoadingPageState();
+  State<RecommendationLoadingPage> createState() =>
+      _RecommendationLoadingPageState();
 }
 
 class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
@@ -223,7 +224,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  LoadingAnimationWidget.threeArchedCircle(color: Colors.white, size: 36),
+                  LoadingAnimationWidget.threeArchedCircle(
+                      color: Colors.white, size: 36),
                   const SizedBox(height: 16),
                   // Step label
                   Text(
@@ -234,7 +236,10 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
                             : filtering
                                 ? "filtering".tr()
                                 : '',
-                    style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
@@ -242,7 +247,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _stepDot(active: askingGpt || fetchingMovieInfo || filtering),
+                      _stepDot(
+                          active: askingGpt || fetchingMovieInfo || filtering),
                       const SizedBox(width: 8),
                       _stepDot(active: fetchingMovieInfo || filtering),
                       const SizedBox(width: 8),
@@ -260,7 +266,10 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
                         child: Text(
                           _tips[_tipIndex].tr(),
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey[500], fontSize: 13, height: 1.4),
+                          style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 13,
+                              height: 1.4),
                         ),
                       ),
                     ),
@@ -289,7 +298,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: context.appColors.border, width: 1),
             ),
-            child: Icon(Icons.movie_outlined, color: context.appColors.inactive, size: 56),
+            child: Icon(Icons.movie_outlined,
+                color: context.appColors.inactive, size: 56),
           ),
           const SizedBox(height: 16),
           Container(
@@ -339,15 +349,23 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       );
 
       // Format excluded titles for the prompt
-      final excludedTitlesStr = QueryCacheService.formatExcludedTitlesForPrompt(cachedTitles);
+      final excludedTitlesStr =
+          QueryCacheService.formatExcludedTitlesForPrompt(cachedTitles);
       // Also exclude any seed titles passed in (e.g. the movie we're finding similars for)
-      final seedExclusion = widget.itemsToNotRecommend.isNotEmpty ? widget.itemsToNotRecommend : '';
+      final seedExclusion = widget.itemsToNotRecommend.isNotEmpty
+          ? widget.itemsToNotRecommend
+          : '';
       // Exclude titles already in the user's watchlist or watched history
-      final watchlistItems =
-          widget.excludeWatchlist ? await WatchlistService().getWatchlist().first : <WatchlistItem>[];
-      final watchlistTitles = watchlistItems.take(50).map((i) => i.title).join(', ');
-      final watchedItems = widget.excludeWatched ? await WatchedService().getWatchedList() : <WatchedItem>[];
-      final watchedTitles = watchedItems.take(50).map((i) => i.title).join(', ');
+      final watchlistItems = widget.excludeWatchlist
+          ? await WatchlistService().getWatchlist().first
+          : <WatchlistItem>[];
+      final watchlistTitles =
+          watchlistItems.take(50).map((i) => i.title).join(', ');
+      final watchedItems = widget.excludeWatched
+          ? await WatchedService().getWatchedList()
+          : <WatchedItem>[];
+      final watchedTitles =
+          watchedItems.take(50).map((i) => i.title).join(', ');
       final notInterestedTitles = await NotInterestedService.getTitles();
       final notInterestedStr = notInterestedTitles.join(', ');
       final allExcluded = [
@@ -357,7 +375,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
         if (watchedTitles.isNotEmpty) watchedTitles,
         if (notInterestedStr.isNotEmpty) notInterestedStr,
       ].join(', ');
-      String doNotRecommend = allExcluded.isNotEmpty ? doNotRecommendPrefix + allExcluded : '';
+      String doNotRecommend =
+          allExcluded.isNotEmpty ? doNotRecommendPrefix + allExcluded : '';
 
       // Check if user has limited streaming services (1-2) and add priority instruction
       String priorityInstruction = '';
@@ -380,13 +399,17 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       final regionCode = prefs.getString('region') ?? 'US';
       final region = availableRegions.firstWhere(
         (r) => r.iso == regionCode,
-        orElse: () => Region(iso: 'US', englishName: 'United States', foreignName: 'United States'),
+        orElse: () => Region(
+            iso: 'US',
+            englishName: 'United States',
+            foreignName: 'United States'),
       );
       final countryName = region.englishName ?? 'United States';
 
       // Build taste signals from watched history
       final watchedService = WatchedService();
-      final highlyRated = await watchedService.getHighlyRatedItems(threshold: 7);
+      final highlyRated =
+          await watchedService.getHighlyRatedItems(threshold: 7);
       final lowRated = await watchedService.getLowRatedItems(threshold: 5);
       String tasteSignals = '';
       if (highlyRated.isNotEmpty) {
@@ -396,7 +419,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       }
       if (lowRated.isNotEmpty) {
         final disliked = lowRated.take(5).map((i) => i.title).join(', ');
-        tasteSignals += 'The user gave low ratings to: $disliked. Avoid recommending titles too similar to these. ';
+        tasteSignals +=
+            'The user gave low ratings to: $disliked. Avoid recommending titles too similar to these. ';
       }
 
       String queryContent = widget.type == 0
@@ -412,7 +436,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       }
 
       // Parse titles from response and add to cache
-      final newTitles = QueryCacheService.parseTitlesFromResponse(responseContent);
+      final newTitles =
+          QueryCacheService.parseTitlesFromResponse(responseContent);
       await QueryCacheService.addExcludedTitles(
         widget.type,
         widget.requestString,
@@ -434,7 +459,9 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       final watchlistIds = watchlistItems.map((i) => i.mediaId).toSet();
       final watchedIds = watchedItems.map((i) => i.mediaId).toSet();
       final excludedIds = watchlistIds.union(watchedIds);
-      return filtered.where((w) => w.id == null || !excludedIds.contains(w.id)).toList();
+      return filtered
+          .where((w) => w.id == null || !excludedIds.contains(w.id))
+          .toList();
     } catch (e) {
       // Log error to Firebase Analytics
       FirebaseAnalytics.instance.logEvent(
@@ -489,7 +516,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       List<String> list = movieTitle.split('y:');
       if (list.length > 1) {
         if (widget.type == 0) {
-          final movieResult = await HttpService().findMovieByTitle(list[0], list[1]);
+          final movieResult =
+              await HttpService().findMovieByTitle(list[0], list[1]);
           if (movieResult.id != null) {
             return WatchObject(
               posterPath: movieResult.posterPath,
@@ -500,7 +528,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
             );
           }
         } else {
-          final seriesResult = await HttpService().findShowByTitle(list[0], list[1]);
+          final seriesResult =
+              await HttpService().findShowByTitle(list[0], list[1]);
           if (seriesResult.id != null) {
             return WatchObject(
               posterPath: seriesResult.posterPath,
@@ -525,7 +554,8 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     return watchObjectsList;
   }
 
-  Future<List<WatchObject>> filterProviders(List<WatchObject> watchObjectList) async {
+  Future<List<WatchObject>> filterProviders(
+      List<WatchObject> watchObjectList) async {
     setState(() {
       filtering = true;
     });

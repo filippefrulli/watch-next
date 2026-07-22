@@ -15,7 +15,7 @@ class ImdbImportService {
     try {
       // Read the CSV file
       final input = file.readAsStringSync();
-      final csvData = const CsvToListConverter().convert(input, eol: '\n');
+      final csvData = Csv().decode(input);
 
       if (csvData.isEmpty) {
         return (0, 0, 0);

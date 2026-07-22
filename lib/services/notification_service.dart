@@ -64,7 +64,7 @@ class NotificationService {
     );
 
     await _localNotifications.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: _onLocalNotificationTap,
     );
   }
@@ -106,7 +106,7 @@ class NotificationService {
   /// Schedule a weekly notification for Friday at 6 PM local time
   static Future<void> scheduleWeeklyFridayReminder({BuildContext? context}) async {
     // Cancel any existing weekly reminder first
-    await _localNotifications.cancel(_weeklyReminderId);
+    await _localNotifications.cancel(id: _weeklyReminderId);
 
     // Get translated strings - use fallback if context not available
     String title;
@@ -144,11 +144,11 @@ class NotificationService {
     );
 
     await _localNotifications.zonedSchedule(
-      _weeklyReminderId,
-      title,
-      body,
-      _nextFriday(18, 0), // Friday at 6:00 PM
-      notificationDetails,
+      id: _weeklyReminderId,
+      title: title,
+      body: body,
+      scheduledDate: _nextFriday(18, 0), // Friday at 6:00 PM
+      notificationDetails: notificationDetails,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime, // Repeats weekly!
       payload: 'weekly_reminder',
@@ -172,7 +172,7 @@ class NotificationService {
 
   /// Cancel weekly reminder
   static Future<void> cancelWeeklyReminder() async {
-    await _localNotifications.cancel(_weeklyReminderId);
+    await _localNotifications.cancel(id: _weeklyReminderId);
     debugPrint('Weekly Friday reminder cancelled');
   }
 

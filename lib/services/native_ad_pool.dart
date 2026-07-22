@@ -83,7 +83,7 @@ class NativeAdPool {
           size: 13.0,
         ),
       ),
-    )..load();
+    ).load();
   }
 
   void dispose() {

@@ -28,7 +28,7 @@ class IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: context.appColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -39,31 +39,13 @@ class IntroPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 56),
-                    // App glyph
+                    // App glyph — orange mark reads clean on the near-black base
                     DelayedDisplay(
                       delay: const Duration(milliseconds: 80),
-                      child: Container(
-                        width: 64,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [context.appColors.accent, context.appColors.accentDark],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.appColors.accent.withValues(alpha: 0.35),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Image.asset('assets/icon_transparent.png'),
-                        ),
+                      child: Image.asset(
+                        'assets/icon_transparent.png',
+                        width: 72,
+                        height: 72,
                       ),
                     ),
                     const SizedBox(height: 32),

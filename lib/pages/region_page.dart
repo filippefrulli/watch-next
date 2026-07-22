@@ -17,12 +17,38 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
   String? _selectedIso;
   String? _initialRegion;
   List<Region> _filteredRegions = availableRegions;
+  final ScrollController _scrollController = ScrollController();
+
+  // Approximate height of a single country row (content + vertical padding +
+  // divider). Used to scroll the pre-selected country into view.
+  static const double _tileExtent = 81;
 
   @override
   initState() {
     availableRegions.sort((a, b) => a.englishName!.compareTo(b.englishName!));
     super.initState();
     _loadInitialRegion();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Scrolls the currently selected country into view so an auto-detected
+  /// pre-selection is visible rather than hidden below the fold.
+  void _scrollToSelected() {
+    final iso = _selectedIso;
+    if (iso == null || !_scrollController.hasClients) return;
+    final index = _filteredRegions.indexWhere((r) => r.iso == iso);
+    if (index < 0) return;
+    final target = (index * _tileExtent - 120).clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _onSearchChanged(String value) {
@@ -53,6 +79,12 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
           if (mounted) setState(() => _selectedIso = match.iso);
         }
       }
+    }
+
+    // Once a country is pre-selected, bring it into view so the selection is
+    // visible instead of hidden below the fold.
+    if (_selectedIso != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSelected());
     }
   }
 
@@ -161,6 +193,7 @@ class _SecondIntroScreenState extends State<RegionIntroPage> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: ListView.separated(
+            controller: _scrollController,
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: _filteredRegions.length,
             separatorBuilder: (context, index) => Divider(

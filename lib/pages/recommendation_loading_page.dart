@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watch_next/utils/app_toast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -160,14 +160,11 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
         );
       } else {
         if (mounted) {
-          Fluttertoast.showToast(
-            msg: _noStreamingMatch ? 'no_movies'.tr() : 'no_titles_found'.tr(),
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 4,
+          AppToast.showText(
+            _noStreamingMatch ? 'no_movies'.tr() : 'no_titles_found'.tr(),
+            gravity: ToastGravity.center,
+            duration: const Duration(seconds: 4),
             backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0,
           );
           Navigator.of(context).pop();
         }
@@ -479,14 +476,11 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        Fluttertoast.showToast(
-          msg: "invalid_query".tr(),
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 3,
+        AppToast.showText(
+          "invalid_query".tr(),
+          gravity: ToastGravity.center,
+          duration: const Duration(seconds: 3),
           backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
         );
       }
 

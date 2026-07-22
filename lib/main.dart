@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_next/firebase_options.dart';
 import 'package:watch_next/pages/force_upgrade_page.dart';
@@ -92,22 +91,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OKToast(
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        navigatorObservers: [
-          FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
-        ],
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        debugShowCheckedModeBanner: false,
-        builder: (context, child) {
-          return ScrollConfiguration(
-            behavior: MyBehavior(),
-            child: child!,
-          );
-        },
+    return MaterialApp(
+      navigatorKey: navigatorKey,
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: MyBehavior(),
+          child: child!,
+        );
+      },
         theme: ThemeData(
           colorScheme: theme.colorScheme.copyWith(
             primary: AppColors.defaults.background,
@@ -197,8 +195,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         home: const Splash(),
-      ),
-    );
+      );
   }
 }
 

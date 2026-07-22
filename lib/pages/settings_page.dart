@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_next/services/purchase_service.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:watch_next/utils/app_toast.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:watch_next/pages/language_page.dart';
@@ -582,12 +582,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                     if (!dialogContext.mounted) return;
                                     Navigator.pop(dialogContext);
 
-                                    Fluttertoast.showToast(
-                                      msg: success ? 'feedback_sent'.tr() : 'feedback_error'.tr(),
-                                      toastLength: Toast.LENGTH_LONG,
-                                      gravity: ToastGravity.BOTTOM,
+                                    AppToast.showText(
+                                      success ? 'feedback_sent'.tr() : 'feedback_error'.tr(),
+                                      gravity: ToastGravity.bottom,
                                       backgroundColor: success ? Colors.green : Colors.red,
-                                      textColor: Colors.white,
                                     );
                                   },
                             child: Center(

@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:oktoast/oktoast.dart';
+import 'package:watch_next/utils/app_toast.dart';
 import 'package:watch_next/pages/recommendation_loading_page.dart';
 import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/notification_service.dart';
@@ -344,7 +344,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
       if (mounted) {
         setState(() => enableLoading = false);
-        showToastWidget(
+        AppToast.showWidget(
           ToastWidget(
             title: "error_occurred".tr(),
             icon: const Icon(Icons.error_outline, color: Colors.red, size: 36),
@@ -360,7 +360,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     await _checkConnection();
 
     if (noInternet) {
-      showToastWidget(
+      AppToast.showWidget(
         ToastWidget(
           title: "connect_to_internet".tr(),
           icon: Icon(Icons.cloud_off, color: context.appColors.accent, size: 36),

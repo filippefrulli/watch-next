@@ -53,12 +53,23 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  // The app is dark-only, so the system bars need light (white) icons to stay
+  // legible now that they're drawn on top of our background.
+  //
+  // Deliberately no statusBarColor / systemNavigationBarColor / divider color:
+  // those go through Window.setStatusBarColor & friends, which Android 15
+  // deprecated and Play Console flags. Under edge-to-edge the bars are
+  // transparent anyway and the app paints behind them.
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarIconBrightness: Brightness.dark,
-    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark, // iOS: dark background -> light icons
   ));
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive).then(
+  // Edge-to-edge on every Android version, not just 15+. Targeting SDK 35
+  // makes Android force it regardless; requesting it explicitly is the
+  // backward-compatible equivalent of enableEdgeToEdge().
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then(
     (_) => runApp(
       EasyLocalization(
         supportedLocales: const [
@@ -264,20 +275,21 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePa
   @override
   void initState() {
     super.initState();
+    // Applied once here rather than on every build. The overlay style matches
+    // the one set in main() — see the note there on why no bar colours are set.
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemNavigationBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+    ));
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarIconBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.dark));
-
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: [SystemUiOverlay.top]);
-
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {},
       child: Scaffold(

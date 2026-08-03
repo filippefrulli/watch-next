@@ -124,7 +124,10 @@ class _StreamingServicesPage extends State<StreamingServicesPage> with TickerPro
     return FutureBuilder<dynamic>(
       future: resultList,
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        // An empty list is as much a dead end as a thrown error — without the
+        // grid there is nothing to select and no way off this step — so both
+        // land on the retry state rather than an endless spinner.
+        if (snapshot.hasError || (snapshot.hasData && snapshot.data.length == 0)) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(32),

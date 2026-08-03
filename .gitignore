@@ -52,3 +52,5 @@ key.properties
 .env.local
 
 .vscode
+# Local dev config (App Check debug token) — never commit
+dev.json

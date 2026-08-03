@@ -11,8 +11,6 @@ import 'package:watch_next/services/feedback_service.dart';
 import 'package:watch_next/services/notification_service.dart';
 import 'package:watch_next/services/ad_preload_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
-import 'package:watch_next/services/backend_service.dart';
-import 'package:watch_next/utils/prompts.dart';
 import 'package:watch_next/utils/app_colors.dart';
 import 'package:watch_next/widgets/feedback_dialog.dart';
 import 'package:watch_next/widgets/main_menu/hero_input.dart';
@@ -34,7 +32,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   bool isLongEnough = false;
   bool hasText = false;
-  bool isValidQuery = false;
   bool enableLoading = false;
   bool noInternet = false;
   int typeIsMovie = 0;
@@ -320,41 +317,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
   }
 
-  Future<void> _validateQuery() async {
-    try {
-      final content = await BackendService.llm(
-        system: typeIsMovie == 0 ? validationPromptMovie : validationPromptSeries,
-        user: _controller.text,
-      );
-
-      if (mounted) {
-        setState(() {
-          isValidQuery = content == "YES";
-          enableLoading = false;
-        });
-      }
-    } catch (e) {
-      FirebaseAnalytics.instance.logEvent(
-        name: 'api_error',
-        parameters: <String, Object>{
-          'error': 'validation_query_failed',
-          'message': e.toString(),
-        },
-      );
-
-      if (mounted) {
-        setState(() => enableLoading = false);
-        AppToast.showWidget(
-          ToastWidget(
-            title: "error_occurred".tr(),
-            icon: const Icon(Icons.error_outline, color: Colors.red, size: 36),
-          ),
-          duration: const Duration(seconds: 4),
-        );
-      }
-    }
-  }
-
   Future<void> _onGoPressed() async {
     FocusScope.of(context).unfocus();
     await _checkConnection();
@@ -372,37 +334,21 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
     if (!isLongEnough || !mounted) return;
 
-    setState(() {
-      enableLoading = true;
-      isValidQuery = false;
-    });
-
-    await _validateQuery();
-    if (!mounted) return;
-
-    if (isValidQuery) {
-      await _handleValidQuery();
-    } else {
-      _handleInvalidQuery();
-    }
+    // Validation used to be its own blocking LLM round trip here, before the
+    // recommendation request had even started. It's now folded into the
+    // recommendation prompt, so we go straight to the loading page and find
+    // out from its result whether the query was usable. enableLoading still
+    // disables the button for the hop, so a double tap can't push twice.
+    setState(() => enableLoading = true);
+    await _handleQuery();
+    if (mounted) setState(() => enableLoading = false);
   }
 
-  Future<void> _handleValidQuery() async {
-    FirebaseAnalytics.instance.logEvent(
-      name: 'valid_prompt',
-      parameters: <String, Object>{
-        "type": typeIsMovie == 0 ? "movie" : "show",
-      },
-    );
-
-    await FeedbackService.incrementSuccessfulQuery();
-
-    if (!mounted) return;
-
+  Future<void> _handleQuery() async {
     // Build the full query with settings suffix
     final fullQuery = _controller.text + _querySettings.toPromptSuffix(isMovie: typeIsMovie == 0);
 
-    await Navigator.of(context).push(
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => RecommendationLoadingPage(
           requestString: fullQuery,
@@ -414,6 +360,23 @@ class _MainMenuPageState extends State<MainMenuPage> {
         ),
       ),
     );
+
+    if (!mounted) return;
+
+    if (result == invalidQueryResult) {
+      await _handleInvalidQuery();
+      return;
+    }
+
+    // Only a query that actually produced recommendations counts as valid.
+    FirebaseAnalytics.instance.logEvent(
+      name: 'valid_prompt',
+      parameters: <String, Object>{
+        "type": typeIsMovie == 0 ? "movie" : "show",
+      },
+    );
+
+    await FeedbackService.incrementSuccessfulQuery();
 
     if (mounted) {
       final shouldShow = await FeedbackService.shouldShowFeedbackDialog();

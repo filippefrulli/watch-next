@@ -27,15 +27,29 @@ void main() async {
 
   // App Check attests that requests to our Cloud Functions come from a genuine,
   // unmodified build of this app, so the API-key proxy can't be abused by
-  // scripts that scraped a function URL. Debug builds use the debug provider
-  // (register the printed debug token in the Firebase console); release builds
-  // use Play Integrity (Android) and App Attest (iOS).
+  // scripts that scraped a function URL. Debug builds use the debug provider;
+  // release builds use Play Integrity (Android) and App Attest (iOS).
+  //
+  // Without a token every proxied call 401s, which makes the app look broken
+  // (the streaming-services step of onboarding can't load its list). The debug
+  // provider mints a *new* random token on every fresh install, so relying on
+  // the auto-generated one means re-registering it in the Firebase console
+  // after every wipe. Instead pass a fixed token you registered once:
+  //
+  //   flutter run --dart-define-from-file=dev.json
+  //
+  // with dev.json (gitignored) holding {"APP_CHECK_DEBUG_TOKEN": "<uuid>"}.
+  // Register that uuid under Firebase Console → App Check → the app →
+  // Manage debug tokens. Falling back to null keeps the old behaviour (a
+  // freshly generated token logged at startup) when the define is absent.
+  const rawDebugToken = String.fromEnvironment('APP_CHECK_DEBUG_TOKEN');
+  final debugToken = rawDebugToken.isEmpty ? null : rawDebugToken;
   await FirebaseAppCheck.instance.activate(
     providerAndroid: kDebugMode
-        ? AndroidDebugProvider()
+        ? AndroidDebugProvider(debugToken: debugToken)
         : AndroidPlayIntegrityProvider(),
     providerApple: kDebugMode
-        ? AppleDebugProvider()
+        ? AppleDebugProvider(debugToken: debugToken)
         : AppleAppAttestProvider(),
   );
 

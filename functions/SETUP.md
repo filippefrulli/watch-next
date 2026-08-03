@@ -1,15 +1,24 @@
 # Watch Next — API key proxy setup
 
-All third-party API keys (OpenAI, TMDB, OMDb) now live **server-side**
-in these Cloud Functions and no longer ship inside the app binary. The app
-reaches them through App Check-gated endpoints, so a decompiled build no longer
-leaks any usable key.
+The **paid** third-party keys live **server-side** in these Cloud Functions and
+never ship inside the app binary. The app reaches them through App Check-gated
+endpoints, so a decompiled build leaks nothing that costs money.
 
 Functions:
 - `llm`  — OpenAI recommendation + query validation. Has a global daily
   request cap (`LLM_DAILY_CAP` in `src/index.ts`) as a cost safety valve.
-- `tmdb` — transparent TMDB v3 pass-through.
+- `tmdb` — transparent TMDB v3 pass-through. **No longer used by the current
+  app**, which calls TMDB directly (see below). Keep it deployed for older
+  installs until the force-upgrade gate has retired them.
 - `omdb` — OMDb ratings pass-through.
+
+### Why TMDB is *not* proxied
+Routing TMDB through App Check meant any device that fails attestation — a
+debug build without a registered token, an emulator, a non-Play install — could
+load *nothing*, not even the streaming-service list in onboarding, making the
+app look broken. TMDB v3 is free with generous limits, so `tmdbApiKey` in
+`lib/utils/secrets.dart` ships in the binary and is treated as public. Rotate it
+if it gets abused; nothing else depends on it.
 
 ## One-time setup
 
@@ -46,10 +55,31 @@ In Firebase Console → **App Check**:
    new app version with App Check is live (see rollout note below).
 
 #### Local debug testing
-Debug builds use the App Check *debug* provider. On first run the app logs a
-debug token like:
-`App Check debug token: 01234567-89AB-...`
-Copy it into Firebase Console → App Check → your app → **Manage debug tokens**.
+Debug builds use the App Check *debug* provider. Left to itself it mints a
+**new random token on every fresh install**, so you'd have to re-register it in
+the console after every wipe — and until you do, every proxied call 401s and the
+app looks broken (most visibly: the streaming-services onboarding step can't
+load its list).
+
+Use a **fixed** token instead. `dev.json` in the repo root (gitignored) holds it:
+
+```json
+{ "APP_CHECK_DEBUG_TOKEN": "<uuid>" }
+```
+
+1. Register that uuid under Firebase Console → App Check → the app →
+   **Manage debug tokens** (any uuid works; you invent it, the console accepts
+   it). Do this once per app registration — Android and iOS are separate apps in
+   App Check, so add it under both.
+2. Run with it:
+   ```bash
+   flutter run --dart-define-from-file=dev.json
+   ```
+   In VS Code, add `"--dart-define-from-file=dev.json"` to `args` in
+   `.vscode/launch.json`; in Android Studio, to *Additional run args*.
+
+Without the define, `main.dart` falls back to the auto-generated token printed
+at startup, i.e. the old behaviour.
 
 ### 5. Rotate the old keys
 After the secrets are set and functions deployed, rotate (regenerate) the keys

@@ -29,6 +29,10 @@ class MovieInfoPanel extends StatefulWidget {
   final List<String> trailerImages;
   final Function(String) onTrailerTap;
 
+  /// Controller supplied by [SlidingUpPanel.panelBuilder] so a downward drag
+  /// anywhere in the panel closes it while the content is scrolled to the top.
+  final ScrollController? scrollController;
+
   const MovieInfoPanel({
     super.key,
     required this.mediaId,
@@ -39,6 +43,7 @@ class MovieInfoPanel extends StatefulWidget {
     required this.trailerList,
     required this.trailerImages,
     required this.onTrailerTap,
+    this.scrollController,
   });
 
   @override
@@ -280,6 +285,7 @@ class _MovieInfoPanelState extends State<MovieInfoPanel> {
             // Scrollable content
             Expanded(
               child: SingleChildScrollView(
+                controller: widget.scrollController,
                 physics: const ClampingScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),

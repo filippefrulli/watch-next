@@ -398,7 +398,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
           SlidingUpPanel(
             controller: pc,
             margin: const EdgeInsets.all(8.0),
-            panel: MovieInfoPanel(
+            panelBuilder: (sc) => MovieInfoPanel(
               mediaId: selectedWatchObject.id!,
               title: selectedWatchObject.title ?? '',
               overview: selectedWatchObject.overview ?? '',
@@ -407,6 +407,7 @@ class _RecommendationResultsPageState extends State<RecommendationResultsPage> {
               trailerList: trailerList,
               trailerImages: trailerImages,
               onTrailerTap: _launchURL,
+              scrollController: sc,
             ),
             borderRadius: const BorderRadius.all(
               Radius.circular(25),

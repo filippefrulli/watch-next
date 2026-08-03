@@ -76,6 +76,9 @@ async function withinDailyLlmCap(): Promise<boolean> {
 // Returns: { content }
 // ---------------------------------------------------------------------------
 export const llm = onRequest(
+  // Deliberately no minInstances: a warm container costs ~$8/month to shave a
+  // cold start off the fraction of requests that hit a scaled-to-zero service.
+  // Revisit only if tail latency is still bad once the cheap wins are measured.
   { secrets: [OPENAI_KEY], timeoutSeconds: 120, memory: "256MiB" },
   async (req, res) => {
     if (req.method !== "POST") {
@@ -113,7 +116,10 @@ export const llm = onRequest(
         body: JSON.stringify({
           model: "gpt-5.4-mini",
           messages,
-          reasoning_effort: "low",
+          // Recall, not reasoning: the model is listing films it already knows,
+          // so reasoning tokens bought nothing but latency. "none" makes it
+          // behave like a non-reasoning model and answer immediately.
+          reasoning_effort: "none",
         }),
       });
       if (!r.ok) {

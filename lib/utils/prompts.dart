@@ -21,7 +21,9 @@ STREAMING AVAILABILITY: Prioritize movies that are widely available on streaming
 
 DIVERSITY: Ensure a healthy variety across your 40 results — mix tones (e.g. serious and lighthearted), sub-genres, release decades, and countries of origin. Avoid clustering too many similar titles together.
 
-SIMILAR TITLES: If given a specific movie name, return that movie plus 39 similar ones.
+SIMILAR TITLES: If the user names a specific movie (a bare title, "a movie like X", "something similar to X"), NEVER include that movie itself — the user has already seen it and is asking what to watch next. Return 40 other movies that match it in tone, theme or style. Sequels, prequels and remakes of it are allowed, the movie itself is not.
+
+NO DUPLICATES: All 40 entries must be different movies. Never list the same movie twice, including under an alternate spelling, a translated title, a subtitle variant or with/without a leading article (e.g. "The Terminator" and "Terminator" are the same movie — list it once).
 
 USER CRITERIA:''';
 
@@ -47,7 +49,9 @@ STREAMING AVAILABILITY: Prioritize TV shows that are widely available on streami
 
 DIVERSITY: Ensure a healthy variety across your 40 results — mix tones (e.g. serious and lighthearted), sub-genres, episode formats, release decades, and countries of origin. Avoid clustering too many similar titles together.
 
-SIMILAR TITLES: If given a specific show name, return that show plus 39 similar ones.
+SIMILAR TITLES: If the user names a specific show (a bare title, "a show like X", "something similar to X"), NEVER include that show itself — the user has already seen it and is asking what to watch next. Return 40 other shows that match it in tone, theme or style. Spin-offs and reboots of it are allowed, the show itself is not.
+
+NO DUPLICATES: All 40 entries must be different shows. Never list the same show twice, including under an alternate spelling, a translated title, a subtitle variant or with/without a leading article (e.g. "The Office" and "Office" are the same show — list it once).
 
 USER CRITERIA:''';
 

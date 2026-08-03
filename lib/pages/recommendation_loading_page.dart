@@ -22,6 +22,7 @@ import 'package:watch_next/services/watched_service.dart';
 import 'package:watch_next/services/watchlist_service.dart';
 import 'package:watch_next/services/backend_service.dart';
 import 'package:watch_next/utils/prompts.dart';
+import 'package:watch_next/utils/result_filters.dart';
 import 'package:watch_next/utils/app_colors.dart';
 
 /// Popped as this route's result when the LLM judged the query unusable, so
@@ -69,6 +70,10 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
   bool _adLoaded = false;
   bool _noStreamingMatch = false;
   bool _invalidQuery = false;
+
+  /// Titles left after duplicates and the seed title are dropped, so the
+  /// debug yield line separates our own filtering from TMDB lookup misses.
+  int _uniqueTitleCount = 0;
 
   // Rotating tips shown under the progress indicator to reduce perceived wait.
   Timer? _tipTimer;
@@ -467,8 +472,9 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
           '· total ${llmMs + tmdbSearchMs + providersMs}ms',
         );
         debugPrint(
-          '📊 yield: ${newTitles.length} from LLM → ${parsed.length} found on TMDB '
-          '→ ${filtered.length} on user services → ${finalResults.length} cards shown',
+          '📊 yield: ${newTitles.length} from LLM → $_uniqueTitleCount unique/non-seed '
+          '→ ${parsed.length} found on TMDB → ${filtered.length} on user services '
+          '→ ${finalResults.length} cards shown',
         );
       }
 
@@ -507,7 +513,10 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       fetchingMovieInfo = true;
     });
 
-    List<String> responseTitles = response.split(',,');
+    // The model repeats itself often enough — sometimes verbatim, sometimes as
+    // an article or punctuation variant of a title it already listed — that the
+    // duplicates have to be dropped here rather than trusted to the prompt.
+    List<String> responseTitles = dedupeResponseEntries(response.split(',,'));
     if (responseTitles.isEmpty) {
       FirebaseAnalytics.instance.logEvent(
         name: 'empty_results',
@@ -518,6 +527,13 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
       );
       return [];
     }
+
+    // "A movie like Terminator" is a request for what to watch after it, not
+    // for Terminator — drop the seed before spending a TMDB lookup on it.
+    responseTitles = responseTitles
+        .where((entry) => !isSeedTitle(entry.split('y:').first, widget.requestString))
+        .toList();
+    _uniqueTitleCount = responseTitles.length;
 
     // Parallelize HTTP requests using Future.wait
     final futures = responseTitles.map((movieTitle) async {
@@ -551,7 +567,19 @@ class _RecommendationLoadingPageState extends State<RecommendationLoadingPage> {
     }).toList();
 
     final results = await Future.wait(futures);
-    final watchObjectsList = results.whereType<WatchObject>().toList();
+
+    // Second pass over the resolved titles: two different spellings from the
+    // model ("Terminator 2" / "Terminator 2: Judgment Day") land on the same
+    // TMDB id, and the localized title TMDB returns is the one that has to be
+    // matched against a request written in the user's own language.
+    final seenIds = <int>{};
+    final watchObjectsList = <WatchObject>[];
+    for (final watchObject in results.whereType<WatchObject>()) {
+      if (watchObject.id != null && !seenIds.add(watchObject.id!)) continue;
+      final title = watchObject.title;
+      if (title != null && isSeedTitle(title, widget.requestString)) continue;
+      watchObjectsList.add(watchObject);
+    }
 
     setState(() {
       fetchingMovieInfo = false;
